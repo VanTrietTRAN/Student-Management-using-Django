@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import dj_database_url
 import os
 from pathlib import Path
+from django.core.management.utils import get_random_secret_key
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,13 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('MY_SECRET_KEY')  # Consider using your secret key
+# Use an environment variable in production. For development provide a safe fallback.
+SECRET_KEY = os.environ.get('asdfasvnvaksdnvlakwnv') or os.environ.get('SECRET_KEY') or get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # ALLOWED_HOSTS = ['smswithdjango.herokuapp.com']
-ALLOWED_HOSTS = ['*']  # Not recommended but useful in dev mode
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # Not recommended but useful in dev mode
 
 
 # Application definition
@@ -46,6 +48,9 @@ INSTALLED_APPS = [
     # My Apps
     'main_app.apps.MainAppConfig'
 ]
+
+# Set default auto field to silence model primary key warnings
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -158,7 +163,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 
-EMAIL_HOST_USER = os.environ.get('EMAIL_ADDRESS') 
+EMAIL_HOST_USER = os.environ.get('EMAIL_ADDRESS')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = "Student Management System <admin@admin.com>"
