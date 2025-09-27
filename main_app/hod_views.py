@@ -9,32 +9,32 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
+from django.contrib.auth.models import Group, Permission
 
 from .forms import *
+from .middleware import require_hod
 from .models import *
 
 
 def admin_home(request):
     total_staff = Staff.objects.all().count()
     total_students = Student.objects.all().count()
-    subjects = Subject.objects.all()
-    total_subject = subjects.count()
     total_course = Course.objects.all().count()
-    attendance_list = Attendance.objects.filter(subject__in=subjects)
-    total_attendance = attendance_list.count()
+
+    # Attendance aggregation by course (instead of subject)
+    courses = Course.objects.all()
+    course_list = []
     attendance_list = []
-    subject_list = []
-    for subject in subjects:
-        attendance_count = Attendance.objects.filter(subject=subject).count()
-        subject_list.append(subject.name[:7])
+    for course in courses:
+        attendance_count = Attendance.objects.filter(subject__course=course).count()
+        course_list.append(course.name[:12])
         attendance_list.append(attendance_count)
     context = {
         'page_title': "Administrative Dashboard",
         'total_students': total_students,
         'total_staff': total_staff,
         'total_course': total_course,
-        'total_subject': total_subject,
-        'subject_list': subject_list,
+        'course_list': course_list,
         'attendance_list': attendance_list
 
     }
@@ -563,6 +563,48 @@ def admin_view_profile(request):
             messages.error(
                 request, "Error Occured While Updating Profile " + str(e))
     return render(request, "hod_template/admin_view_profile.html", context)
+
+
+@require_hod
+def manage_permissions(request):
+    # Ensure default groups exist
+    staff_group, _ = Group.objects.get_or_create(name="Staff")
+    student_group, _ = Group.objects.get_or_create(name="Student")
+
+    # Build form
+    form = PermissionAssignmentForm(request.POST or None)
+    context = {
+        'page_title': 'Manage Permissions',
+        'form': form,
+        'staff_group': staff_group,
+        'student_group': student_group,
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            target_user = form.cleaned_data['target_user']
+            selected_groups = form.cleaned_data['groups']
+            selected_perms = form.cleaned_data['user_permissions']
+
+            # Update groups
+            target_user.groups.set(selected_groups)
+            # Update direct permissions
+            target_user.user_permissions.set(selected_perms)
+            # Keep user_type in sync with assigned role groups for UI/redirects
+            group_names = set(g.name for g in selected_groups)
+            if 'Staff' in group_names and 'Student' in group_names:
+                messages.warning(request, "User assigned to both Staff and Student groups. user_type unchanged.")
+            elif 'Staff' in group_names:
+                target_user.user_type = '2'
+            elif 'Student' in group_names:
+                target_user.user_type = '3'
+            # If neither Staff nor Student, leave user_type as is (could be HOD)
+            target_user.save()
+            messages.success(request, "Permissions and role updated successfully")
+            return redirect(reverse('manage_permissions'))
+        else:
+            messages.error(request, "Please correct the errors below")
+
+    return render(request, 'hod_template/manage_permissions.html', context)
 
 
 def admin_notify_staff(request):

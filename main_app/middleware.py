@@ -24,3 +24,31 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 pass
             else:
                 return redirect(reverse('login_page'))
+
+
+def require_group(group_name):
+    def decorator(view_func):
+        def _wrapped(request, *args, **kwargs):
+            if request.user.is_authenticated and request.user.groups.filter(name=group_name).exists():
+                return view_func(request, *args, **kwargs)
+            return redirect(reverse('login_page'))
+        return _wrapped
+    return decorator
+
+
+def require_permission(perm_codename):
+    def decorator(view_func):
+        def _wrapped(request, *args, **kwargs):
+            if request.user.is_authenticated and request.user.has_perm(perm_codename):
+                return view_func(request, *args, **kwargs)
+            return redirect(reverse('login_page'))
+        return _wrapped
+    return decorator
+
+
+def require_hod(view_func):
+    def _wrapped(request, *args, **kwargs):
+        if request.user.is_authenticated and (getattr(request.user, 'user_type', None) == '1' or request.user.is_superuser):
+            return view_func(request, *args, **kwargs)
+        return redirect(reverse('login_page'))
+    return _wrapped

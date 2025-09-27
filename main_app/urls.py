@@ -39,6 +39,7 @@ urlpatterns = [
          name='admin_notify_staff'),
     path("admin_view_profile", hod_views.admin_view_profile,
          name='admin_view_profile'),
+    path("admin/manage-permissions/", hod_views.manage_permissions, name='manage_permissions'),
     path("check_email_availability", hod_views.check_email_availability,
          name="check_email_availability"),
     path("session/manage/", hod_views.manage_session, name='manage_session'),

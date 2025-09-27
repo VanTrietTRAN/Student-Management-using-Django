@@ -1,5 +1,6 @@
 from django import forms
 from django.forms.widgets import DateInput, TextInput
+from django.contrib.auth.models import Group, Permission
 
 from .models import *
 
@@ -189,3 +190,32 @@ class EditResultForm(FormSettings):
     class Meta:
         model = StudentResult
         fields = ['session_year', 'subject', 'student', 'test', 'exam']
+
+
+class PermissionAssignmentForm(forms.Form):
+    target_user = forms.ModelChoiceField(label="User", queryset=CustomUser.objects.none())
+    groups = forms.ModelMultipleChoiceField(
+        label="Groups",
+        queryset=Group.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={"class": "form-control"})
+    )
+    user_permissions = forms.ModelMultipleChoiceField(
+        label="Permissions",
+        queryset=Permission.objects.all().select_related("content_type"),
+        required=False,
+        widget=forms.SelectMultiple(attrs={"class": "form-control"})
+    )
+
+    def __init__(self, *args, **kwargs):
+        user_queryset = kwargs.pop("user_queryset", None)
+        super(PermissionAssignmentForm, self).__init__(*args, **kwargs)
+        if user_queryset is None:
+            self.fields["target_user"].queryset = CustomUser.objects.filter(user_type__in=[2, 3]).order_by("first_name", "last_name")
+        else:
+            self.fields["target_user"].queryset = user_queryset
+        # Style alignment with existing forms
+        for field in self.visible_fields():
+            existing = field.field.widget.attrs.get('class', '')
+            field.field.widget.attrs['class'] = (existing + ' form-control').strip()
+

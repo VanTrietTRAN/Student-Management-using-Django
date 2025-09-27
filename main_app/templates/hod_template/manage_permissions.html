@@ -1,0 +1,49 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>{{ page_title }}</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Assign Groups</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>{{ form.target_user.label }}</label>
+                        {{ form.target_user }}
+                        {% if form.target_user.errors %}
+                            <div class="text-danger small">{{ form.target_user.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.groups.label }}</label>
+                        {{ form.groups }}
+                        {% if form.groups.errors %}
+                            <div class="text-danger small">{{ form.groups.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {# Permissions selector intentionally hidden per request #}
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

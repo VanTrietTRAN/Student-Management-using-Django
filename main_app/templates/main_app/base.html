@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Student Management System</title>
+    <title>{% block html_title %}Student Management System{% endblock html_title %}</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
@@ -28,7 +28,9 @@
     <!-- summernote -->
     <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.css'%} ">
     <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=swap" rel="stylesheet">
     {% block custom_css %}
 
     {% endblock custom_css %}
@@ -87,19 +89,39 @@
             <div class="col-md-12">
             <div class="form-group">
                 {% if messages %}
-                {% for message in messages  %}
-    
-                {% if message.tags == 'success' %}
-                <div class="alert alert-success">
-                    {{message}}
-                </div>
-                {% else %}
-                <div class="alert alert-danger">
-                    {{message}}
-                </div>
-                {% endif %}
-    
-                {% endfor %}
+                    {% for message in messages %}
+                        {% with tag=message.tags %}
+                            {% if 'success' in tag %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% elif 'error' in tag or 'danger' in tag %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% elif 'warning' in tag %}
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
                 {% endif %}
             </div>
             </div></div></div></section>
@@ -115,39 +137,36 @@
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
-    <script src="{% static 'plugins/jquery/jquery.min.js'%} "></script>
+    <script src="{% static 'plugins/jquery/jquery.min.js'%} " defer></script>
     <!-- jQuery UI 1.11.4 -->
-    <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js'%} "></script>
+    <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js'%} " defer></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-    <script>
+    <script defer>
         $.widget.bridge('uibutton', $.ui.button)
     </script>
     <!-- Bootstrap 4 -->
-    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js'%} "></script>
+    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js'%} " defer></script>
     <!-- ChartJS -->
-    <script src="{% static 'plugins/chart.js/Chart.min.js'%} "></script>
+    <script src="{% static 'plugins/chart.js/Chart.min.js'%} " defer></script>
     <!-- Sparkline -->
-    <script src="{% static 'plugins/sparklines/sparkline.js'%} "></script>
+    <script src="{% static 'plugins/sparklines/sparkline.js'%} " defer></script>
     <!-- JQVMap -->
-    <script src="{% static 'plugins/jqvmap/jquery.vmap.min.js'%} "></script>
-    <script src="{% static 'plugins/jqvmap/maps/jquery.vmap.usa.js'%} "></script>
+    <script src="{% static 'plugins/jqvmap/jquery.vmap.min.js'%} " defer></script>
+    <script src="{% static 'plugins/jqvmap/maps/jquery.vmap.usa.js'%} " defer></script>
     <!-- jQuery Knob Chart -->
-    <script src="{% static 'plugins/jquery-knob/jquery.knob.min.js'%} "></script>
+    <script src="{% static 'plugins/jquery-knob/jquery.knob.min.js'%} " defer></script>
     <!-- daterangepicker -->
-    <script src="{% static 'plugins/moment/moment.min.js'%} "></script>
-    <script src="{% static 'plugins/daterangepicker/daterangepicker.js'%} "></script>
+    <script src="{% static 'plugins/moment/moment.min.js'%} " defer></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js'%} " defer></script>
     <!-- Tempusdominus Bootstrap 4 -->
-    <script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js'%} "></script>
+    <script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js'%} " defer></script>
     <!-- Summernote -->
-    <script src="{% static 'plugins/summernote/summernote-bs4.min.js'%} "></script>
+    <script src="{% static 'plugins/summernote/summernote-bs4.min.js'%} " defer></script>
     <!-- overlayScrollbars -->
-    <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js'%} "></script>
+    <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js'%} " defer></script>
     <!-- AdminLTE App -->
-    <script src="{% static 'dist/js/adminlte.js'%} "></script>
-    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="{% static 'dist/js/pages/dashboard.js'%} "></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="{% static 'dist/js/demo.js'%} "></script>
+    <script src="{% static 'dist/js/adminlte.js'%} " defer></script>
+    
     {% block custom_js %}
 
     {% endblock custom_js %}

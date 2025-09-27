@@ -127,6 +127,11 @@ $  cd student-management-using-django
 $  pip3 install -r requirements.txt
 ```
 
+**5. Apply Migrations**
+```bash
+$ python manage.py migrate
+```
+
 **5. Add the hosts**
 
 - Got to settings.py file 
@@ -137,7 +142,21 @@ ALLOWED_HOSTS = []
 *Do not use the fault allowed settings in this repo. It has security risk!*
 
 
-**6. Now Run Server**
+**6. (Optional) Create sample data or superuser**
+
+Create Super User (HOD):
+```bash
+$ python manage.py createsuperuser
+```
+
+Set up default Groups & Permissions (Staff, Student):
+```bash
+$ python manage.py setup_groups_permissions
+```
+
+You can later assign Groups/Permissions via UI at: `/admin/manage-permissions/`.
+
+**7. Now Run Server**
 
 Command for PC:
 ```python
@@ -154,7 +173,21 @@ Command for Linux:
 $ python3 manage.py runserver
 ```
 
-**7. Login Credentials**
+**8. Login**
+
+App Login Page:
+```
+http://127.0.0.1:8000/
+```
+
+Admin Permission Management UI:
+```
+http://127.0.0.1:8000/admin/manage-permissions/
+```
+
+You can log in using the superuser created above, or use the default demo credentials below.
+
+**Default Demo Credentials**
 
 Create Super User (HOD)
 Command for PC:
@@ -178,7 +211,7 @@ Then Add Email and Password
 
 **or Use Default Credentials**
 
-*For HOD /SuperAdmin*
+*For HOD / SuperAdmin*
 Email: admin@admin.com
 Password: admin
 

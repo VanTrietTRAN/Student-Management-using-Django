@@ -3,12 +3,18 @@
     <div class="card-body">
 
 
-        {% for field in form  %}
+        {% for field in form %}
         <div class="form-group">
-            {{field.errors}}
-            {{field.label_tag}}
-            {{field}}
-
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+            {% endif %}
+            {% if field.errors %}
+                <div class="invalid-feedback" style="display:block;">
+                    {{ field.errors|striptags }}
+                </div>
+            {% endif %}
         </div>
         {% endfor %}
 
