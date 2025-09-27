@@ -100,7 +100,7 @@ python manage.py collectstatic --settings=core.settings.base
 ### Run
 From the [backend](backend) folder, runt this command:
 ```
-python manage.py runserve
+python manage.py runserver
 ```
 You can also open the project with Visual Studio Code, Open the `Run and Debug tab` and run the config `Run Dev`
 

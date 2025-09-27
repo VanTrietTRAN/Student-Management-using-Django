@@ -5,3 +5,12 @@ from .article import Article
 from .section import Section
 from .section_article import SectionArticle
 from .build import Build
+from .student import Student
+from .classroom import Classroom
+from .subject import Subject
+from .grade import Grade
+from .tuition import Tuition
+from .notification import Notification
+from .reward import Reward
+from .teacher import Teacher
+from .staff import Staff

@@ -25,17 +25,37 @@
                             <IconDashboard class="el-icon" />
                             <span>{{ t('Dashboard') }}</span>
                         </el-menu-item>
-                        <el-menu-item index="/websites/sites">
-                            <IconWebsite class="el-icon" />
-                            <span>{{ t('Sites') }}</span>
+                        <el-menu-item index="/websites/students">
+                            <IconUsers class="el-icon" />
+                            <span>{{ t('Quản lý sinh viên') }}</span>
                         </el-menu-item>
-                        <el-menu-item index="/websites/articles">
+                        <el-menu-item index="/websites/classes">
+                            <IconCalendar class="el-icon" />
+                            <span>{{ t('Quản lý lớp học') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/subjects">
                             <Document class="el-icon" />
-                            <span>{{ t('Articles') }}</span>
+                            <span>{{ t('Quản lý môn học') }}</span>
                         </el-menu-item>
-                        <el-menu-item index="/websites/categories">
-                            <Folder class="el-icon" />
-                            <span>{{ t('Article_categories') }}</span>
+                        <el-menu-item index="/websites/grades">
+                            <IconAppraisal class="el-icon" />
+                            <span>{{ t('Quản lý điểm số') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/schedule">
+                            <IconCalendar class="el-icon" />
+                            <span>{{ t('Lịch học & thi') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/tuition">
+                            <IconFile class="el-icon" />
+                            <span>{{ t('Quản lý học phí') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/notifications">
+                            <IconBulb class="el-icon" />
+                            <span>{{ t('Thông báo') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/rewards">
+                            <IconAppraisal class="el-icon" />
+                            <span>{{ t('Khen thưởng & Kỷ luật') }}</span>
                         </el-menu-item>
                     </Sidebar>
                 </aside>
@@ -54,7 +74,12 @@
 import AmozLogo from "/assets/icons/Logo.svg";
 import IconWebsite from "~/assets/icons/website.svg";
 import IconDashboard from "~/assets/icons/dashboard.svg";
-import { Document, Folder } from '@element-plus/icons-vue';
+import IconUsers from "~/assets/icons/users.svg";
+import IconCalendar from "~/assets/icons/calendar.svg";
+import IconFile from "~/assets/icons/file.svg";
+import IconAppraisal from "~/assets/icons/appraisal.svg";
+import IconBulb from "~/assets/icons/bulb.svg";
+import { Document } from '@element-plus/icons-vue';
 import { useOauthStore } from "@/stores/oauth";
 
 const { t } = useI18n();

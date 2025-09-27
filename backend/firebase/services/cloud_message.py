@@ -118,8 +118,7 @@ class CloudMessageService(BaseService):
 
         # Send the message
         response = messaging.send_each_for_multicast(multicast_message=message)
-        success_message = f'{
-            response.success_count} messages were sent successfully'
+        success_message = f'{response.success_count} messages were sent successfully'
         print(success_message)
 
         return success_message
