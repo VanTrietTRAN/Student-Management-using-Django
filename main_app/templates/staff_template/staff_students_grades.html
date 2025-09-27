@@ -1,0 +1,313 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                        <div class="card-tools">
+                            <a href="{% url 'staff_manage_students' %}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Back to Students
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filter Section -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="courseFilter">Select Course</label>
+                                    <select class="form-control" id="courseFilter">
+                                        <option value="">Choose Course</option>
+                                        {% for course in courses %}
+                                        <option value="{{ course.id }}">{{ course.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-primary btn-block" id="loadGrades">
+                                        <i class="fas fa-search"></i> Load Students
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-info btn-block" id="testLoad">
+                                        <i class="fas fa-test-tube"></i> Test Load
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Grades Table -->
+                        <div class="table-responsive">
+                            <table id="gradesTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Course</th>
+                                        <th>Test Score</th>
+                                        <th>Exam Score</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gradesTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">
+                                            Please select a course to load students
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Grade Edit Modal -->
+<div class="modal fade" id="gradeEditModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Grade</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="gradeEditForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="editStudentId" name="student_id">
+                    <input type="hidden" id="editSubjectId" name="subject_id">
+                    <div class="form-group">
+                        <label for="editTestScore">Test Score</label>
+                        <input type="number" class="form-control" id="editTestScore" name="test_score" min="0" max="100" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="editExamScore">Exam Score</label>
+                        <input type="number" class="form-control" id="editExamScore" name="exam_score" min="0" max="100" step="0.1">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveGrade">Save Grade</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+$(document).ready(function() {
+    let currentCourseId = null;
+    
+    // Load students when button is clicked
+    $('#loadGrades').click(function() {
+        currentCourseId = $('#courseFilter').val();
+        console.log('Load button clicked, courseId:', currentCourseId);
+        alert('Load button clicked! Course ID: ' + currentCourseId);
+        
+        if (!currentCourseId) {
+            alert('Please select a course');
+            return;
+        }
+        
+        loadStudents(currentCourseId);
+    });
+    
+    // Auto-load students when course is selected
+    $('#courseFilter').change(function() {
+        const courseId = $('#courseFilter').val();
+        console.log('Course changed, courseId:', courseId);
+        alert('Course changed! Course ID: ' + courseId);
+        
+        if (courseId) {
+            currentCourseId = courseId;
+            loadStudents(courseId);
+        }
+    });
+    
+    // Test load all students
+    $('#testLoad').click(function() {
+        console.log('Testing load all students');
+        alert('Test button clicked!');
+        $.ajax({
+            url: '{% url "staff_students_grades" %}',
+            type: 'GET',
+            data: {
+                'test': 'true'
+            },
+            success: function(response) {
+                console.log('Test response:', response);
+                alert('Test response: ' + JSON.stringify(response));
+                if (response.success) {
+                    updateGradesTable(response.data);
+                } else {
+                    alert('Test Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Test AJAX Error:', xhr.responseText);
+                alert('Test Error: ' + error);
+            }
+        });
+    });
+    
+    // Load students function
+    function loadStudents(courseId) {
+        console.log('Loading students for course:', courseId);
+        alert('loadStudents function called with courseId: ' + courseId);
+        $.ajax({
+            url: '{% url "staff_students_grades" %}',
+            type: 'GET',
+            data: {
+                'course_id': courseId
+            },
+            success: function(response) {
+                console.log('Response:', response);
+                alert('AJAX Success! Response: ' + JSON.stringify(response));
+                if (response.success) {
+                    updateGradesTable(response.data);
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('AJAX Error:', xhr.responseText);
+                alert('AJAX Error: ' + error + ' - Response: ' + xhr.responseText);
+            }
+        });
+    }
+    
+    // Update grades table
+    function updateGradesTable(gradesData) {
+        console.log('Updating grades table with data:', gradesData);
+        const tbody = $('#gradesTableBody');
+        tbody.empty();
+        
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable('#gradesTable')) {
+            $('#gradesTable').DataTable().destroy();
+        }
+        
+        if (gradesData && gradesData.length > 0) {
+            console.log(`Adding ${gradesData.length} students to table`);
+            gradesData.forEach(function(grade) {
+                tbody.append(`
+                    <tr>
+                        <td>${grade.student_id}</td>
+                        <td>${grade.name}</td>
+                        <td>${grade.email}</td>
+                        <td>${grade.course || 'N/A'}</td>
+                        <td>
+                            <input type="number" class="form-control test-score" 
+                                   data-student-id="${grade.student_id}" 
+                                   data-course-id="${currentCourseId}"
+                                   value="${grade.test_score}"
+                                   min="0" max="100" step="0.1" placeholder="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control exam-score" 
+                                   data-student-id="${grade.student_id}" 
+                                   data-course-id="${currentCourseId}"
+                                   value="${grade.exam_score}"
+                                   min="0" max="100" step="0.1" placeholder="0">
+                        </td>
+                        <td class="total-score">${grade.total}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary save-grade-btn" 
+                                    data-student-id="${grade.student_id}" 
+                                    data-course-id="${currentCourseId}">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+            
+            // Initialize DataTable after data is loaded
+            $('#gradesTable').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "paging": false,
+                "searching": false,
+                "info": false
+            });
+        } else {
+            console.log('No students found');
+            tbody.append(`
+                <tr>
+                    <td colspan="8" class="text-center text-muted">
+                        No students found for the selected course
+                    </td>
+                </tr>
+            `);
+        }
+    }
+    
+    // Calculate total score
+    $(document).on('input', '.test-score, .exam-score', function() {
+        const row = $(this).closest('tr');
+        const testScore = parseFloat(row.find('.test-score').val()) || 0;
+        const examScore = parseFloat(row.find('.exam-score').val()) || 0;
+        const total = testScore + examScore;
+        row.find('.total-score').text(total.toFixed(1));
+    });
+    
+    // Save grade
+    $(document).on('click', '.save-grade-btn', function() {
+        const studentId = $(this).data('student-id');
+        const courseId = $(this).data('course-id');
+        const row = $(this).closest('tr');
+        const testScore = row.find('.test-score').val();
+        const examScore = row.find('.exam-score').val();
+        
+        console.log('Saving grade for student:', studentId, 'course:', courseId);
+        
+        $.ajax({
+            url: '{% url "staff_save_grade" %}',
+            type: 'POST',
+            data: {
+                'student_id': studentId,
+                'course_id': courseId,
+                'test_score': testScore,
+                'exam_score': examScore,
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    $(this).removeClass('btn-primary').addClass('btn-success').html('<i class="fas fa-check"></i> Saved');
+                    setTimeout(() => {
+                        $(this).removeClass('btn-success').addClass('btn-primary').html('<i class="fas fa-save"></i> Save');
+                    }, 2000);
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Error saving grade');
+            }
+        });
+    });
+    
+    // Initialize DataTable will be done after data is loaded
+});
+</script>
+{% endblock custom_js %}

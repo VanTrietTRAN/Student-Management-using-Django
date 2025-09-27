@@ -37,167 +37,6 @@ def staff_home(request):
     return render(request, 'staff_template/home_content.html', context)
 
 
-def staff_take_attendance(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    subjects = Subject.objects.filter(staff_id=staff)
-    sessions = Session.objects.all()
-    context = {
-        'subjects': subjects,
-        'sessions': sessions,
-        'page_title': 'Take Attendance'
-    }
-
-    return render(request, 'staff_template/staff_take_attendance.html', context)
-
-
-@csrf_exempt
-def get_students(request):
-    subject_id = request.POST.get('subject')
-    session_id = request.POST.get('session')
-    try:
-        subject = get_object_or_404(Subject, id=subject_id)
-        session = get_object_or_404(Session, id=session_id)
-        students = Student.objects.filter(
-            course_id=subject.course.id, session=session)
-        student_data = []
-        for student in students:
-            data = {
-                    "id": student.id,
-                    "name": student.admin.last_name + " " + student.admin.first_name
-                    }
-            student_data.append(data)
-        return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
-    except Exception as e:
-        return e
-
-
-
-@csrf_exempt
-def save_attendance(request):
-    student_data = request.POST.get('student_ids')
-    date = request.POST.get('date')
-    subject_id = request.POST.get('subject')
-    session_id = request.POST.get('session')
-    students = json.loads(student_data)
-    try:
-        session = get_object_or_404(Session, id=session_id)
-        subject = get_object_or_404(Subject, id=subject_id)
-
-        # Check if an attendance object already exists for the given date and session
-        attendance, created = Attendance.objects.get_or_create(session=session, subject=subject, date=date)
-
-        for student_dict in students:
-            student = get_object_or_404(Student, id=student_dict.get('id'))
-
-            # Check if an attendance report already exists for the student and the attendance object
-            attendance_report, report_created = AttendanceReport.objects.get_or_create(student=student, attendance=attendance)
-
-            # Update the status only if the attendance report was newly created
-            if report_created:
-                attendance_report.status = student_dict.get('status')
-                attendance_report.save()
-
-    except Exception as e:
-        return None
-
-    return HttpResponse("OK")
-
-
-def staff_update_attendance(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    subjects = Subject.objects.filter(staff_id=staff)
-    sessions = Session.objects.all()
-    context = {
-        'subjects': subjects,
-        'sessions': sessions,
-        'page_title': 'Update Attendance'
-    }
-
-    return render(request, 'staff_template/staff_update_attendance.html', context)
-
-
-@csrf_exempt
-def get_student_attendance(request):
-    attendance_date_id = request.POST.get('attendance_date_id')
-    try:
-        date = get_object_or_404(Attendance, id=attendance_date_id)
-        attendance_data = AttendanceReport.objects.filter(attendance=date)
-        student_data = []
-        for attendance in attendance_data:
-            data = {"id": attendance.student.admin.id,
-                    "name": attendance.student.admin.last_name + " " + attendance.student.admin.first_name,
-                    "status": attendance.status}
-            student_data.append(data)
-        return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
-    except Exception as e:
-        return e
-
-
-@csrf_exempt
-def update_attendance(request):
-    student_data = request.POST.get('student_ids')
-    date = request.POST.get('date')
-    students = json.loads(student_data)
-    try:
-        attendance = get_object_or_404(Attendance, id=date)
-
-        for student_dict in students:
-            student = get_object_or_404(
-                Student, admin_id=student_dict.get('id'))
-            attendance_report = get_object_or_404(AttendanceReport, student=student, attendance=attendance)
-            attendance_report.status = student_dict.get('status')
-            attendance_report.save()
-    except Exception as e:
-        return None
-
-    return HttpResponse("OK")
-
-
-def staff_apply_leave(request):
-    form = LeaveReportStaffForm(request.POST or None)
-    staff = get_object_or_404(Staff, admin_id=request.user.id)
-    context = {
-        'form': form,
-        'leave_history': LeaveReportStaff.objects.filter(staff=staff),
-        'page_title': 'Apply for Leave'
-    }
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                obj = form.save(commit=False)
-                obj.staff = staff
-                obj.save()
-                messages.success(
-                    request, "Application for leave has been submitted for review")
-                return redirect(reverse('staff_apply_leave'))
-            except Exception:
-                messages.error(request, "Could not apply!")
-        else:
-            messages.error(request, "Form has errors!")
-    return render(request, "staff_template/staff_apply_leave.html", context)
-
-
-def staff_feedback(request):
-    form = FeedbackStaffForm(request.POST or None)
-    staff = get_object_or_404(Staff, admin_id=request.user.id)
-    context = {
-        'form': form,
-        'feedbacks': FeedbackStaff.objects.filter(staff=staff),
-        'page_title': 'Add Feedback'
-    }
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                obj = form.save(commit=False)
-                obj.staff = staff
-                obj.save()
-                messages.success(request, "Feedback submitted for review")
-                return redirect(reverse('staff_feedback'))
-            except Exception:
-                messages.error(request, "Could not Submit!")
-        else:
-            messages.error(request, "Form has errors!")
-    return render(request, "staff_template/staff_feedback.html", context)
 
 
 def staff_view_profile(request):
@@ -262,51 +101,316 @@ def staff_view_notification(request):
     return render(request, "staff_template/staff_view_notification.html", context)
 
 
-def staff_add_result(request):
+
+
+# ===== NEW STAFF FEATURES =====
+
+def staff_manage_students(request):
+    """Quản lý danh sách sinh viên - hiển thị, thêm, sửa, xóa"""
     staff = get_object_or_404(Staff, admin=request.user)
-    subjects = Subject.objects.filter(staff=staff)
-    sessions = Session.objects.all()
+    students = Student.objects.filter(course=staff.course)
     context = {
-        'page_title': 'Result Upload',
-        'subjects': subjects,
-        'sessions': sessions
+        'page_title': 'Manage Students',
+        'students': students,
+        'staff': staff
+    }
+    return render(request, 'staff_template/staff_manage_students.html', context)
+
+
+def staff_add_student(request):
+    """Thêm sinh viên mới"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    form = StudentForm(request.POST or None, request.FILES or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Student',
+        'staff': staff
     }
     if request.method == 'POST':
-        try:
-            student_id = request.POST.get('student_list')
-            subject_id = request.POST.get('subject')
-            test = request.POST.get('test')
-            exam = request.POST.get('exam')
-            student = get_object_or_404(Student, id=student_id)
-            subject = get_object_or_404(Subject, id=subject_id)
+        if form.is_valid():
             try:
-                data = StudentResult.objects.get(
-                    student=student, subject=subject)
-                data.exam = exam
-                data.test = test
-                data.save()
-                messages.success(request, "Scores Updated")
-            except:
-                result = StudentResult(student=student, subject=subject, test=test, exam=exam)
-                result.save()
-                messages.success(request, "Scores Saved")
+                user = CustomUser.objects.create_user(
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password'],
+                    first_name=form.cleaned_data['first_name'],
+                    last_name=form.cleaned_data['last_name'],
+                    user_type=3,
+                    gender=form.cleaned_data['gender'],
+                    address=form.cleaned_data['address'],
+                    profile_pic=form.cleaned_data['profile_pic']
+                )
+                student = Student.objects.create(
+                    admin=user,
+                    course=staff.course,
+                    session=form.cleaned_data['session']
+                )
+                messages.success(request, "Student added successfully!")
+                return redirect('staff_manage_students')
+            except Exception as e:
+                messages.error(request, f"Error occurred: {str(e)}")
+        else:
+            messages.error(request, "Form has errors!")
+    return render(request, 'staff_template/staff_add_student.html', context)
+
+
+def staff_edit_student(request, student_id):
+    """Sửa thông tin sinh viên"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    student = get_object_or_404(Student, id=student_id, course=staff.course)
+    form = StudentEditForm(request.POST or None, request.FILES or None, instance=student)
+    context = {
+        'form': form,
+        'page_title': 'Edit Student',
+        'student': student,
+        'staff': staff
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                user = student.admin
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user.email = form.cleaned_data['email']
+                user.gender = form.cleaned_data['gender']
+                user.address = form.cleaned_data['address']
+                
+                if form.cleaned_data['password']:
+                    user.set_password(form.cleaned_data['password'])
+                
+                if form.cleaned_data['profile_pic']:
+                    user.profile_pic = form.cleaned_data['profile_pic']
+                
+                user.save()
+                student.session = form.cleaned_data['session']
+                student.save()
+                messages.success(request, "Student updated successfully!")
+                return redirect('staff_manage_students')
+            except Exception as e:
+                messages.error(request, f"Error occurred: {str(e)}")
+        else:
+            messages.error(request, "Form has errors!")
+    return render(request, 'staff_template/staff_edit_student.html', context)
+
+
+def staff_delete_student(request, student_id):
+    """Xóa sinh viên"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    student = get_object_or_404(Student, id=student_id, course=staff.course)
+    try:
+        student.admin.delete()  # This will also delete the student due to CASCADE
+        messages.success(request, "Student deleted successfully!")
+    except Exception as e:
+        messages.error(request, f"Error occurred: {str(e)}")
+    return redirect('staff_manage_students')
+
+
+def staff_students_grades(request):
+    """Trang nhập điểm trực tiếp trên bảng danh sách sinh viên"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    students = Student.objects.filter(course=staff.course)
+    subjects = Subject.objects.filter(staff=staff)
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    
+    print(f"Staff: {staff}")
+    print(f"Staff course: {staff.course}")
+    print(f"Students count: {students.count()}")
+    print(f"Subjects count: {subjects.count()}")
+    print(f"All courses count: {courses.count()}")
+    
+    # Handle AJAX request for getting students by course
+    if request.method == 'GET' and request.GET.get('course_id'):
+        course_id = request.GET.get('course_id')
+        print(f"AJAX request received for course_id: {course_id}")
+        
+        try:
+            course = get_object_or_404(Course, id=course_id)
+            print(f"Course found: {course.name}")
+            
+            # Get all students in the selected course
+            students = Student.objects.filter(course=course)
+            print(f"Found {students.count()} students for course {course.name}")
+            
+            # Debug: print all students
+            for student in students:
+                print(f"Student: {student.admin.last_name}, {student.admin.first_name} - {student.admin.email}")
+            
+            grades_data = []
+            for student in students:
+                grades_data.append({
+                    'student_id': student.id,
+                    'name': f"{student.admin.last_name}, {student.admin.first_name}",
+                    'email': student.admin.email,
+                    'course': course.name,
+                    'test_score': 0,
+                    'exam_score': 0,
+                    'total': 0
+                })
+            
+            print(f"Returning {len(grades_data)} student records")
+            return JsonResponse({'success': True, 'data': grades_data})
         except Exception as e:
-            messages.warning(request, "Error Occured While Processing Form")
-    return render(request, "staff_template/staff_add_result.html", context)
+            print(f"Error in staff_students_grades: {str(e)}")
+            return JsonResponse({'success': False, 'message': str(e)})
+    
+    # If no course_id, return all students for testing
+    if request.method == 'GET' and request.GET.get('test') == 'true':
+        grades_data = []
+        for student in students:
+            grades_data.append({
+                'student_id': student.id,
+                'name': f"{student.admin.last_name}, {student.admin.first_name}",
+                'email': student.admin.email,
+                'test_score': 0,
+                'exam_score': 0,
+                'total': 0
+            })
+        return JsonResponse({'success': True, 'data': grades_data})
+    
+    context = {
+        'page_title': 'Student Grades Management',
+        'students': students,
+        'subjects': subjects,
+        'courses': courses,
+        'sessions': sessions,
+        'staff': staff
+    }
+    return render(request, 'staff_template/staff_students_grades.html', context)
 
 
 @csrf_exempt
-def fetch_student_result(request):
-    try:
-        subject_id = request.POST.get('subject')
-        student_id = request.POST.get('student')
-        student = get_object_or_404(Student, id=student_id)
-        subject = get_object_or_404(Subject, id=subject_id)
-        result = StudentResult.objects.get(student=student, subject=subject)
-        result_data = {
-            'exam': result.exam,
-            'test': result.test
-        }
-        return HttpResponse(json.dumps(result_data))
-    except Exception as e:
-        return HttpResponse('False')
+def staff_save_grade(request):
+    """Lưu điểm sinh viên (AJAX)"""
+    if request.method == 'POST':
+        try:
+            student_id = request.POST.get('student_id')
+            subject_id = request.POST.get('subject_id')
+            test_score = request.POST.get('test_score', 0)
+            exam_score = request.POST.get('exam_score', 0)
+            
+            student = get_object_or_404(Student, id=student_id)
+            subject = get_object_or_404(Subject, id=subject_id)
+            
+            # Kiểm tra xem staff có quyền dạy môn này không
+            staff = get_object_or_404(Staff, admin=request.user)
+            if subject.staff != staff:
+                return JsonResponse({'success': False, 'message': 'Unauthorized'})
+            
+            result, created = StudentResult.objects.get_or_create(
+                student=student,
+                subject=subject,
+                defaults={'test': test_score, 'exam': exam_score}
+            )
+            
+            if not created:
+                result.test = test_score
+                result.exam = exam_score
+                result.save()
+            
+            return JsonResponse({'success': True, 'message': 'Grade saved successfully'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+
+def staff_create_notification(request):
+    """Tạo thông báo mới"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    
+    if request.method == 'POST':
+        message = request.POST.get('message')
+        target_type = request.POST.get('target_type')  # 'all', 'course', 'specific'
+        target_course = request.POST.get('target_course')
+        specific_students = request.POST.getlist('specific_students')
+        
+        try:
+            if target_type == 'all':
+                # Gửi cho tất cả sinh viên
+                students = Student.objects.all()
+                for student in students:
+                    NotificationStudent.objects.create(
+                        student=student,
+                        message=message
+                    )
+            elif target_type == 'course':
+                # Gửi cho sinh viên trong khóa học
+                course = get_object_or_404(Course, id=target_course)
+                students = Student.objects.filter(course=course)
+                for student in students:
+                    NotificationStudent.objects.create(
+                        student=student,
+                        message=message
+                    )
+            elif target_type == 'specific':
+                # Gửi cho sinh viên cụ thể
+                for student_id in specific_students:
+                    student = get_object_or_404(Student, id=student_id)
+                    NotificationStudent.objects.create(
+                        student=student,
+                        message=message
+                    )
+            
+            messages.success(request, "Notification sent successfully!")
+            return redirect('staff_create_notification')
+        except Exception as e:
+            messages.error(request, f"Error occurred: {str(e)}")
+    
+    # Lấy danh sách sinh viên trong khóa học của staff
+    students = Student.objects.filter(course=staff.course)
+    courses = Course.objects.all()
+    
+    context = {
+        'page_title': 'Create Notification',
+        'students': students,
+        'courses': courses,
+        'staff': staff
+    }
+    return render(request, 'staff_template/staff_create_notification.html', context)
+
+
+def staff_edit_profile(request):
+    """Trang sửa thông tin cá nhân của staff (tối ưu hóa)"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    user = staff.admin
+    
+    # Initialize form with user data
+    initial_data = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'gender': user.gender,
+        'address': user.address,
+    }
+    
+    form = StaffEditForm(request.POST or None, request.FILES or None, initial=initial_data)
+    context = {
+        'form': form,
+        'page_title': 'Edit Profile',
+        'staff': staff
+    }
+    
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user.email = form.cleaned_data['email']
+                user.gender = form.cleaned_data['gender']
+                user.address = form.cleaned_data['address']
+                
+                if form.cleaned_data['password']:
+                    user.set_password(form.cleaned_data['password'])
+                
+                if form.cleaned_data['profile_pic']:
+                    user.profile_pic = form.cleaned_data['profile_pic']
+                
+                user.save()
+                messages.success(request, "Profile updated successfully!")
+                return redirect('staff_edit_profile')
+            except Exception as e:
+                messages.error(request, f"Error occurred: {str(e)}")
+        else:
+            messages.error(request, "Form has errors!")
+    
+    return render(request, 'staff_template/staff_edit_profile.html', context)

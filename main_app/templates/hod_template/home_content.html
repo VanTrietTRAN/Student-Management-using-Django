@@ -36,7 +36,16 @@
                     </div>
                 </div>
             </div>
-            
+            <div class="col-md-3 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="fas fa-calendar-check"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Sessions</span>
+                        <span class="info-box-number">{{ total_sessions }}</span>
+                        <a class="small text-muted" href="{% url 'manage_session' %}">More info</a>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- /.row -->
         <!-- Main row -->

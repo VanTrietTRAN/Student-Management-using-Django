@@ -17,9 +17,10 @@ from .models import *
 
 
 def admin_home(request):
-    total_staff = Staff.objects.all().count()
-    total_students = Student.objects.all().count()
+    total_staff = CustomUser.objects.filter(user_type='2').count()
+    total_students = CustomUser.objects.filter(user_type='3').count()
     total_course = Course.objects.all().count()
+    total_sessions = Session.objects.all().count()
 
     # Attendance aggregation by course (instead of subject)
     courses = Course.objects.all()
@@ -34,6 +35,7 @@ def admin_home(request):
         'total_students': total_students,
         'total_staff': total_staff,
         'total_course': total_course,
+        'total_sessions': total_sessions,
         'course_list': course_list,
         'attendance_list': attendance_list
 

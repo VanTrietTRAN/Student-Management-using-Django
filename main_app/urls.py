@@ -87,30 +87,21 @@ urlpatterns = [
 
     # Staff
     path("staff/home/", staff_views.staff_home, name='staff_home'),
-    path("staff/apply/leave/", staff_views.staff_apply_leave,
-         name='staff_apply_leave'),
-    path("staff/feedback/", staff_views.staff_feedback, name='staff_feedback'),
     path("staff/view/profile/", staff_views.staff_view_profile,
          name='staff_view_profile'),
-    path("staff/attendance/take/", staff_views.staff_take_attendance,
-         name='staff_take_attendance'),
-    path("staff/attendance/update/", staff_views.staff_update_attendance,
-         name='staff_update_attendance'),
-    path("staff/get_students/", staff_views.get_students, name='get_students'),
-    path("staff/attendance/fetch/", staff_views.get_student_attendance,
-         name='get_student_attendance'),
-    path("staff/attendance/save/",
-         staff_views.save_attendance, name='save_attendance'),
-    path("staff/attendance/update/",
-         staff_views.update_attendance, name='update_attendance'),
     path("staff/fcmtoken/", staff_views.staff_fcmtoken, name='staff_fcmtoken'),
     path("staff/view/notification/", staff_views.staff_view_notification,
          name="staff_view_notification"),
-    path("staff/result/add/", staff_views.staff_add_result, name='staff_add_result'),
-    path("staff/result/edit/", EditResultView.as_view(),
-         name='edit_student_result'),
-    path('staff/result/fetch/', staff_views.fetch_student_result,
-         name='fetch_student_result'),
+    
+    # New Staff Features
+    path("staff/students/manage/", staff_views.staff_manage_students, name='staff_manage_students'),
+    path("staff/students/add/", staff_views.staff_add_student, name='staff_add_student'),
+    path("staff/students/edit/<int:student_id>/", staff_views.staff_edit_student, name='staff_edit_student'),
+    path("staff/students/delete/<int:student_id>/", staff_views.staff_delete_student, name='staff_delete_student'),
+    path("staff/students/grades/", staff_views.staff_students_grades, name='staff_students_grades'),
+    path("staff/grades/save/", staff_views.staff_save_grade, name='staff_save_grade'),
+    path("staff/notification/create/", staff_views.staff_create_notification, name='staff_create_notification'),
+    path("staff/profile/edit/", staff_views.staff_edit_profile, name='staff_edit_profile'),
 
 
 
