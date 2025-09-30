@@ -5,10 +5,10 @@ class Tuition(models.Model):
     from .registration import Registration
     registration = models.ForeignKey(
         Registration,
-        on_delete=models.CASCADE,
-        related_name="tuitions",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="tuitions",
         verbose_name="Đăng ký học phần"
     )
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Sinh viên")

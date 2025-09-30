@@ -5,7 +5,7 @@ class Classroom(models.Model):
     major = models.CharField(max_length=50, verbose_name="Ngành")
     year = models.CharField(max_length=10, verbose_name="Khóa")
     teacher_name = models.CharField(max_length=100, verbose_name="Giảng viên chủ nhiệm")
-    room = models.CharField(max_length=20, verbose_name="Phòng học")
+    room = models.CharField(max_length=20, verbose_name="Phòng học", null=True, blank=True)
     student_count = models.IntegerField(default=0, verbose_name="Số sinh viên")
     status = models.CharField(
         max_length=20,

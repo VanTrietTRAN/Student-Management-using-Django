@@ -93,7 +93,7 @@
                         <p class="text-2xl font-bold text-gray-900">{{ totalSubjects }}</p>
                     </div>
                 </div>
-            </div>
+          </div>
 
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
                 <div class="flex items-center">
@@ -106,7 +106,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+          </div>
 
         <!-- Recent Activities -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -155,9 +155,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+          </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">

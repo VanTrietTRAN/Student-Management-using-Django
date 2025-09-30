@@ -1,18 +1,19 @@
 from django.db import models
 from oauth.models import User
-from .classroom import Classroom
 
 class Student(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name='student_profile',
-        verbose_name="Tài khoản người dùng"
+        verbose_name="Tài khoản người dùng",
+        null=True,
+        blank=True
     )
     student_id = models.CharField(max_length=20, unique=True, verbose_name="Mã sinh viên")
     full_name = models.CharField(max_length=100, verbose_name="Họ và tên")
     email = models.EmailField(verbose_name="Email")
-    phone = models.CharField(max_length=15, verbose_name="Số điện thoại")
+    phone = models.CharField(max_length=15, verbose_name="Số điện thoại", null=True, blank=True)
     from .classroom import Classroom
     classroom = models.ForeignKey(
         Classroom,
