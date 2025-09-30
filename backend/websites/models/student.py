@@ -1,5 +1,6 @@
 from django.db import models
 from oauth.models import User
+from .classroom import Classroom
 
 class Student(models.Model):
     user = models.OneToOneField(
@@ -12,7 +13,15 @@ class Student(models.Model):
     full_name = models.CharField(max_length=100, verbose_name="Họ và tên")
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(max_length=15, verbose_name="Số điện thoại")
-    classroom = models.CharField(max_length=20, verbose_name="Lớp")
+    from .classroom import Classroom
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="students",
+        verbose_name="Lớp"
+    )
     major = models.CharField(max_length=50, verbose_name="Ngành")
     profile_picture = models.ImageField(
         upload_to='students/profile_pictures/',

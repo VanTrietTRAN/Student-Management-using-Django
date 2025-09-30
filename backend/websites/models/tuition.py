@@ -2,6 +2,15 @@ from django.db import models
 from .student import Student
 
 class Tuition(models.Model):
+    from .registration import Registration
+    registration = models.ForeignKey(
+        Registration,
+        on_delete=models.CASCADE,
+        related_name="tuitions",
+        null=True,
+        blank=True,
+        verbose_name="Đăng ký học phần"
+    )
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Sinh viên")
     amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Số tiền")
     semester = models.CharField(max_length=10, verbose_name="Học kỳ")

@@ -1,7 +1,20 @@
 from django.db import models
 from oauth.models import User
+from .subject import Subject
 
 class Teacher(models.Model):
+    subjects = models.ManyToManyField(
+        'websites.Subject',
+        related_name='teachers',
+        blank=True,
+        verbose_name="Môn giảng dạy"
+    )
+    profile_picture = models.ImageField(
+        upload_to='teachers/profile_pictures/',
+        null=True,
+        blank=True,
+        verbose_name="Ảnh đại diện"
+    )
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
