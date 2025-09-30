@@ -1,13 +1,25 @@
 from django.db import models
-from django.contrib.auth.models import User
+from oauth.models import User
 
 class Student(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='student_profile',
+        verbose_name="Tài khoản người dùng"
+    )
     student_id = models.CharField(max_length=20, unique=True, verbose_name="Mã sinh viên")
     full_name = models.CharField(max_length=100, verbose_name="Họ và tên")
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(max_length=15, verbose_name="Số điện thoại")
     classroom = models.CharField(max_length=20, verbose_name="Lớp")
     major = models.CharField(max_length=50, verbose_name="Ngành")
+    profile_picture = models.ImageField(
+        upload_to='students/profile_pictures/',
+        null=True,
+        blank=True,
+        verbose_name="Ảnh đại diện"
+    )
     status = models.CharField(
         max_length=20,
         choices=[

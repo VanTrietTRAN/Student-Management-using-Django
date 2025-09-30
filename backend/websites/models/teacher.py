@@ -1,6 +1,13 @@
 from django.db import models
+from oauth.models import User
 
 class Teacher(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='teacher_profile',
+        verbose_name="Tài khoản người dùng"
+    )
     teacher_id = models.CharField(max_length=20, unique=True, verbose_name="Mã giảng viên")
     full_name = models.CharField(max_length=100, verbose_name="Họ và tên")
     email = models.EmailField(verbose_name="Email")
