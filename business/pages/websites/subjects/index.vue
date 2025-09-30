@@ -5,7 +5,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">Quản lý môn học</h1>
-                    <p class="text-gray-600">Quản lý thông tin môn học, chương trình đào tạo và đăng ký môn học</p>
+                    <p class="text-gray-600">Thiết lập môn học, phân công giảng viên và quản lý đăng ký</p>
                 </div>
                 <el-button type="primary" :icon="Plus" @click="showAddDialog = true">
                     Thêm môn học mới
@@ -28,7 +28,7 @@
                     <el-option label="Kỹ thuật phần mềm" value="KTPM" />
                     <el-option label="An toàn thông tin" value="ATTT" />
                 </el-select>
-                <el-select v-model="selectedType" placeholder="Loại môn học" clearable>
+                <el-select v-model="selectedType" placeholder="Chọn loại môn" clearable>
                     <el-option label="Tất cả loại" value="" />
                     <el-option label="Bắt buộc" value="Bắt buộc" />
                     <el-option label="Tự chọn" value="Tự chọn" />
@@ -45,7 +45,7 @@
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-full">
-                        <IconFile class="w-8 h-8 text-blue-600" />
+                        <Document class="w-8 h-8 text-blue-600" />
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Tổng môn học</p>
@@ -57,11 +57,11 @@
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-green-100 rounded-full">
-                        <IconFile class="w-8 h-8 text-green-600" />
+                        <IconUsers class="w-8 h-8 text-green-600" />
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Môn bắt buộc</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ requiredSubjects }}</p>
+                        <p class="text-sm font-medium text-gray-600">Môn đang mở</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ activeSubjects }}</p>
                     </div>
                 </div>
             </div>
@@ -69,11 +69,11 @@
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-purple-100 rounded-full">
-                        <IconFile class="w-8 h-8 text-purple-600" />
+                        <IconAppraisal class="w-8 h-8 text-purple-600" />
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Môn tự chọn</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ electiveSubjects }}</p>
+                        <p class="text-sm font-medium text-gray-600">Tổng tín chỉ</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ totalCredits }}</p>
                     </div>
                 </div>
             </div>
@@ -81,11 +81,11 @@
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-orange-100 rounded-full">
-                        <IconFile class="w-8 h-8 text-orange-600" />
+                        <IconCalendar class="w-8 h-8 text-orange-600" />
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Môn thực tập</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ internshipSubjects }}</p>
+                        <p class="text-sm font-medium text-gray-600">Môn bắt buộc</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ requiredSubjects }}</p>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
             <div class="overflow-x-auto">
                 <el-table :data="filteredSubjects" stripe style="width: 100%">
                     <el-table-column prop="subjectCode" label="Mã môn" width="120" />
-                    <el-table-column prop="subjectName" label="Tên môn học" width="250" />
+                    <el-table-column prop="subjectName" label="Tên môn học" width="200" />
                     <el-table-column prop="credits" label="Tín chỉ" width="100" />
                     <el-table-column prop="major" label="Ngành" width="120" />
                     <el-table-column prop="type" label="Loại" width="120">
@@ -110,7 +110,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="semester" label="Học kỳ" width="100" />
-                    <el-table-column prop="teacherName" label="Giảng viên" width="200" />
+                    <el-table-column prop="teacherName" label="Giảng viên" width="180" />
                     <el-table-column prop="status" label="Trạng thái" width="120">
                         <template #default="scope">
                             <el-tag :type="getStatusType(scope.row.status)">
@@ -154,7 +154,7 @@
                     <el-input v-model="newSubject.subjectName" />
                 </el-form-item>
                 <el-form-item label="Số tín chỉ">
-                    <el-input-number v-model="newSubject.credits" :min="1" :max="6" />
+                    <el-input-number v-model="newSubject.credits" :min="1" :max="10" />
                 </el-form-item>
                 <el-form-item label="Ngành">
                     <el-select v-model="newSubject.major" placeholder="Chọn ngành">
@@ -163,15 +163,20 @@
                         <el-option label="An toàn thông tin" value="ATTT" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="Loại môn học">
-                    <el-select v-model="newSubject.type" placeholder="Chọn loại">
+                <el-form-item label="Loại môn">
+                    <el-select v-model="newSubject.type" placeholder="Chọn loại môn">
                         <el-option label="Bắt buộc" value="Bắt buộc" />
                         <el-option label="Tự chọn" value="Tự chọn" />
                         <el-option label="Thực tập" value="Thực tập" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Học kỳ">
-                    <el-input-number v-model="newSubject.semester" :min="1" :max="8" />
+                    <el-select v-model="newSubject.semester" placeholder="Chọn học kỳ">
+                        <el-option label="Học kỳ 1" value="1" />
+                        <el-option label="Học kỳ 2" value="2" />
+                        <el-option label="Học kỳ 3" value="3" />
+                        <el-option label="Học kỳ 4" value="4" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="Giảng viên">
                     <el-input v-model="newSubject.teacherName" />
@@ -197,14 +202,14 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Số tín chỉ</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ selectedSubject.credits }}</p>
+                        <p class="mt-1 text-sm text-gray-900 font-bold">{{ selectedSubject.credits }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Ngành</label>
                         <p class="mt-1 text-sm text-gray-900">{{ selectedSubject.major }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Loại môn học</label>
+                        <label class="block text-sm font-medium text-gray-700">Loại môn</label>
                         <el-tag :type="getTypeColor(selectedSubject.type)">
                             {{ selectedSubject.type }}
                         </el-tag>
@@ -241,7 +246,7 @@
                     <el-input v-model="editingSubject.subjectName" />
                 </el-form-item>
                 <el-form-item label="Số tín chỉ">
-                    <el-input-number v-model="editingSubject.credits" :min="1" :max="6" />
+                    <el-input-number v-model="editingSubject.credits" :min="1" :max="10" />
                 </el-form-item>
                 <el-form-item label="Ngành">
                     <el-select v-model="editingSubject.major" placeholder="Chọn ngành">
@@ -250,15 +255,20 @@
                         <el-option label="An toàn thông tin" value="ATTT" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="Loại môn học">
-                    <el-select v-model="editingSubject.type" placeholder="Chọn loại">
+                <el-form-item label="Loại môn">
+                    <el-select v-model="editingSubject.type" placeholder="Chọn loại môn">
                         <el-option label="Bắt buộc" value="Bắt buộc" />
                         <el-option label="Tự chọn" value="Tự chọn" />
                         <el-option label="Thực tập" value="Thực tập" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Học kỳ">
-                    <el-input-number v-model="editingSubject.semester" :min="1" :max="8" />
+                    <el-select v-model="editingSubject.semester" placeholder="Chọn học kỳ">
+                        <el-option label="Học kỳ 1" value="1" />
+                        <el-option label="Học kỳ 2" value="2" />
+                        <el-option label="Học kỳ 3" value="3" />
+                        <el-option label="Học kỳ 4" value="4" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="Giảng viên">
                     <el-input v-model="editingSubject.teacherName" />
@@ -266,8 +276,8 @@
                 <el-form-item label="Trạng thái">
                     <el-select v-model="editingSubject.status" placeholder="Chọn trạng thái">
                         <el-option label="Đang mở" value="Đang mở" />
-                        <el-option label="Đã đóng" value="Đã đóng" />
-                        <el-option label="Tạm dừng" value="Tạm dừng" />
+                        <el-option label="Tạm đóng" value="Tạm đóng" />
+                        <el-option label="Kết thúc" value="Kết thúc" />
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -283,7 +293,10 @@
 import { ref, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
-import IconFile from '@/assets/icons/file.svg';
+import { Document } from '@element-plus/icons-vue';
+import IconUsers from '@/assets/icons/users.svg';
+import IconAppraisal from '@/assets/icons/appraisal.svg';
+import IconCalendar from '@/assets/icons/calendar.svg';
 
 definePageMeta({
     layout: 'websites'
@@ -307,7 +320,7 @@ const newSubject = ref({
     credits: 3,
     major: '',
     type: '',
-    semester: 1,
+    semester: '',
     teacherName: ''
 });
 
@@ -316,11 +329,11 @@ const subjects = ref([
     {
         id: 1,
         subjectCode: 'CS101',
-        subjectName: 'Lập trình Cơ bản',
+        subjectName: 'Lập trình cơ bản',
         credits: 3,
         major: 'CNTT',
         type: 'Bắt buộc',
-        semester: 1,
+        semester: '1',
         teacherName: 'ThS. Nguyễn Văn A',
         status: 'Đang mở'
     },
@@ -328,32 +341,32 @@ const subjects = ref([
         id: 2,
         subjectCode: 'CS102',
         subjectName: 'Cấu trúc dữ liệu',
-        credits: 3,
+        credits: 4,
         major: 'CNTT',
         type: 'Bắt buộc',
-        semester: 2,
+        semester: '2',
         teacherName: 'TS. Trần Thị B',
         status: 'Đang mở'
     },
     {
         id: 3,
-        subjectCode: 'CS201',
-        subjectName: 'Lập trình Web',
+        subjectCode: 'SE201',
+        subjectName: 'Phát triển phần mềm',
         credits: 3,
         major: 'KTPM',
-        type: 'Tự chọn',
-        semester: 3,
+        type: 'Bắt buộc',
+        semester: '3',
         teacherName: 'ThS. Lê Văn C',
         status: 'Đang mở'
     },
     {
         id: 4,
-        subjectCode: 'CS301',
-        subjectName: 'Thực tập tốt nghiệp',
-        credits: 4,
+        subjectCode: 'IT301',
+        subjectName: 'An toàn thông tin',
+        credits: 3,
         major: 'ATTT',
-        type: 'Thực tập',
-        semester: 7,
+        type: 'Bắt buộc',
+        semester: '4',
         teacherName: 'TS. Phạm Thị D',
         status: 'Đang mở'
     }
@@ -361,9 +374,9 @@ const subjects = ref([
 
 // Computed properties
 const totalSubjects = computed(() => subjects.value.length);
+const activeSubjects = computed(() => subjects.value.filter(s => s.status === 'Đang mở').length);
+const totalCredits = computed(() => subjects.value.reduce((sum, s) => sum + s.credits, 0));
 const requiredSubjects = computed(() => subjects.value.filter(s => s.type === 'Bắt buộc').length);
-const electiveSubjects = computed(() => subjects.value.filter(s => s.type === 'Tự chọn').length);
-const internshipSubjects = computed(() => subjects.value.filter(s => s.type === 'Thực tập').length);
 
 const filteredSubjects = computed(() => {
     let filtered = subjects.value;
@@ -387,21 +400,21 @@ const filteredSubjects = computed(() => {
 });
 
 // Methods
+const getStatusType = (status: string) => {
+    switch (status) {
+        case 'Đang mở': return 'success';
+        case 'Tạm đóng': return 'warning';
+        case 'Kết thúc': return 'info';
+        default: return 'danger';
+    }
+};
+
 const getTypeColor = (type: string) => {
     switch (type) {
         case 'Bắt buộc': return 'danger';
         case 'Tự chọn': return 'success';
         case 'Thực tập': return 'warning';
         default: return 'info';
-    }
-};
-
-const getStatusType = (status: string) => {
-    switch (status) {
-        case 'Đang mở': return 'success';
-        case 'Đã đóng': return 'info';
-        case 'Tạm dừng': return 'warning';
-        default: return 'danger';
     }
 };
 
@@ -430,7 +443,7 @@ const updateSubject = () => {
     if (index > -1) {
         subjects.value[index] = { ...editingSubject.value };
         showEditDialog.value = false;
-        ElMessage.success(`Cập nhật thông tin môn học: ${editingSubject.value.subjectName}`);
+        ElMessage.success(`Cập nhật môn học: ${editingSubject.value.subjectName}`);
     }
 };
 
@@ -455,7 +468,7 @@ const deleteSubject = (subject: any) => {
 };
 
 const addSubject = () => {
-    if (newSubject.value.subjectCode && newSubject.value.subjectName && newSubject.value.major) {
+    if (newSubject.value.subjectCode && newSubject.value.subjectName) {
         subjects.value.push({
             id: subjects.value.length + 1,
             ...newSubject.value,
@@ -468,7 +481,7 @@ const addSubject = () => {
             credits: 3,
             major: '',
             type: '',
-            semester: 1,
+            semester: '',
             teacherName: ''
         };
         ElMessage.success('Thêm môn học thành công');

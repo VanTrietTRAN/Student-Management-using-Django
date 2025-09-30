@@ -57,6 +57,10 @@
                             <IconAppraisal class="el-icon" />
                             <span>{{ t('Khen thưởng & Kỷ luật') }}</span>
                         </el-menu-item>
+                        <el-menu-item index="/websites/teachers">
+                            <IconUsers class="el-icon" />
+                            <span>{{ t('Quản lý giảng viên') }}</span>
+                        </el-menu-item>
                     </Sidebar>
                 </aside>
                 <div class="flex-auto">

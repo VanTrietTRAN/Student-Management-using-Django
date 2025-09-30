@@ -5,7 +5,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">Quản lý học phí</h1>
-                    <p class="text-gray-600">Tra cứu, đóng học phí và lịch sử giao dịch của sinh viên</p>
+                    <p class="text-gray-600">Theo dõi tình hình đóng học phí và tạo báo cáo thu chi</p>
                 </div>
                 <el-button type="primary" :icon="Plus" @click="showAddDialog = true">
                     Thêm học phí mới
@@ -13,25 +13,26 @@
             </div>
         </div>
 
-        <!-- Search Section -->
+        <!-- Search and Filter Section -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <el-input
                     v-model="searchKeyword"
-                    placeholder="Tìm kiếm theo mã sinh viên..."
+                    placeholder="Tìm kiếm theo tên sinh viên..."
                     :prefix-icon="Search"
                     clearable
                 />
-                <el-select v-model="selectedStatus" placeholder="Trạng thái thanh toán" clearable>
-                    <el-option label="Tất cả" value="" />
+                <el-select v-model="selectedStatus" placeholder="Chọn trạng thái" clearable>
+                    <el-option label="Tất cả trạng thái" value="" />
                     <el-option label="Đã đóng" value="Đã đóng" />
                     <el-option label="Chưa đóng" value="Chưa đóng" />
                     <el-option label="Quá hạn" value="Quá hạn" />
                 </el-select>
-                <el-select v-model="selectedSemester" placeholder="Học kỳ" clearable>
+                <el-select v-model="selectedSemester" placeholder="Chọn học kỳ" clearable>
                     <el-option label="Tất cả học kỳ" value="" />
                     <el-option label="Học kỳ 1" value="1" />
                     <el-option label="Học kỳ 2" value="2" />
+                    <el-option label="Học kỳ 3" value="3" />
                 </el-select>
                 <el-button type="primary" :icon="Search" @click="handleSearch">
                     Tìm kiếm
@@ -48,7 +49,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Tổng học phí</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ totalTuition.toLocaleString() }} VNĐ</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ totalTuition }}</p>
                     </div>
                 </div>
             </div>
@@ -60,7 +61,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Đã thu</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ paidAmount.toLocaleString() }} VNĐ</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ paidAmount }}</p>
                     </div>
                 </div>
             </div>
@@ -72,7 +73,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Chưa thu</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ unpaidAmount.toLocaleString() }} VNĐ</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ unpaidAmount }}</p>
                     </div>
                 </div>
             </div>
@@ -80,11 +81,11 @@
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
                 <div class="flex items-center">
                     <div class="p-3 bg-orange-100 rounded-full">
-                        <IconFile class="w-8 h-8 text-orange-600" />
+                        <IconUsers class="w-8 h-8 text-orange-600" />
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Tỷ lệ thu</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ paymentRate }}%</p>
+                        <p class="text-sm font-medium text-gray-600">Sinh viên chưa đóng</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ unpaidStudents }}</p>
                     </div>
                 </div>
             </div>
@@ -96,17 +97,16 @@
                 <h3 class="text-lg font-semibold text-gray-900">Danh sách học phí</h3>
             </div>
             <div class="overflow-x-auto">
-                <el-table :data="filteredTuitions" stripe style="width: 100%">
-                    <el-table-column prop="studentId" label="Mã SV" width="100" />
-                    <el-table-column prop="studentName" label="Tên sinh viên" width="200" />
-                    <el-table-column prop="className" label="Lớp" width="100" />
-                    <el-table-column prop="semester" label="Học kỳ" width="100" />
-                    <el-table-column prop="amount" label="Số tiền" width="150">
+                <el-table :data="filteredTuition" stripe style="width: 100%">
+                    <el-table-column prop="studentName" label="Sinh viên" width="180" />
+                    <el-table-column prop="amount" label="Số tiền" width="120">
                         <template #default="scope">
-                            {{ scope.row.amount.toLocaleString() }} VNĐ
+                            <span class="font-semibold">{{ formatCurrency(scope.row.amount) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="dueDate" label="Hạn nộp" width="120" />
+                    <el-table-column prop="semester" label="Học kỳ" width="100" />
+                    <el-table-column prop="dueDate" label="Hạn đóng" width="120" />
+                    <el-table-column prop="paymentDate" label="Ngày đóng" width="120" />
                     <el-table-column prop="status" label="Trạng thái" width="120">
                         <template #default="scope">
                             <el-tag :type="getStatusType(scope.row.status)">
@@ -114,14 +114,21 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="paymentDate" label="Ngày nộp" width="120" />
                     <el-table-column label="Thao tác" width="200">
                         <template #default="scope">
                             <el-button size="small" @click="viewTuition(scope.row)">
                                 Xem
                             </el-button>
-                            <el-button size="small" type="success" @click="markAsPaid(scope.row)">
-                                Đánh dấu đã nộp
+                            <el-button size="small" type="primary" @click="editTuition(scope.row)">
+                                Sửa
+                            </el-button>
+                            <el-button 
+                                v-if="scope.row.status !== 'Đã đóng'" 
+                                size="small" 
+                                type="success" 
+                                @click="markAsPaid(scope.row)"
+                            >
+                                Đánh dấu đã đóng
                             </el-button>
                         </template>
                     </el-table-column>
@@ -132,11 +139,111 @@
                     v-model:current-page="currentPage"
                     v-model:page-size="pageSize"
                     :page-sizes="[10, 20, 50, 100]"
-                    :total="totalTuitions"
+                    :total="totalTuition"
                     layout="total, sizes, prev, pager, next, jumper"
                 />
             </div>
         </div>
+
+        <!-- Add Tuition Dialog -->
+        <el-dialog v-model="showAddDialog" title="Thêm học phí mới" width="600px">
+            <el-form :model="newTuition" label-width="120px">
+                <el-form-item label="Sinh viên">
+                    <el-select v-model="newTuition.studentName" placeholder="Chọn sinh viên">
+                        <el-option label="Nguyễn Văn An" value="Nguyễn Văn An" />
+                        <el-option label="Trần Thị Bình" value="Trần Thị Bình" />
+                        <el-option label="Lê Văn Cường" value="Lê Văn Cường" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Số tiền">
+                    <el-input-number v-model="newTuition.amount" :min="0" :step="100000" />
+                </el-form-item>
+                <el-form-item label="Học kỳ">
+                    <el-select v-model="newTuition.semester" placeholder="Chọn học kỳ">
+                        <el-option label="Học kỳ 1" value="1" />
+                        <el-option label="Học kỳ 2" value="2" />
+                        <el-option label="Học kỳ 3" value="3" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Hạn đóng">
+                    <el-date-picker v-model="newTuition.dueDate" type="date" placeholder="Chọn ngày hạn" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showAddDialog = false">Hủy</el-button>
+                <el-button type="primary" @click="addTuition">Thêm</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- View Tuition Dialog -->
+        <el-dialog v-model="showViewDialog" title="Chi tiết học phí" width="800px">
+            <div v-if="selectedTuition" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Sinh viên</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ selectedTuition.studentName }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Số tiền</label>
+                        <p class="mt-1 text-sm text-gray-900 font-bold text-lg">{{ formatCurrency(selectedTuition.amount) }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Học kỳ</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ selectedTuition.semester }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Hạn đóng</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ selectedTuition.dueDate }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Ngày đóng</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ selectedTuition.paymentDate || 'Chưa đóng' }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Trạng thái</label>
+                        <el-tag :type="getStatusType(selectedTuition.status)">
+                            {{ selectedTuition.status }}
+                        </el-tag>
+                    </div>
+                </div>
+            </div>
+            <template #footer>
+                <el-button @click="showViewDialog = false">Đóng</el-button>
+                <el-button type="primary" @click="editTuitionFromView">Chỉnh sửa</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- Edit Tuition Dialog -->
+        <el-dialog v-model="showEditDialog" title="Chỉnh sửa học phí" width="600px">
+            <el-form :model="editingTuition" label-width="120px">
+                <el-form-item label="Sinh viên">
+                    <el-input v-model="editingTuition.studentName" disabled />
+                </el-form-item>
+                <el-form-item label="Số tiền">
+                    <el-input-number v-model="editingTuition.amount" :min="0" :step="100000" />
+                </el-form-item>
+                <el-form-item label="Học kỳ">
+                    <el-input v-model="editingTuition.semester" disabled />
+                </el-form-item>
+                <el-form-item label="Hạn đóng">
+                    <el-date-picker v-model="editingTuition.dueDate" type="date" placeholder="Chọn ngày hạn" />
+                </el-form-item>
+                <el-form-item label="Ngày đóng">
+                    <el-date-picker v-model="editingTuition.paymentDate" type="date" placeholder="Chọn ngày đóng" />
+                </el-form-item>
+                <el-form-item label="Trạng thái">
+                    <el-select v-model="editingTuition.status" placeholder="Chọn trạng thái">
+                        <el-option label="Chưa đóng" value="Chưa đóng" />
+                        <el-option label="Đã đóng" value="Đã đóng" />
+                        <el-option label="Quá hạn" value="Quá hạn" />
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showEditDialog = false">Hủy</el-button>
+                <el-button type="primary" @click="updateTuition">Cập nhật</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -145,6 +252,7 @@ import { ref, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconFile from '@/assets/icons/file.svg';
+import IconUsers from '@/assets/icons/users.svg';
 
 definePageMeta({
     layout: 'websites'
@@ -162,72 +270,73 @@ const showEditDialog = ref(false);
 const selectedTuition = ref(null);
 const editingTuition = ref({});
 
+const newTuition = ref({
+    studentName: '',
+    amount: 0,
+    semester: '',
+    dueDate: ''
+});
+
 // Mock data
-const tuitions = ref([
+const tuition = ref([
     {
         id: 1,
-        studentId: 'SV001',
         studentName: 'Nguyễn Văn An',
-        className: 'CNTT21A',
-        semester: 1,
-        amount: 15000000,
-        dueDate: '15/09/2024',
-        status: 'Đã đóng',
-        paymentDate: '10/09/2024'
+        amount: 5000000,
+        semester: '1',
+        dueDate: '2024-01-15',
+        paymentDate: '2024-01-10',
+        status: 'Đã đóng'
     },
     {
         id: 2,
-        studentId: 'SV002',
         studentName: 'Trần Thị Bình',
-        className: 'CNTT21B',
-        semester: 1,
-        amount: 15000000,
-        dueDate: '15/09/2024',
-        status: 'Chưa đóng',
-        paymentDate: ''
+        amount: 5000000,
+        semester: '1',
+        dueDate: '2024-01-15',
+        paymentDate: null,
+        status: 'Chưa đóng'
     },
     {
         id: 3,
-        studentId: 'SV003',
         studentName: 'Lê Văn Cường',
-        className: 'CNTT22A',
-        semester: 1,
-        amount: 15000000,
-        dueDate: '15/09/2024',
-        status: 'Quá hạn',
-        paymentDate: ''
+        amount: 5000000,
+        semester: '2',
+        dueDate: '2024-02-15',
+        paymentDate: null,
+        status: 'Quá hạn'
     }
 ]);
 
 // Computed properties
-const totalTuitions = computed(() => tuitions.value.length);
-const totalTuition = computed(() => tuitions.value.reduce((sum, t) => sum + t.amount, 0));
+const totalTuition = computed(() => tuition.value.length);
 const paidAmount = computed(() => 
-    tuitions.value.filter(t => t.status === 'Đã đóng').reduce((sum, t) => sum + t.amount, 0)
+    tuition.value
+        .filter(t => t.status === 'Đã đóng')
+        .reduce((sum, t) => sum + t.amount, 0)
 );
 const unpaidAmount = computed(() => 
-    tuitions.value.filter(t => t.status !== 'Đã đóng').reduce((sum, t) => sum + t.amount, 0)
+    tuition.value
+        .filter(t => t.status !== 'Đã đóng')
+        .reduce((sum, t) => sum + t.amount, 0)
 );
-const paymentRate = computed(() => 
-    totalTuition.value > 0 ? Math.round((paidAmount.value / totalTuition.value) * 100) : 0
-);
+const unpaidStudents = computed(() => tuition.value.filter(t => t.status !== 'Đã đóng').length);
 
-const filteredTuitions = computed(() => {
-    let filtered = tuitions.value;
+const filteredTuition = computed(() => {
+    let filtered = tuition.value;
     
     if (searchKeyword.value) {
-        filtered = filtered.filter(tuition => 
-            tuition.studentId.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-            tuition.studentName.toLowerCase().includes(searchKeyword.value.toLowerCase())
+        filtered = filtered.filter(t => 
+            t.studentName.toLowerCase().includes(searchKeyword.value.toLowerCase())
         );
     }
     
     if (selectedStatus.value) {
-        filtered = filtered.filter(tuition => tuition.status === selectedStatus.value);
+        filtered = filtered.filter(t => t.status === selectedStatus.value);
     }
     
     if (selectedSemester.value) {
-        filtered = filtered.filter(tuition => tuition.semester.toString() === selectedSemester.value);
+        filtered = filtered.filter(t => t.semester === selectedSemester.value);
     }
     
     return filtered;
@@ -243,18 +352,45 @@ const getStatusType = (status: string) => {
     }
 };
 
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount);
+};
+
 const handleSearch = () => {
     ElMessage.success('Tìm kiếm hoàn tất');
 };
 
-const viewTuition = (tuition: any) => {
-    selectedTuition.value = tuition;
+const viewTuition = (tuitionItem: any) => {
+    selectedTuition.value = tuitionItem;
     showViewDialog.value = true;
 };
 
-const markAsPaid = (tuition: any) => {
+const editTuition = (tuitionItem: any) => {
+    editingTuition.value = { ...tuitionItem };
+    showEditDialog.value = true;
+};
+
+const editTuitionFromView = () => {
+    showViewDialog.value = false;
+    editingTuition.value = { ...selectedTuition.value };
+    showEditDialog.value = true;
+};
+
+const updateTuition = () => {
+    const index = tuition.value.findIndex(t => t.id === editingTuition.value.id);
+    if (index > -1) {
+        tuition.value[index] = { ...editingTuition.value };
+        showEditDialog.value = false;
+        ElMessage.success(`Cập nhật học phí: ${editingTuition.value.studentName}`);
+    }
+};
+
+const markAsPaid = (tuitionItem: any) => {
     ElMessageBox.confirm(
-        `Bạn có chắc chắn muốn đánh dấu đã nộp học phí cho "${tuition.studentName}"?`,
+        `Đánh dấu học phí của "${tuitionItem.studentName}" là đã đóng?`,
         'Xác nhận',
         {
             confirmButtonText: 'Xác nhận',
@@ -262,12 +398,36 @@ const markAsPaid = (tuition: any) => {
             type: 'success',
         }
     ).then(() => {
-        tuition.status = 'Đã đóng';
-        tuition.paymentDate = new Date().toLocaleDateString('vi-VN');
-        ElMessage.success(`Đã đánh dấu nộp học phí: ${tuition.studentName}`);
+        const index = tuition.value.findIndex(t => t.id === tuitionItem.id);
+        if (index > -1) {
+            tuition.value[index].status = 'Đã đóng';
+            tuition.value[index].paymentDate = new Date().toISOString().split('T')[0];
+            ElMessage.success(`Đã đánh dấu học phí: ${tuitionItem.studentName}`);
+        }
     }).catch(() => {
-        ElMessage.info('Đã hủy thao tác');
+        ElMessage.info('Đã hủy');
     });
+};
+
+const addTuition = () => {
+    if (newTuition.value.studentName && newTuition.value.amount > 0) {
+        tuition.value.push({
+            id: tuition.value.length + 1,
+            ...newTuition.value,
+            paymentDate: null,
+            status: 'Chưa đóng'
+        });
+        showAddDialog.value = false;
+        newTuition.value = {
+            studentName: '',
+            amount: 0,
+            semester: '',
+            dueDate: ''
+        };
+        ElMessage.success('Thêm học phí thành công');
+    } else {
+        ElMessage.error('Vui lòng điền đầy đủ thông tin');
+    }
 };
 </script>
 

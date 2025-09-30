@@ -3,49 +3,35 @@ from .student import Student
 from .subject import Subject
 
 class Grade(models.Model):
-    """Model cho điểm số"""
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Sinh viên")
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name="Môn học")
-    semester = models.PositiveIntegerField(verbose_name="Học kỳ")
-    midterm_score = models.FloatField(verbose_name="Điểm giữa kỳ")
-    final_score = models.FloatField(verbose_name="Điểm cuối kỳ")
-    average_score = models.FloatField(verbose_name="Điểm trung bình")
-    grade = models.CharField(max_length=5, verbose_name="Xếp loại")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
-    
+    semester = models.CharField(max_length=10, verbose_name="Học kỳ")
+    midterm_score = models.FloatField(default=0.0, verbose_name="Điểm giữa kỳ")
+    final_score = models.FloatField(default=0.0, verbose_name="Điểm cuối kỳ")
+    gpa = models.FloatField(default=0.0, verbose_name="Điểm TB")
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('Hoàn thành', 'Hoàn thành'),
+            ('Chưa hoàn thành', 'Chưa hoàn thành'),
+            ('Thi lại', 'Thi lại'),
+        ],
+        default='Chưa hoàn thành',
+        verbose_name="Trạng thái"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
-        db_table = 'grades'
         verbose_name = "Điểm số"
         verbose_name_plural = "Điểm số"
-        unique_together = ['student', 'subject', 'semester']
         ordering = ['-created_at']
-    
+        unique_together = ['student', 'subject', 'semester']
+
     def __str__(self):
-        return f"{self.student.full_name} - {self.subject.subject_name} - {self.average_score}"
-    
+        return f"{self.student.full_name} - {self.subject.subject_name} - {self.semester}"
+
     def save(self, *args, **kwargs):
-        # Tự động tính điểm trung bình
-        self.average_score = (self.midterm_score + self.final_score) / 2
-        
-        # Tự động xếp loại
-        if self.average_score >= 9.5:
-            self.grade = 'A+'
-        elif self.average_score >= 8.5:
-            self.grade = 'A'
-        elif self.average_score >= 8.0:
-            self.grade = 'B+'
-        elif self.average_score >= 7.0:
-            self.grade = 'B'
-        elif self.average_score >= 6.5:
-            self.grade = 'C+'
-        elif self.average_score >= 5.5:
-            self.grade = 'C'
-        elif self.average_score >= 5.0:
-            self.grade = 'D+'
-        elif self.average_score >= 4.0:
-            self.grade = 'D'
-        else:
-            self.grade = 'F'
-        
+        # Auto-calculate GPA: 30% midterm + 70% final
+        self.gpa = (self.midterm_score * 0.3) + (self.final_score * 0.7)
         super().save(*args, **kwargs)

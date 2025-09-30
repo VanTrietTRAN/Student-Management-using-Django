@@ -1,136 +1,106 @@
 #!/usr/bin/env python
+"""
+Script to create default user accounts for the student information system.
+Run this script after setting up the database.
+"""
+
 import os
+import sys
 import django
 from django.conf import settings
 
+# Add the project directory to Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.development')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.base')
 django.setup()
 
-from django.contrib.auth import get_user_model
-from websites.models import Student, Teacher, Staff
-
-User = get_user_model()
+from django.contrib.auth.models import User
+from django.core.management import call_command
 
 def create_default_accounts():
-    """Tạo các tài khoản mặc định"""
+    """Create default user accounts based on config.env settings"""
     
-    # Tạo tài khoản sinh viên mẫu
-    student_user, created = User.objects.get_or_create(
-        email='student@university.edu',
-        defaults={
-            'username': 'student',
-            'first_name': 'Sinh',
-            'last_name': 'Viên',
-            'is_active': True
+    # Default accounts from config.env
+    accounts = [
+        {
+            'username': 'student@university.edu',
+            'email': 'student@university.edu',
+            'password': 'student123',
+            'first_name': 'Sinh viên',
+            'last_name': 'Mẫu',
+            'is_staff': False,
+            'is_superuser': False
+        },
+        {
+            'username': 'teacher@university.edu',
+            'email': 'teacher@university.edu',
+            'password': 'teacher123',
+            'first_name': 'Giảng viên',
+            'last_name': 'Mẫu',
+            'is_staff': True,
+            'is_superuser': False
+        },
+        {
+            'username': 'training@university.edu',
+            'email': 'training@university.edu',
+            'password': 'training123',
+            'first_name': 'Nhân viên',
+            'last_name': 'Phòng đào tạo',
+            'is_staff': True,
+            'is_superuser': False
+        },
+        {
+            'username': 'affairs@university.edu',
+            'email': 'affairs@university.edu',
+            'password': 'affairs123',
+            'first_name': 'Nhân viên',
+            'last_name': 'Phòng công tác sinh viên',
+            'is_staff': True,
+            'is_superuser': False
+        },
+        {
+            'username': 'admin@university.edu',
+            'email': 'admin@university.edu',
+            'password': 'admin123',
+            'first_name': 'Quản trị viên',
+            'last_name': 'Hệ thống',
+            'is_staff': True,
+            'is_superuser': True
         }
-    )
-    if created:
-        student_user.set_password('123456')
-        student_user.save()
-        print("✅ Tạo tài khoản sinh viên thành công")
+    ]
     
-    # Tạo tài khoản giảng viên mẫu
-    teacher_user, created = User.objects.get_or_create(
-        email='teacher@university.edu',
-        defaults={
-            'username': 'teacher',
-            'first_name': 'Giảng',
-            'last_name': 'Viên',
-            'is_active': True
-        }
-    )
-    if created:
-        teacher_user.set_password('123456')
-        teacher_user.save()
-        print("✅ Tạo tài khoản giảng viên thành công")
+    print("Creating default user accounts...")
     
-    # Tạo tài khoản phòng đào tạo
-    training_user, created = User.objects.get_or_create(
-        email='training@university.edu',
-        defaults={
-            'username': 'training',
-            'first_name': 'Phòng',
-            'last_name': 'Đào tạo',
-            'is_active': True
-        }
-    )
-    if created:
-        training_user.set_password('123456')
-        training_user.save()
-        print("✅ Tạo tài khoản phòng đào tạo thành công")
+    for account in accounts:
+        username = account['username']
+        
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            print(f"User {username} already exists, skipping...")
+            continue
+        
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=account['email'],
+            password=account['password'],
+            first_name=account['first_name'],
+            last_name=account['last_name'],
+            is_staff=account['is_staff'],
+            is_superuser=account['is_superuser']
+        )
+        
+        print(f"Created user: {username} ({account['first_name']} {account['last_name']})")
     
-    # Tạo tài khoản phòng công tác sinh viên
-    affairs_user, created = User.objects.get_or_create(
-        email='studentaffairs@university.edu',
-        defaults={
-            'username': 'studentaffairs',
-            'first_name': 'Phòng',
-            'last_name': 'Công tác sinh viên',
-            'is_active': True
-        }
-    )
-    if created:
-        affairs_user.set_password('123456')
-        affairs_user.save()
-        print("✅ Tạo tài khoản phòng công tác sinh viên thành công")
-    
-    # Tạo dữ liệu mẫu
-    create_sample_data()
-
-def create_sample_data():
-    """Tạo dữ liệu mẫu"""
-    
-    # Tạo sinh viên mẫu
-    student, created = Student.objects.get_or_create(
-        student_id='SV001',
-        defaults={
-            'full_name': 'Nguyễn Văn An',
-            'email': 'an.nguyen@email.com',
-            'phone': '0123456789',
-            'class_name': 'CNTT21A',
-            'major': 'CNTT',
-            'year': '2021',
-            'status': 'Đang học',
-            'gpa': 8.5
-        }
-    )
-    if created:
-        print("✅ Tạo sinh viên mẫu thành công")
-    
-    # Tạo giảng viên mẫu
-    teacher, created = Teacher.objects.get_or_create(
-        teacher_id='GV001',
-        defaults={
-            'full_name': 'ThS. Trần Thị Bình',
-            'email': 'binh.tran@email.com',
-            'phone': '0987654321',
-            'department': 'Khoa Công nghệ thông tin',
-            'position': 'Giảng viên',
-            'degree': 'Thạc sĩ',
-            'status': 'Đang làm việc'
-        }
-    )
-    if created:
-        print("✅ Tạo giảng viên mẫu thành công")
-    
-    # Tạo nhân viên mẫu
-    staff, created = Staff.objects.get_or_create(
-        staff_id='NV001',
-        defaults={
-            'full_name': 'Nguyễn Văn Cường',
-            'email': 'cuong.nguyen@email.com',
-            'phone': '0369852147',
-            'department': 'Phòng đào tạo',
-            'position': 'Chuyên viên',
-            'role': 'Phòng đào tạo',
-            'status': 'Đang làm việc'
-        }
-    )
-    if created:
-        print("✅ Tạo nhân viên mẫu thành công")
+    print("\nDefault accounts created successfully!")
+    print("\nLogin credentials:")
+    print("Student: student@university.edu / student123")
+    print("Teacher: teacher@university.edu / teacher123")
+    print("Training Staff: training@university.edu / training123")
+    print("Student Affairs: affairs@university.edu / affairs123")
+    print("Admin: admin@university.edu / admin123")
 
 if __name__ == '__main__':
-    print("🚀 Bắt đầu tạo tài khoản mặc định...")
     create_default_accounts()
-    print("✅ Hoàn thành!")
