@@ -81,82 +81,80 @@ Copy the [backend/config.env.sample](backend/config.env.sample) to `backend/conf
 ### Migrate data
 From the [backend](backend) folder, runt this command:
 ```
-python manage.py migrate
+# Student Management (Pandosima starter)
+
+Hướng dẫn rút gọn, tập trung vào phát triển cục bộ trên Windows (PowerShell).
+
+Mục đích: cung cấp các bước cần thiết để chạy backend (Django) và frontend (Nuxt) trên Windows.
+
+## Yêu cầu cơ bản
+- Python 3.12+ (sử dụng `py` trên Windows)
+- Node.js (khuyến nghị phiên bản tương thích với `package.json` trong `business/`)
+- MySQL client / MySQL server (hoặc cấu hình DB tương ứng trong `backend/config.env`)
+
+## Thiết lập & chạy trên Windows (PowerShell)
+
+1) Chuẩn bị backend
+
+```powershell
+# vào thư mục backend
+cd .\backend
+
+# tạo virtual environment và kích hoạt
+py -3 -m venv .venv
+.\.venv\Scripts\Activate
+
+# cài Python dependencies
+pip install -r requirements/base.txt
+
+# sao chép file mẫu cấu hình và chỉnh lại các biến môi trường (DB, EMAIL, BUSINESS_HOST...)
+Copy-Item -Path .\config.env.sample -Destination .\config.env
+# (Mở .\config.env và chỉnh các giá trị phù hợp với máy của bạn)
+
+# áp dụng migrations
+py manage.py migrate
+
+# tạo các tài khoản mặc định (dùng cho phát triển cục bộ)
+py create_default_accounts.py
+
+# chạy backend
+py manage.py runserver 127.0.0.1:8000
 ```
-### Build business site frontend
-From the [business](business) folder, runt these commands:
-```
+
+2) Chạy frontend (business)
+
+Mở PowerShell mới và chạy:
+
+```powershell
+cd .\business
 npm install
-npm run build
+npm run dev
+# dev server theo package.json sẽ lắng nghe ở 127.0.0.1:3008 (mở http://127.0.0.1:3008/ để truy cập)
 ```
 
-### Collect static files
-(For production only)
-From the [backend](backend) folder, runt this command:
-```
-python manage.py collectstatic --settings=core.settings.base
+3) Lưu ý tạo RSA key cho OIDC
+
+Nếu dự án yêu cầu `oidc.key`, bạn có thể tạo bằng OpenSSL. Trên Windows, dùng Git Bash hoặc WSL để chạy:
+
+```bash
+openssl genrsa -out oidc.key 4096
 ```
 
-### Run
-From the [backend](backend) folder, runt this command:
-```
-python manage.py runserver
-```
-You can also open the project with Visual Studio Code, Open the `Run and Debug tab` and run the config `Run Dev`
+## Tài khoản mặc định (dành cho môi trường dev)
+- Student: student@university.edu / student123  (is_staff=False, is_superuser=False)
+- Lecture: lecture@university.edu / lecture123  (is_staff=True, is_superuser=False)
+- Admin: admin@university.edu / admin123  (is_staff=True, is_superuser=True)
 
-## Access the webstites
-* Access the host pointed by the `BUSINESS_HOST` environemnt variable, you will see the business site. Example: http://127.0.0.1:8008
+Những tài khoản này được tạo bởi `backend/create_default_accounts.py`. Chỉ dùng cho phát triển cục bộ.
 
-## Debuging
-In case you want to debug frontend in paralell with backend, make sure to follow these step:
-1. Turn on these evironement variable (in `backend/config.env`):
+## Debug / Dev mode
+- Nếu muốn phát triển frontend song song với backend, bật trong `backend/config.env`:
+
 ```
 BUSINESS_FRONTEND_DEV_MODE=True
-DOCS_FRONTEND_DEV_MODE=True
-```
-2. Run the business site (frontend)
-From visual studio terminal, at the folder [business](business):
-```
-npm install
-npm run dev
-```
-3. Run the document site (frontend)
-From visual studio terminal, at the folder [docs](docs):
-```
-npm install
-npm run dev
-```
-4. On Visual studio, in the `Run and Debug` tag, chose `Run Dev` and click the run button next to it.
-
-Note: Copy [launch config tempalte](./.vscode/launch-template.json) to [launch config file](./.vscode/launch.json). Depend on your Operation System, you might have to modify the [launch config](./.vscode/launch.json), change path separator from '/' to '\\\\' and versa.
-
-## Using docker
-If you want to use docker, copy these file to the root folder and rename it:
-- [ci/docker-compose.yml.local](ci/docker-compose.yml.local) -> `docker-compose.yml`
-- [ci/Dockerfile.template](ci/Dockerfile.template) -> `Dockerfile`
-- [ci/docker.env.template](docker.env.template) -> `docker.env`. Then open it and change the environment variable's values acord to your environment.
-
-Build and run the container:
-```
-docker-compose up -d --build
 ```
 
-## Localization
-To translate your response content to other langueages:
-1. Create [language files](https://docs.djangoproject.com/en/5.0/topics/i18n/translation/#localization-how-to-create-language-files) inside each app folder.
+Sau đó chạy `npm run dev` trong `business/`.
 
-    For example: [backend/businesses/locale/vi/LC_MESSAGES/django.po](./backend/businesses/locale/vi/LC_MESSAGES/django.po)
-Note that you can use [django-admin makemessages](https://docs.djangoproject.com/en/5.0/topics/i18n/translation/#localization-how-to-create-language-files) command to create this file. It will collect the text from python/html/js files and generate the languague file for you. But sometime, we traslate dynamic text from database or external services too. They are not available in your source code, so make sure to put these text to the file manually.
-
-2. From your app folder, call this command to compile the texts
-```
-django-admin compilemessages
-```
-
-3. Use translate APIs
-
-    Use [translate APIs](https://docs.djangoproject.com/en/5.0/topics/i18n/translation/) to translate your response or your templates.
-
-4. Consum translated contents
-
-    On client side (frontend or mobile app), put `Accept-Language` to your request, you will see the translated contents.
+## Ghi chú ngắn
+- Tài liệu gốc chứa nhiều phần dành cho Mac/Linux, Docker và localization. README này đã được rút gọn để chỉ giữ các phần thiết yếu cho phát triển cục bộ trên Windows. Nếu bạn cần các hướng dẫn cho Docker hoặc macOS, tôi có thể khôi phục hoặc thêm vào file riêng.

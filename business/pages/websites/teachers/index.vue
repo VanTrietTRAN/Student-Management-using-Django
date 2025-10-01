@@ -420,9 +420,10 @@ const addTeacher = () => {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');
     }
 };
-})
 
 // Computed properties
+
+</script>
 
 <style scoped>
 .el-table {

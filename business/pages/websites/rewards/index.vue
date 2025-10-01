@@ -1,37 +1,19 @@
 <template>
-    <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
-        <!-- Header Section -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Khen thưởng & Kỷ luật</h1>
-                    <p class="text-gray-600">Quản lý quá trình rèn luyện, khen thưởng và kỷ luật sinh viên</p>
-                </div>
-                        <el-button type="primary" :icon="Plus" @click="showAddDialog = true">
-                            Thêm mới
-                        </el-button>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Kỷ luật</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ disciplineCount }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-                <div class="flex items-center">
-                    <div class="p-3 bg-orange-100 rounded-full">
-                        <IconUsers class="w-8 h-8 text-orange-600" />
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Đang xử lý</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ pendingCount }}</p>
-                    </div>
-                </div>
-            </div>
+  <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Khen thưởng & Kỷ luật</h1>
+          <p class="text-gray-600">Quản lý quá trình rèn luyện, khen thưởng và kỷ luật sinh viên</p>
         </div>
+        <div>
+          <el-button type="primary" :icon="Plus" @click="showAddDialog = true">Thêm mới</el-button>
+        </div>
+      </div>
+    </div>
 
-        <!-- Rewards/Discipline Table -->
+    <!-- Rewards/Discipline Table -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">Danh sách khen thưởng & kỷ luật</h3>
