@@ -14,6 +14,13 @@ from .views import (
     SectionViewSet,
     SectionPublicViewSet,
     BuildViewSet
+    ,
+    SubjectViewSet,
+    ClassroomViewSet,
+    StudentViewSet,
+    RegistrationViewSet,
+    TuitionViewSet,
+    GradeViewSet
 )
 
 app_name = "websites"
@@ -26,6 +33,12 @@ router.register(r"menus", MenuViewSet, basename="websites-menus")
 router.register(r"articles", ArticleViewSet, basename="websites-articles")
 router.register(r"sections", SectionViewSet, basename="websites-sections")
 router.register(r"builds", BuildViewSet, basename="websites-builds")
+router.register(r"subjects", SubjectViewSet, basename="websites-subjects")
+router.register(r"classrooms", ClassroomViewSet, basename="websites-classrooms")
+router.register(r"students", StudentViewSet, basename="websites-students")
+router.register(r"registrations", RegistrationViewSet, basename="websites-registrations")
+router.register(r"tuitions", TuitionViewSet, basename="websites-tuitions")
+router.register(r"grades", GradeViewSet, basename="websites-grades")
 
 site_router = routers.NestedSimpleRouter(router, r"sites", lookup="sites")
 site_router.register(r"routes", RouteViewSet, basename="websites-site-routes")

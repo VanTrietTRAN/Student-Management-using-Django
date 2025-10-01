@@ -190,10 +190,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
 import IconFile from '@/assets/icons/file.svg';
+import AcademicService from '@/services/websites/academic';
 
 definePageMeta({
     layout: 'student'
@@ -207,41 +208,20 @@ const showPaymentDialog = ref(false);
 const selectedTuition = ref(null);
 const paymentTuition = ref(null);
 
-const paymentForm = ref({
-    method: '',
-    note: ''
-});
+const paymentForm = ref({ method: '', note: '' });
 
-// Mock data
-const tuition = ref([
-    {
-        id: 1,
-        semester: '1',
-        amount: 5000000,
-        dueDate: '2024-01-15',
-        paymentDate: '2024-01-10',
-        status: 'Đã đóng',
-        paymentMethod: 'Chuyển khoản'
-    },
-    {
-        id: 2,
-        semester: '2',
-        amount: 5000000,
-        dueDate: '2024-02-15',
-        paymentDate: null,
-        status: 'Chưa đóng',
-        paymentMethod: null
-    },
-    {
-        id: 3,
-        semester: '3',
-        amount: 5000000,
-        dueDate: '2024-03-15',
-        paymentDate: null,
-        status: 'Quá hạn',
-        paymentMethod: null
+// Tuition from API
+const tuition = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getTuitions();
+        tuition.value = res && res.data ? res.data : res;
+    } catch (err) {
+        ElMessage.error('Không thể tải thông tin học phí');
+        console.error(err);
     }
-]);
+});
 
 // Computed properties
 const totalTuition = computed(() => tuition.value.reduce((sum, t) => sum + t.amount, 0));

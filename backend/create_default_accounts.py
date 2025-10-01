@@ -16,7 +16,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.base')
 django.setup()
 
-from django.contrib.auth.models import User
+from oauth.models import User
+from businesses.models import Employee
 from django.core.management import call_command
 
 def create_default_accounts():
@@ -25,65 +26,44 @@ def create_default_accounts():
     # Default accounts from config.env
     accounts = [
         {
-            'username': 'student@university.edu',
             'email': 'student@university.edu',
             'password': 'student123',
             'first_name': 'Sinh viên',
-            'last_name': 'Mẫu',
+            'last_name': '',
             'is_staff': False,
-            'is_superuser': False
+            'is_superuser': False,
+            'user_type': 'student'
         },
         {
-            'username': 'teacher@university.edu',
-            'email': 'teacher@university.edu',
-            'password': 'teacher123',
+            'email': 'lecture@university.edu',
+            'password': 'lecture123',
             'first_name': 'Giảng viên',
-            'last_name': 'Mẫu',
+            'last_name': '',
             'is_staff': True,
-            'is_superuser': False
+            'is_superuser': False,
+            'user_type': 'teacher'
         },
         {
-            'username': 'training@university.edu',
-            'email': 'training@university.edu',
-            'password': 'training123',
-            'first_name': 'Nhân viên',
-            'last_name': 'Phòng đào tạo',
-            'is_staff': True,
-            'is_superuser': False
-        },
-        {
-            'username': 'affairs@university.edu',
-            'email': 'affairs@university.edu',
-            'password': 'affairs123',
-            'first_name': 'Nhân viên',
-            'last_name': 'Phòng công tác sinh viên',
-            'is_staff': True,
-            'is_superuser': False
-        },
-        {
-            'username': 'admin@university.edu',
             'email': 'admin@university.edu',
             'password': 'admin123',
             'first_name': 'Quản trị viên',
-            'last_name': 'Hệ thống',
+            'last_name': '',
             'is_staff': True,
-            'is_superuser': True
+            'is_superuser': True,
+            'user_type': 'admin'
         }
     ]
     
     print("Creating default user accounts...")
     
     for account in accounts:
-        username = account['username']
-        
+        email = account['email']
         # Check if user already exists
-        if User.objects.filter(username=username).exists():
-            print(f"User {username} already exists, skipping...")
+        if User.objects.filter(email=email).exists():
+            print(f"User {email} already exists, skipping...")
             continue
-        
         # Create user
         user = User.objects.create_user(
-            username=username,
             email=account['email'],
             password=account['password'],
             first_name=account['first_name'],
@@ -91,15 +71,26 @@ def create_default_accounts():
             is_staff=account['is_staff'],
             is_superuser=account['is_superuser']
         )
-        
-        print(f"Created user: {username} ({account['first_name']} {account['last_name']})")
+        user.user_type = account['user_type']
+        user.save()
+        # Tạo employee liên kết nếu chưa có
+        if not Employee.objects.filter(user=user).exists():
+            emp = Employee.objects.create(
+                user=user,
+                first_name=account['first_name'],
+                last_name=account['last_name'],
+                work_mail=account['email'],
+                status=1  # Active
+            )
+            print(f"Created employee for: {email}")
+        else:
+            print(f"Employee already exists for: {email}")
+        print(f"Created user: {email} ({account['first_name']})")
     
     print("\nDefault accounts created successfully!")
     print("\nLogin credentials:")
     print("Student: student@university.edu / student123")
-    print("Teacher: teacher@university.edu / teacher123")
-    print("Training Staff: training@university.edu / training123")
-    print("Student Affairs: affairs@university.edu / affairs123")
+    print("Lecture: lecture@university.edu / lecture123")
     print("Admin: admin@university.edu / admin123")
 
 if __name__ == '__main__':

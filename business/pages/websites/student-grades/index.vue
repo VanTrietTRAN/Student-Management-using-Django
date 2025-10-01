@@ -166,10 +166,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
 import IconAppraisal from '@/assets/icons/appraisal.svg';
+import AcademicService from '@/services/websites/academic';
 
 definePageMeta({
     layout: 'student'
@@ -181,57 +182,19 @@ const selectedYear = ref('');
 const showDetailDialog = ref(false);
 const selectedGrade = ref(null);
 
-// Mock data
-const grades = ref([
-    {
-        id: 1,
-        subjectCode: 'CS101',
-        subjectName: 'Lập trình cơ bản',
-        credits: 3,
-        semester: '1',
-        year: '2021-2022',
-        midtermScore: 8.5,
-        finalScore: 9.0,
-        gpa: 8.8,
-        status: 'Hoàn thành'
-    },
-    {
-        id: 2,
-        subjectCode: 'CS102',
-        subjectName: 'Cấu trúc dữ liệu',
-        credits: 4,
-        semester: '2',
-        year: '2021-2022',
-        midtermScore: 7.5,
-        finalScore: 8.0,
-        gpa: 7.8,
-        status: 'Hoàn thành'
-    },
-    {
-        id: 3,
-        subjectCode: 'SE201',
-        subjectName: 'Phát triển phần mềm',
-        credits: 3,
-        semester: '1',
-        year: '2022-2023',
-        midtermScore: 9.0,
-        finalScore: 9.5,
-        gpa: 9.3,
-        status: 'Hoàn thành'
-    },
-    {
-        id: 4,
-        subjectCode: 'IT301',
-        subjectName: 'An toàn thông tin',
-        credits: 3,
-        semester: '2',
-        year: '2022-2023',
-        midtermScore: 8.0,
-        finalScore: 8.5,
-        gpa: 8.4,
-        status: 'Hoàn thành'
+// Grades from API
+const grades = ref([]);
+
+onMounted(async () => {
+    try {
+        // optionally pass student filter if available via store
+        const res = await AcademicService.getGrades();
+        grades.value = res && res.data ? res.data : res;
+    } catch (err) {
+        ElMessage.error('Không thể tải điểm của bạn');
+        console.error(err);
     }
-]);
+});
 
 // Computed properties
 const currentGPA = computed(() => {

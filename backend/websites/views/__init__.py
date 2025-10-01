@@ -10,3 +10,9 @@ from .article_public import ArticlePublicViewSet
 from .section import SectionViewSet
 from .section_public import SectionPublicViewSet
 from .build import BuildViewSet
+from .subjects import SubjectViewSet
+from .classrooms import ClassroomViewSet
+from .students import StudentViewSet
+from .registrations import RegistrationViewSet
+from .tuitions import TuitionViewSet
+from .grades import GradeViewSet

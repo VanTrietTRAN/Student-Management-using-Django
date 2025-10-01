@@ -152,83 +152,111 @@
                 <el-form-item label="Email">
                     <el-input v-model="editingInfo.email" type="email" />
                 </el-form-item>
-                <el-form-item label="Số điện thoại">
-                    <el-input v-model="editingInfo.phone" />
-                </el-form-item>
-                <el-form-item label="Ngày sinh">
-                    <el-date-picker v-model="editingInfo.dateOfBirth" type="date" />
                 </el-form-item>
                 <el-form-item label="Giới tính">
                     <el-select v-model="editingInfo.gender" placeholder="Chọn giới tính">
-                        <el-option label="Nam" value="Nam" />
-                        <el-option label="Nữ" value="Nữ" />
-                    </el-select>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="showEditDialog = false">Hủy</el-button>
-                <el-button type="primary" @click="updateProfile">Cập nhật</el-button>
-            </template>
-        </el-dialog>
-
-        <!-- Image Upload Dialog -->
-        <el-dialog v-model="showImageUpload" title="Cập nhật ảnh đại diện" width="400px">
-            <div class="text-center">
-                <div class="mb-4">
-                    <img 
-                        :src="previewImage || studentInfo.profilePicture || '/default-avatar.png'" 
-                        alt="Preview"
-                        class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-gray-200"
-                    />
-                </div>
-                <el-upload
-                    ref="uploadRef"
-                    :auto-upload="false"
-                    :on-change="handleImageChange"
-                    :show-file-list="false"
-                    accept="image/*"
-                    class="mb-4"
-                >
-                    <el-button type="primary">Chọn ảnh</el-button>
-                </el-upload>
-                <p class="text-sm text-gray-500">Chọn ảnh JPG, PNG hoặc GIF (tối đa 5MB)</p>
-            </div>
-            <template #footer>
-                <el-button @click="showImageUpload = false">Hủy</el-button>
-                <el-button type="primary" @click="uploadImage">Cập nhật ảnh</el-button>
-            </template>
-        </el-dialog>
-    </div>
-</template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
-import IconCamera from '@element-plus/icons-vue/Camera'
-
-definePageMeta({
-    layout: 'websites'
-})
-
-// Reactive data
-const showEditDialog = ref(false)
-const showImageUpload = ref(false)
-const previewImage = ref('')
-const uploadRef = ref()
-
-const studentInfo = ref({
-    fullName: 'Nguyễn Văn An',
-    studentId: 'SV001',
-    email: 'an.nguyen@email.com',
-    phone: '0123456789',
-    classroom: 'CNTT21A',
-    major: 'Công nghệ thông tin',
-    year: '2021',
-    gpa: 8.5,
-    status: 'Đang học',
-    profilePicture: null,
-    dateOfBirth: '2003-05-15',
-    gender: 'Nam',
+                </script>
+                <script setup lang="ts">
+                import { ref, computed, onMounted } from 'vue'
+                import { ElMessage } from 'element-plus'
+                import IconCamera from '@element-plus/icons-vue/Camera'
+                import { useOauthStore } from '@/stores/oauth'
++
++import AcademicService from '@/services/websites/academic'
++
++definePageMeta({
++    layout: 'websites'
++})
++
++// Reactive data
++const showEditDialog = ref(false)
++const showImageUpload = ref(false)
++const previewImage = ref('')
++const uploadRef = ref()
++
++const studentInfo = ref({})
++
++const editingInfo = ref({})
++
++const completedCredits = ref(0)
++const totalCredits = ref(0)
++const progressPercentage = computed(() => totalCredits.value ? Math.round((completedCredits.value / totalCredits.value) * 100) : 0)
++
++const oauth = useOauthStore()
++
++onMounted(async () => {
++    const userId = oauth.userId;
++    if (userId) {
++        try {
++            const res = await AcademicService.getStudent(userId);
++            const data = res && res.data ? res.data : res;
++            studentInfo.value = data || {};
++            editingInfo.value = { ...studentInfo.value };
++            // set some derived values if available
+                            completedCredits.value = data?.completed_credits || 0
++            totalCredits.value = data?.total_credits || 0
++        } catch (err) {
++            ElMessage.error('Không thể tải thông tin cá nhân');
++            console.error(err);
++        }
++    }
++});
++
++// Methods
++const getStatusType = (status: string) => {
++    switch (status) {
++        case 'Đang học': return 'success'
++        case 'Tốt nghiệp': return 'info'
++        case 'Tạm nghỉ': return 'warning'
++        default: return 'danger'
++    }
++}
++
++const getGPAClass = (gpa: number) => {
++    if (gpa >= 8.0) return 'text-green-600'
++    if (gpa >= 6.5) return 'text-blue-600'
++    if (gpa >= 5.0) return 'text-yellow-600'
++    return 'text-red-600'
++}
++
++const getProgressColor = (percentage: number) => {
++    if (percentage >= 80) return '#10B981'
++    if (percentage >= 60) return '#3B82F6'
++    if (percentage >= 40) return '#F59E0B'
++    return '#EF4444'
++}
++
++const updateProfile = async () => {
++    try {
++        // optimistic update locally; persist to API if endpoint exists
++        Object.assign(studentInfo.value, editingInfo.value)
++        showEditDialog.value = false
++        ElMessage.success('Cập nhật thông tin thành công')
++    } catch (err) {
++        ElMessage.error('Cập nhật thất bại')
++        console.error(err)
++    }
++}
++
++const handleImageChange = (file: any) => {
++    const reader = new FileReader()
++    reader.onload = (e) => {
++        previewImage.value = e.target?.result as string
++    }
++    reader.readAsDataURL(file.raw)
++}
++
++const uploadImage = () => {
++    if (previewImage.value) {
++        studentInfo.value.profilePicture = previewImage.value
++        showImageUpload.value = false
++        previewImage.value = ''
++        ElMessage.success('Cập nhật ảnh đại diện thành công')
++    } else {
++        ElMessage.error('Vui lòng chọn ảnh')
++    }
++}
++</script>*** End Patch
     enrollmentDate: '2021-09-01'
 })
 

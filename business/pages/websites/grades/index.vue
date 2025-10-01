@@ -257,11 +257,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconAppraisal from '@/assets/icons/appraisal.svg';
 import IconUsers from '@/assets/icons/users.svg';
+import AcademicService from '@/services/websites/academic';
 
 definePageMeta({
     layout: 'websites'
@@ -287,39 +288,17 @@ const newGrade = ref({
     finalScore: 0
 });
 
-// Mock data
-const grades = ref([
-    {
-        id: 1,
-        studentName: 'Nguyễn Văn An',
-        subjectName: 'Lập trình cơ bản',
-        semester: '1',
-        midtermScore: 8.5,
-        finalScore: 9.0,
-        gpa: 8.8,
-        status: 'Hoàn thành'
-    },
-    {
-        id: 2,
-        studentName: 'Trần Thị Bình',
-        subjectName: 'Cấu trúc dữ liệu',
-        semester: '2',
-        midtermScore: 7.5,
-        finalScore: 8.0,
-        gpa: 7.8,
-        status: 'Hoàn thành'
-    },
-    {
-        id: 3,
-        studentName: 'Lê Văn Cường',
-        subjectName: 'Phát triển phần mềm',
-        semester: '3',
-        midtermScore: 9.0,
-        finalScore: 9.5,
-        gpa: 9.3,
-        status: 'Hoàn thành'
+const grades = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getGrades();
+        grades.value = res && res.data ? res.data : res;
+    } catch (err) {
+        ElMessage.error('Không thể tải danh sách điểm');
+        console.error(err);
     }
-]);
+});
 
 // Computed properties
 const totalGrades = computed(() => grades.value.length);
