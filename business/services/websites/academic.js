@@ -23,6 +23,11 @@ class AcademicService extends BaseService {
     return this.request().get(`${this.entity}/students`, params);
   }
 
+  // Teachers
+  getTeachers(params = null) {
+    return this.request().get(`${this.entity}/teachers`, params);
+  }
+
   getStudent(id) {
     return this.request().get(`${this.entity}/students/${id}`);
   }
@@ -65,6 +70,21 @@ class AcademicService extends BaseService {
 
   createGrade(data) {
     return this.request().post(`${this.entity}/grades`, data);
+  }
+
+  // Notifications
+  getNotifications(params = null) {
+    return this.request().get(`${this.entity}/notifications`, params);
+  }
+
+  // Schedules
+  getSchedules(params = null) {
+    return this.request().get(`${this.entity}/schedules`, params);
+  }
+
+  // Rewards / Records
+  getRewards(params = null) {
+    return this.request().get(`${this.entity}/rewards`, params);
   }
 }
 

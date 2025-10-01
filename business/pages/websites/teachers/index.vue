@@ -248,10 +248,10 @@ import { Plus, Search } from '@element-plus/icons-vue';
 import IconUsers from '@/assets/icons/users.svg';
 import IconAppraisal from '@/assets/icons/appraisal.svg';
 import IconCalendar from '@/assets/icons/calendar.svg';
+import { onMounted } from 'vue'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'websites'
-});
+definePageMeta({ layout: 'websites' });
 
 // Reactive data
 const searchKeyword = ref('');
@@ -273,51 +273,50 @@ const newTeacher = ref({
     department: ''
 });
 
-// Mock data
-const teachers = ref([
-    {
-        id: 1,
-        teacherId: 'GV001',
-        fullName: 'ThS. Nguyễn Văn A',
-        email: 'a.nguyen@university.edu',
-        phone: '0123456789',
-        department: 'CNTT',
-        status: 'Đang làm việc'
-    },
-    {
-        id: 2,
-        teacherId: 'GV002',
-        fullName: 'TS. Trần Thị B',
-        email: 'b.tran@university.edu',
-        phone: '0987654321',
-        department: 'CNTT',
-        status: 'Đang làm việc'
-    },
-    {
-        id: 3,
-        teacherId: 'GV003',
-        fullName: 'ThS. Lê Văn C',
-        email: 'c.le@university.edu',
-        phone: '0369852147',
-        department: 'KTPM',
-        status: 'Đang làm việc'
-    },
-    {
-        id: 4,
-        teacherId: 'GV004',
-        fullName: 'TS. Phạm Thị D',
-        email: 'd.pham@university.edu',
-        phone: '0741235698',
-        department: 'ATTT',
-        status: 'Đang làm việc'
+// Teachers list (will be loaded from API)
+const teachers = ref<any[]>([])
+
+// fallback mock in case API isn't available
+const fallbackTeachers = [
+    { id: 1, teacherId: 'GV001', fullName: 'ThS. Nguyễn Văn A', email: 'a.nguyen@university.edu', phone: '0123456789', department: 'CNTT', status: 'Đang làm việc' },
+    { id: 2, teacherId: 'GV002', fullName: 'TS. Trần Thị B', email: 'b.tran@university.edu', phone: '0987654321', department: 'CNTT', status: 'Đang làm việc' }
+]
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getTeachers({ page_size: 100 })
+        const data = res && res.data ? res.data : res
+        teachers.value = Array.isArray(data) ? data : (data.results || [])
+        if (!teachers.value.length) teachers.value = fallbackTeachers
+    } catch (err) {
+        console.warn('Failed to load teachers', err)
+        teachers.value = fallbackTeachers
     }
-]);
+})
+
+// Subjects count (for statistics card)
+const subjects = ref<any[]>([])
+const fallbackSubjectsCount = 15
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getSubjects({ page_size: 1 })
+        const data = res && res.data ? res.data : res
+        // if paginated, data.count may exist
+        if (data && typeof data.count === 'number') {
+            subjects.value = new Array(data.count).fill(null)
+        } else {
+            subjects.value = Array.isArray(data) ? data : (data.results || [])
+        }
+    } catch (err) {
+        console.warn('Failed to load subjects count', err)
+        subjects.value = []
+    }
 
 // Computed properties
 const totalTeachers = computed(() => teachers.value.length);
 const activeTeachers = computed(() => teachers.value.filter(t => t.status === 'Đang làm việc').length);
 const cnttTeachers = computed(() => teachers.value.filter(t => t.department === 'CNTT').length);
-const totalSubjects = computed(() => 15); // Mock data
+const totalSubjects = computed(() => subjects.value.length || fallbackSubjectsCount)
 
 const filteredTeachers = computed(() => {
     let filtered = teachers.value;

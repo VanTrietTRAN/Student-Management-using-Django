@@ -161,25 +161,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import IconUsers from '@/assets/icons/users.svg'
 import IconCalendar from '@/assets/icons/calendar.svg'
 import IconAppraisal from '@/assets/icons/appraisal.svg'
 import { Document } from '@element-plus/icons-vue'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'websites'
-})
+definePageMeta({ layout: 'websites' })
 
-// Mock data for statistics
-const totalStudents = ref(1250)
-const totalClasses = ref(45)
-const totalSubjects = ref(120)
-const systemGPA = ref('8.2')
-const activeStudents = ref(1180)
-const activeClasses = ref(42)
-const activeSubjects = ref(95)
-const unpaidTuition = ref(85)
+const totalStudents = ref<number | string>('—')
+const totalClasses = ref<number | string>('—')
+const totalSubjects = ref<number | string>('—')
+const systemGPA = ref<number | string>('—')
+const activeStudents = ref<number | string>('—')
+const activeClasses = ref<number | string>('—')
+const activeSubjects = ref<number | string>('—')
+const unpaidTuition = ref<number | string>('—')
 
 const recentNotifications = ref([
     { id: 1, title: 'Thông báo lịch thi cuối kỳ', time: '2 giờ trước' },
@@ -187,6 +186,55 @@ const recentNotifications = ref([
     { id: 3, title: 'Thông báo nghỉ lễ 30/4', time: '3 ngày trước' },
     { id: 4, title: 'Kết quả xét học bổng', time: '1 tuần trước' }
 ])
+
+onMounted(async () => {
+    try {
+        // students
+        const sRes = await AcademicService.getStudents({ page_size: 1 })
+        const sData = sRes && sRes.data ? sRes.data : sRes
+        // If paginated
+        totalStudents.value = Array.isArray(sData) ? sData.length : (sData.count ?? '—')
+
+        // classrooms
+        try {
+            const cRes = await AcademicService.getClassrooms({ page_size: 1 })
+            const cData = cRes && cRes.data ? cRes.data : cRes
+            totalClasses.value = Array.isArray(cData) ? cData.length : (cData.count ?? '—')
+        } catch (err) {
+            console.warn('classrooms fetch failed', err)
+            totalClasses.value = '—'
+        }
+
+        // subjects
+        try {
+            const subRes = await AcademicService.getSubjects({ page_size: 1 })
+            const subData = subRes && subRes.data ? subRes.data : subRes
+            totalSubjects.value = Array.isArray(subData) ? subData.length : (subData.count ?? '—')
+        } catch (err) {
+            console.warn('subjects fetch failed', err)
+            totalSubjects.value = '—'
+        }
+
+        // system GPA - compute average from grades endpoint if available
+        try {
+            const gRes = await AcademicService.getGrades({ page_size: 1000 })
+            const gData = gRes && gRes.data ? gRes.data : gRes
+            const gradesList = Array.isArray(gData) ? gData : (gData.results || [])
+            if (gradesList.length > 0) {
+                const avg = gradesList.reduce((acc:any, g:any) => acc + (g.gpa || 0), 0) / gradesList.length
+                systemGPA.value = avg.toFixed(2)
+            } else {
+                systemGPA.value = '—'
+            }
+        } catch (err) {
+            console.warn('grades fetch failed', err)
+            systemGPA.value = '—'
+        }
+    } catch (err) {
+        ElMessage.error('Không thể tải số liệu hệ thống')
+        console.error(err)
+    }
+})
 </script>
 
 <style scoped>
