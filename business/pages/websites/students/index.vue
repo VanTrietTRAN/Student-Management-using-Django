@@ -290,6 +290,7 @@ import { ref, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconUsers from '@/assets/icons/users.svg';
+import type { Student, NewStudent, EditingStudent } from '@/types/websites/student';
 
 definePageMeta({
     layout: 'websites'
@@ -304,20 +305,20 @@ const pageSize = ref(20);
 const showAddDialog = ref(false);
 const showViewDialog = ref(false);
 const showEditDialog = ref(false);
-const selectedStudent = ref(null);
-const editingStudent = ref({});
+const selectedStudent = ref<Student | null>(null);
+const editingStudent = ref<EditingStudent>({} as EditingStudent);
 
-const newStudent = ref({
+const newStudent = ref<NewStudent>({
     studentId: '',
     fullName: '',
     email: '',
     phone: '',
     class: '',
-    major: ''
+    major: '',
 });
 
 // Mock data
-const students = ref([
+const students = ref<Student[]>([
     {
         id: 1,
         studentId: 'SV001',
@@ -395,20 +396,22 @@ const handleSearch = () => {
     ElMessage.success('Tìm kiếm hoàn tất');
 };
 
-const viewStudent = (student: any) => {
+const viewStudent = (student: Student) => {
     selectedStudent.value = student;
     showViewDialog.value = true;
 };
 
-const editStudent = (student: any) => {
+const editStudent = (student: Student) => {
     editingStudent.value = { ...student };
     showEditDialog.value = true;
 };
 
 const editStudentFromView = () => {
-    showViewDialog.value = false;
-    editingStudent.value = { ...selectedStudent.value };
-    showEditDialog.value = true;
+    if (selectedStudent.value) {
+        showViewDialog.value = false;
+        editingStudent.value = { ...selectedStudent.value };
+        showEditDialog.value = true;
+    }
 };
 
 // Update student with image upload
@@ -417,10 +420,10 @@ const updateStudent = async () => {
     if (index > -1) {
         const formData = new FormData();
         for (const key in editingStudent.value) {
-            if (key === 'profile_picture' && editingStudent.value.profile_picture) {
+            if (key === 'profile_picture' && editingStudent.value.profile_picture instanceof File) {
                 formData.append('profile_picture', editingStudent.value.profile_picture);
             } else if (key !== 'profile_picture_preview') {
-                formData.append(key, editingStudent.value[key]);
+                formData.append(key, String(editingStudent.value[key as keyof EditingStudent]));
             }
         }
         try {
@@ -469,10 +472,10 @@ const addStudent = async () => {
     if (newStudent.value.studentId && newStudent.value.fullName) {
         const formData = new FormData();
         for (const key in newStudent.value) {
-            if (key === 'profile_picture' && newStudent.value.profile_picture) {
+            if (key === 'profile_picture' && newStudent.value.profile_picture instanceof File) {
                 formData.append('profile_picture', newStudent.value.profile_picture);
             } else if (key !== 'profile_picture_preview') {
-                formData.append(key, newStudent.value[key]);
+                formData.append(key, String(newStudent.value[key as keyof NewStudent]));
             }
         }
         try {
@@ -508,8 +511,9 @@ const addStudent = async () => {
     }
 };
 // Helper to get full image URL from backend
-const getProfilePictureUrl = (path: string | null | undefined) => {
+const getProfilePictureUrl = (path: string | File | null | undefined) => {
     if (!path) return '';
+    if (path instanceof File) return URL.createObjectURL(path);
     if (typeof path !== 'string') return '';
     if (path.startsWith('http')) return path;
     // Use relative path
@@ -523,7 +527,7 @@ const onAddImageChange = (e: Event) => {
         newStudent.value.profile_picture = file;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            newStudent.value.profile_picture_preview = ev.target?.result;
+            newStudent.value.profile_picture_preview = ev.target?.result as string;
         };
         reader.readAsDataURL(file);
     }
@@ -536,7 +540,7 @@ const onEditImageChange = (e: Event) => {
         editingStudent.value.profile_picture = file;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            editingStudent.value.profile_picture_preview = ev.target?.result;
+            editingStudent.value.profile_picture_preview = ev.target?.result as string;
         };
         reader.readAsDataURL(file);
     }

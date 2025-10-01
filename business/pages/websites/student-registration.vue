@@ -1,12 +1,12 @@
-&lt;template>
-  &lt;div class="p-6">
-    &lt;!-- Page Header -->
-    &lt;div class="mb-6">
-      &lt;h1 class="text-2xl font-bold text-gray-900">{{ $t('Đăng ký học phần') }}&lt;/h1>
-    &lt;/div>
+<template>
+  <div class="p-6">
+    <!-- Page Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">{{ $t('Đăng ký học phần') }}</h1>
+    </div>
 
-    &lt;!-- Registration Period Info -->
-    &lt;el-alert
+    <!-- Registration Period Info -->
+    <el-alert
       v-if="registrationPeriod.isActive"
       type="success"
       :title="$t('Thời gian đăng ký:')"
@@ -14,7 +14,7 @@
       show-icon
       class="mb-6"
     />
-    &lt;el-alert
+    <el-alert
       v-else
       type="info"
       :title="$t('Chưa đến thời gian đăng ký')"
@@ -23,110 +23,140 @@
       class="mb-6"
     />
 
-    &lt;!-- Course Search and Filters -->
-    &lt;div class="mb-6 flex gap-4">
-      &lt;el-input
+    <!-- Course Search and Filters -->
+    <div class="mb-6 flex gap-4">
+      <el-input
         v-model="searchQuery"
         :placeholder="$t('Tìm kiếm theo mã hoặc tên học phần')"
         class="w-96"
       >
-        &lt;template #prefix>
-          &lt;el-icon>&lt;Search />&lt;/el-icon>
-        &lt;/template>
-      &lt;/el-input>
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
       
-      &lt;el-select v-model="selectedDepartment" :placeholder="$t('Khoa/Viện')" class="w-64">
-        &lt;el-option
+      <el-select v-model="selectedDepartment" :placeholder="$t('Khoa/Viện')" class="w-64">
+        <el-option
           v-for="dept in departments"
           :key="dept.value"
           :label="dept.label"
           :value="dept.value"
         />
-      &lt;/el-select>
-    &lt;/div>
+      </el-select>
+    </div>
 
-    &lt;!-- Available Courses Table -->
-    &lt;el-table :data="filteredCourses" stripe>
-      &lt;el-table-column type="expand">
-        &lt;template #default="props">
-          &lt;div class="p-4">
-            &lt;h4 class="font-bold mb-2">{{ $t('Lớp học phần có sẵn:') }}&lt;/h4>
-            &lt;el-table :data="props.row.sections" border>
-              &lt;el-table-column prop="sectionCode" :label="$t('Mã lớp')" width="120" />
-              &lt;el-table-column prop="instructor" :label="$t('Giảng viên')" width="200" />
-              &lt;el-table-column prop="schedule" :label="$t('Lịch học')" min-width="200" />
-              &lt;el-table-column prop="room" :label="$t('Phòng học')" width="120" />
-              &lt;el-table-column prop="enrolled" :label="$t('Đã đăng ký')" width="120">
-                &lt;template #default="{ row }">
-                  {{ row.enrolled }}/{{ row.capacity }}
-                &lt;/template>
-              &lt;/el-table-column>
-              &lt;el-table-column align="right" width="120">
-                &lt;template #default="{ row }">
-                  &lt;el-button
+    <!-- Available Courses Table -->
+    <el-table :data="filteredCourses" stripe>
+      <el-table-column type="expand">
+        <template #default="scope">
+          <div class="p-4">
+            <h4 class="font-bold mb-2">{{ $t('Lớp học phần có sẵn:') }}</h4>
+            <el-table :data="scope.row.sections" border>
+              <el-table-column prop="sectionCode" :label="$t('Mã lớp')" width="120" />
+              <el-table-column prop="instructor" :label="$t('Giảng viên')" width="200" />
+              <el-table-column prop="schedule" :label="$t('Lịch học')" min-width="200" />
+              <el-table-column prop="room" :label="$t('Phòng học')" width="120" />
+              <el-table-column prop="enrolled" :label="$t('Đã đăng ký')" width="120">
+                <template #default="scope">
+                  {{ scope.row.enrolled }}/{{ scope.row.capacity }}
+                </template>
+              </el-table-column>
+              <el-table-column align="right" width="120">
+                <template #default="scope">
+                  <el-button
                     type="primary"
-                    :disabled="row.enrolled >= row.capacity"
-                    @click="registerSection(row)"
+                    :disabled="scope.row.enrolled >= scope.row.capacity"
+                    @click="registerSection(scope.row)"
                   >
                     {{ $t('Đăng ký') }}
-                  &lt;/el-button>
-                &lt;/template>
-              &lt;/el-table-column>
-            &lt;/el-table>
-          &lt;/div>
-        &lt;/template>
-      &lt;/el-table-column>
-      &lt;el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
-      &lt;el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="300" />
-      &lt;el-table-column prop="credits" :label="$t('Số tín chỉ')" width="120" align="center" />
-      &lt;el-table-column prop="type" :label="$t('Loại học phần')" width="150">
-        &lt;template #default="{ row }">
-          &lt;el-tag :type="getCourseTypeTag(row.type)">{{ row.type }}&lt;/el-tag>
-        &lt;/template>
-      &lt;/el-table-column>
-      &lt;el-table-column prop="prerequisite" :label="$t('Học phần tiên quyết')" width="200" />
-    &lt;/el-table>
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
+      <el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="300" />
+      <el-table-column prop="credits" :label="$t('Số tín chỉ')" width="120" align="center" />
+      <el-table-column prop="type" :label="$t('Loại học phần')" width="150">
+        <template #default="scope">
+          <el-tag :type="getCourseTypeTag(scope.row.type)">{{ scope.row.type }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="prerequisite" :label="$t('Học phần tiên quyết')" width="200" />
+    </el-table>
 
-    &lt;!-- Registered Courses -->
-    &lt;div class="mt-8">
-      &lt;h2 class="text-xl font-bold mb-4">{{ $t('Các học phần đã đăng ký') }}&lt;/h2>
-      &lt;el-table :data="registeredCourses" stripe>
-        &lt;el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
-        &lt;el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="300" />
-        &lt;el-table-column prop="sectionCode" :label="$t('Mã lớp')" width="120" />
-        &lt;el-table-column prop="schedule" :label="$t('Lịch học')" width="200" />
-        &lt;el-table-column prop="room" :label="$t('Phòng học')" width="120" />
-        &lt;el-table-column prop="instructor" :label="$t('Giảng viên')" width="200" />
-        &lt;el-table-column align="right" width="120">
-          &lt;template #default="{ row }">
-            &lt;el-button type="danger" @click="unregisterCourse(row)">
+    <!-- Registered Courses -->
+    <div class="mt-8">
+      <h2 class="text-xl font-bold mb-4">{{ $t('Các học phần đã đăng ký') }}</h2>
+      <el-table :data="registeredCourses" stripe>
+        <el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
+        <el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="300" />
+        <el-table-column prop="sectionCode" :label="$t('Mã lớp')" width="120" />
+        <el-table-column prop="schedule" :label="$t('Lịch học')" width="200" />
+        <el-table-column prop="room" :label="$t('Phòng học')" width="120" />
+        <el-table-column prop="instructor" :label="$t('Giảng viên')" width="200" />
+        <el-table-column align="right" width="120">
+          <template #default="scope">
+            <el-button type="danger" @click="unregisterCourse(scope.row)">
               {{ $t('Hủy đăng ký') }}
-            &lt;/el-button>
-          &lt;/template>
-        &lt;/el-table-column>
-      &lt;/el-table>
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-      &lt;!-- Registration Summary -->
-      &lt;div class="mt-6 bg-white p-6 rounded-lg shadow">
-        &lt;div class="grid grid-cols-2 gap-6">
-          &lt;div class="text-center">
-            &lt;p class="text-sm text-gray-600">{{ $t('Tổng số tín chỉ đăng ký') }}&lt;/p>
-            &lt;p class="text-2xl font-bold text-primary-600">12/24&lt;/p>
-          &lt;/div>
-          &lt;div class="text-center">
-            &lt;p class="text-sm text-gray-600">{{ $t('Học phí tạm tính') }}&lt;/p>
-            &lt;p class="text-2xl font-bold text-primary-600">12,000,000 VNĐ&lt;/p>
-          &lt;/div>
-        &lt;/div>
-      &lt;/div>
-    &lt;/div>
-  &lt;/div>
-&lt;/template>
+      <!-- Registration Summary -->
+      <div class="mt-6 bg-white p-6 rounded-lg shadow">
+        <div class="grid grid-cols-2 gap-6">
+          <div class="text-center">
+            <p class="text-sm text-gray-600">{{ $t('Tổng số tín chỉ đăng ký') }}</p>
+            <p class="text-2xl font-bold text-primary-600">12/24</p>
+          </div>
+          <div class="text-center">
+            <p class="text-sm text-gray-600">{{ $t('Học phí tạm tính') }}</p>
+            <p class="text-2xl font-bold text-primary-600">12,000,000 VNĐ</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
-&lt;script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+
+const { t: $t } = useI18n()
+
+interface Section {
+  sectionCode: string
+  instructor: string
+  schedule: string
+  room: string
+  enrolled: number
+  capacity: number
+}
+
+interface Course {
+  courseCode: string
+  courseName: string
+  credits: number
+  type: string
+  prerequisite: string
+  sections: Section[]
+}
+
+interface RegisteredCourse {
+  courseCode: string
+  courseName: string
+  sectionCode: string
+  schedule: string
+  room: string
+  instructor: string
+}
 
 const searchQuery = ref('')
 const selectedDepartment = ref('')
@@ -142,7 +172,7 @@ const departments = [
   { value: 'sem', label: 'Viện Kinh tế & Quản lý' },
 ]
 
-const courses = ref([
+const courses = ref<Course[]>([
   {
     courseCode: 'INT3306',
     courseName: 'Web Programming',
@@ -187,7 +217,7 @@ const courses = ref([
   }
 ])
 
-const registeredCourses = ref([
+const registeredCourses = ref<RegisteredCourse[]>([
   {
     courseCode: 'INT3308',
     courseName: 'Software Engineering',
@@ -222,7 +252,7 @@ const getCourseTypeTag = (type: string) => {
   }
 }
 
-const registerSection = async (section: any) => {
+const registerSection = async (section: Section) => {
   try {
     await ElMessageBox.confirm(
       $t('Bạn có chắc chắn muốn đăng ký học phần này?'),
@@ -240,7 +270,7 @@ const registerSection = async (section: any) => {
   }
 }
 
-const unregisterCourse = async (course: any) => {
+const unregisterCourse = async (course: RegisteredCourse) => {
   try {
     await ElMessageBox.confirm(
       $t('Bạn có chắc chắn muốn hủy đăng ký học phần này?'),
@@ -257,10 +287,11 @@ const unregisterCourse = async (course: any) => {
     // User cancelled
   }
 }
-&lt;/script>
+</script>
 
-&lt;style scoped>
+<style scoped>
 .el-table {
-  @apply rounded-lg shadow;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
-&lt;/style>
+</style>

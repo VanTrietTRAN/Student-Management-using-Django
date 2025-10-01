@@ -1,99 +1,99 @@
-&lt;template>
-  &lt;div class="p-6">
-    &lt;!-- Page Header -->
-    &lt;div class="mb-6">
-      &lt;h1 class="text-2xl font-bold text-gray-900">{{ $t('Lịch học/thi') }}&lt;/h1>
-    &lt;/div>
+<template>
+  <div class="p-6">
+    <!-- Page Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">{{ $t('Lịch học/thi') }}</h1>
+    </div>
 
-    &lt;!-- Schedule Type Tabs -->
-    &lt;el-tabs v-model="activeTab" class="mb-6">
-      &lt;el-tab-pane :label="$t('Lịch học')" name="class" />
-      &lt;el-tab-pane :label="$t('Lịch thi')" name="exam" />
-    &lt;/el-tabs>
+    <!-- Schedule Type Tabs -->
+    <el-tabs v-model="activeTab" class="mb-6">
+      <el-tab-pane :label="$t('Lịch học')" name="class" />
+      <el-tab-pane :label="$t('Lịch thi')" name="exam" />
+    </el-tabs>
 
-    &lt;!-- Week Navigation -->
-    &lt;div class="flex items-center justify-between mb-6">
-      &lt;div class="flex items-center gap-4">
-        &lt;el-button-group>
-          &lt;el-button @click="previousWeek">
-            &lt;el-icon>&lt;ArrowLeft />&lt;/el-icon>
-          &lt;/el-button>
-          &lt;el-button @click="nextWeek">
-            &lt;el-icon>&lt;ArrowRight />&lt;/el-icon>
-          &lt;/el-button>
-        &lt;/el-button-group>
-        &lt;el-button @click="currentWeek">{{ $t('Tuần này') }}&lt;/el-button>
-      &lt;/div>
-      &lt;div class="text-lg font-semibold text-gray-700">
+    <!-- Week Navigation -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-4">
+        <el-button-group>
+          <el-button @click="previousWeek">
+            <el-icon><ArrowLeft /></el-icon>
+          </el-button>
+          <el-button @click="nextWeek">
+            <el-icon><ArrowRight /></el-icon>
+          </el-button>
+        </el-button-group>
+        <el-button @click="currentWeek">{{ $t('Tuần này') }}</el-button>
+      </div>
+      <div class="text-lg font-semibold text-gray-700">
         {{ weekRange }}
-      &lt;/div>
-    &lt;/div>
+      </div>
+    </div>
 
-    &lt;!-- Weekly Schedule -->
-    &lt;div v-if="activeTab === 'class'" class="bg-white rounded-lg shadow overflow-hidden">
-      &lt;div class="grid grid-cols-6 gap-px bg-gray-200">
-        &lt;!-- Time Column -->
-        &lt;div class="bg-white p-2">
-          &lt;div class="h-12 border-b border-gray-200 flex items-center justify-center font-semibold">
+    <!-- Weekly Schedule -->
+    <div v-if="activeTab === 'class'" class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="grid grid-cols-6 gap-px bg-gray-200">
+        <!-- Time Column -->
+        <div class="bg-white p-2">
+          <div class="h-12 border-b border-gray-200 flex items-center justify-center font-semibold">
             {{ $t('Thời gian') }}
-          &lt;/div>
-          &lt;div v-for="slot in timeSlots" :key="slot" class="h-24 flex items-center justify-center text-sm text-gray-500">
+          </div>
+          <div v-for="slot in timeSlots" :key="slot" class="h-24 flex items-center justify-center text-sm text-gray-500">
             {{ slot }}
-          &lt;/div>
-        &lt;/div>
+          </div>
+        </div>
 
-        &lt;!-- Day Columns -->
-        &lt;div v-for="day in weekDays" :key="day.date" class="bg-white">
-          &lt;div class="h-12 p-2 border-b border-gray-200">
-            &lt;div class="text-center font-semibold">{{ day.name }}&lt;/div>
-            &lt;div class="text-sm text-gray-500 text-center">{{ day.date }}&lt;/div>
-          &lt;/div>
-          &lt;div class="relative">
-            &lt;div v-for="slot in timeSlots" :key="slot" class="h-24 border-b border-gray-100" />
-            &lt;div
+        <!-- Day Columns -->
+        <div v-for="day in weekDays" :key="day.date" class="bg-white">
+          <div class="h-12 p-2 border-b border-gray-200">
+            <div class="text-center font-semibold">{{ day.name }}</div>
+            <div class="text-sm text-gray-500 text-center">{{ day.date }}</div>
+          </div>
+          <div class="relative">
+            <div v-for="slot in timeSlots" :key="slot" class="h-24 border-b border-gray-100" />
+            <div
               v-for="class_ in getClassesForDay(day.date)"
               :key="class_.id"
               class="absolute left-0 right-0 mx-2 rounded-md overflow-hidden shadow-sm"
               :style="getClassStyle(class_)"
             >
-              &lt;div
+              <div
                 class="p-2 h-full"
                 :class="getClassColorClass(class_)"
               >
-                &lt;div class="font-semibold text-sm">{{ class_.courseName }}&lt;/div>
-                &lt;div class="text-xs">{{ class_.room }}&lt;/div>
-                &lt;div class="text-xs">{{ class_.instructor }}&lt;/div>
-              &lt;/div>
-            &lt;/div>
-          &lt;/div>
-        &lt;/div>
-      &lt;/div>
-    &lt;/div>
+                <div class="font-semibold text-sm">{{ class_.courseName }}</div>
+                <div class="text-xs">{{ class_.room }}</div>
+                <div class="text-xs">{{ class_.instructor }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    &lt;!-- Exam Schedule -->
-    &lt;div v-else class="bg-white rounded-lg shadow">
-      &lt;el-table :data="examSchedule" stripe>
-        &lt;el-table-column prop="date" :label="$t('Ngày thi')" width="150">
-          &lt;template #default="{ row }">
+    <!-- Exam Schedule -->
+    <div v-else class="bg-white rounded-lg shadow">
+      <el-table :data="examSchedule" stripe>
+        <el-table-column prop="date" :label="$t('Ngày thi')" width="150">
+          <template #default="{ row }">
             {{ formatDate(row.date) }}
-          &lt;/template>
-        &lt;/el-table-column>
-        &lt;el-table-column prop="time" :label="$t('Giờ thi')" width="120" />
-        &lt;el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
-        &lt;el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="250" />
-        &lt;el-table-column prop="room" :label="$t('Phòng thi')" width="120" />
-        &lt;el-table-column prop="type" :label="$t('Hình thức thi')" width="150">
-          &lt;template #default="{ row }">
-            &lt;el-tag :type="getExamTypeTag(row.type)">{{ row.type }}&lt;/el-tag>
-          &lt;/template>
-        &lt;/el-table-column>
-        &lt;el-table-column prop="notes" :label="$t('Ghi chú')" min-width="200" />
-      &lt;/el-table>
-    &lt;/div>
-  &lt;/div>
-&lt;/template>
+          </template>
+        </el-table-column>
+        <el-table-column prop="time" :label="$t('Giờ thi')" width="120" />
+        <el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
+        <el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="250" />
+        <el-table-column prop="room" :label="$t('Phòng thi')" width="120" />
+        <el-table-column prop="type" :label="$t('Hình thức thi')" width="150">
+          <template #default="{ row }">
+            <el-tag :type="getExamTypeTag(row.type)">{{ row.type }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="notes" :label="$t('Ghi chú')" min-width="200" />
+      </el-table>
+    </div>
+  </div>
+</template>
 
-&lt;script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
@@ -116,7 +116,7 @@ const timeSlots = [
 // Calculate week days
 const weekDays = computed(() => {
   const days = []
-  for (let i = 0; i &lt; 5; i++) {
+  for (let i = 0; i < 5; i++) {
     const date = currentDate.value.startOf('week').add(i + 1, 'day')
     days.push({
       name: date.format('dddd'),
@@ -233,10 +233,10 @@ const getExamTypeTag = (type: string) => {
 const formatDate = (date: string) => {
   return dayjs(date).format('DD/MM/YYYY')
 }
-&lt;/script>
+</script>
 
-&lt;style scoped>
+<style scoped>
 .el-table {
-  @apply rounded-lg;
+  border-radius: 0.5rem;
 }
-&lt;/style>
+</style>

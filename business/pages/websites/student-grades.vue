@@ -1,63 +1,63 @@
-&lt;template>
-  &lt;div class="p-6">
-    &lt;!-- Page Header -->
-    &lt;div class="mb-6">
-      &lt;h1 class="text-2xl font-bold text-gray-900">{{ $t('Điểm số') }}&lt;/h1>
-    &lt;/div>
+<template>
+  <div class="p-6">
+    <!-- Page Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">{{ $t('Điểm số') }}</h1>
+    </div>
 
-    &lt;!-- Semester Selection -->
-    &lt;div class="mb-6">
-      &lt;el-select v-model="selectedSemester" class="w-64">
-        &lt;el-option
+    <!-- Semester Selection -->
+    <div class="mb-6">
+      <el-select v-model="selectedSemester" class="w-64">
+        <el-option
           v-for="semester in semesters"
           :key="semester.value"
           :label="semester.label"
           :value="semester.value"
         />
-      &lt;/el-select>
-    &lt;/div>
+      </el-select>
+    </div>
 
-    &lt;!-- Grades Table -->
-    &lt;el-table :data="grades" stripe>
-      &lt;el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
-      &lt;el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="250" />
-      &lt;el-table-column prop="credits" :label="$t('Số tín chỉ')" width="120" align="center" />
-      &lt;el-table-column prop="attendance" :label="$t('Chuyên cần')" width="120" align="center" />
-      &lt;el-table-column prop="midterm" :label="$t('Giữa kỳ')" width="120" align="center" />
-      &lt;el-table-column prop="final" :label="$t('Cuối kỳ')" width="120" align="center" />
-      &lt;el-table-column prop="average" :label="$t('Trung bình')" width="120" align="center">
-        &lt;template #default="{ row }">
-          &lt;span :class="getGradeColor(row.average)">{{ row.average }}&lt;/span>
-        &lt;/template>
-      &lt;/el-table-column>
-      &lt;el-table-column prop="letterGrade" :label="$t('Điểm chữ')" width="120" align="center">
-        &lt;template #default="{ row }">
-          &lt;el-tag :type="getGradeTagType(row.letterGrade)">{{ row.letterGrade }}&lt;/el-tag>
-        &lt;/template>
-      &lt;/el-table-column>
-    &lt;/el-table>
+    <!-- Grades Table -->
+    <el-table :data="grades" stripe>
+      <el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
+      <el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="250" />
+      <el-table-column prop="credits" :label="$t('Số tín chỉ')" width="120" align="center" />
+      <el-table-column prop="attendance" :label="$t('Chuyên cần')" width="120" align="center" />
+      <el-table-column prop="midterm" :label="$t('Giữa kỳ')" width="120" align="center" />
+      <el-table-column prop="final" :label="$t('Cuối kỳ')" width="120" align="center" />
+      <el-table-column prop="average" :label="$t('Trung bình')" width="120" align="center">
+        <template #default="{ row }">
+          <span :class="getGradeColor(row.average)">{{ row.average }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="letterGrade" :label="$t('Điểm chữ')" width="120" align="center">
+        <template #default="{ row }">
+          <el-tag :type="getGradeTagType(row.letterGrade)">{{ row.letterGrade }}</el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
 
-    &lt;!-- Semester Summary -->
-    &lt;div class="mt-6 bg-white p-6 rounded-lg shadow">
-      &lt;div class="grid grid-cols-3 gap-6">
-        &lt;div class="text-center">
-          &lt;p class="text-sm text-gray-600">{{ $t('GPA Học kỳ') }}&lt;/p>
-          &lt;p class="text-2xl font-bold text-primary-600">3.67&lt;/p>
-        &lt;/div>
-        &lt;div class="text-center">
-          &lt;p class="text-sm text-gray-600">{{ $t('Số tín chỉ đạt') }}&lt;/p>
-          &lt;p class="text-2xl font-bold text-primary-600">15/15&lt;/p>
-        &lt;/div>
-        &lt;div class="text-center">
-          &lt;p class="text-sm text-gray-600">{{ $t('Xếp loại') }}&lt;/p>
-          &lt;p class="text-2xl font-bold text-primary-600">{{ $t('Giỏi') }}&lt;/p>
-        &lt;/div>
-      &lt;/div>
-    &lt;/div>
-  &lt;/div>
-&lt;/template>
+    <!-- Semester Summary -->
+    <div class="mt-6 bg-white p-6 rounded-lg shadow">
+      <div class="grid grid-cols-3 gap-6">
+        <div class="text-center">
+          <p class="text-sm text-gray-600">{{ $t('GPA Học kỳ') }}</p>
+          <p class="text-2xl font-bold text-primary-600">3.67</p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-gray-600">{{ $t('Số tín chỉ đạt') }}</p>
+          <p class="text-2xl font-bold text-primary-600">15/15</p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-gray-600">{{ $t('Xếp loại') }}</p>
+          <p class="text-2xl font-bold text-primary-600">{{ $t('Giỏi') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
-&lt;script setup lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue'
 
 const selectedSemester = ref('2023-2')
@@ -123,10 +123,10 @@ const getGradeTagType = (grade: string) => {
       return 'danger'
   }
 }
-&lt;/script>
+</script>
 
-&lt;style scoped>
+<style scoped>
 .el-table {
   @apply rounded-lg shadow;
 }
-&lt;/style>
+</style>

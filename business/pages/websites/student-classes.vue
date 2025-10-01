@@ -1,162 +1,162 @@
-&lt;template>
-  &lt;div class="p-6">
-    &lt;!-- Page Header -->
-    &lt;div class="mb-6">
-      &lt;h1 class="text-2xl font-bold text-gray-900">{{ $t('Lớp học') }}&lt;/h1>
-    &lt;/div>
+<template>
+  <div class="p-6">
+    <!-- Page Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">{{ $t('Lớp học') }}</h1>
+    </div>
 
-    &lt;!-- Class Information Tabs -->
-    &lt;el-tabs v-model="activeTab" class="mb-6">
-      &lt;el-tab-pane :label="$t('Lớp khóa học')" name="class" />
-      &lt;el-tab-pane :label="$t('Lớp học phần')" name="course" />
-    &lt;/el-tabs>
+    <!-- Class Information Tabs -->
+    <el-tabs v-model="activeTab" class="mb-6">
+      <el-tab-pane :label="$t('Lớp khóa học')" name="class" />
+      <el-tab-pane :label="$t('Lớp học phần')" name="course" />
+    </el-tabs>
 
-    &lt;!-- Study Class Info -->
-    &lt;div v-if="activeTab === 'class'" class="space-y-6">
-      &lt;!-- Main Class Card -->
-      &lt;el-card class="w-full">
-        &lt;div class="flex items-center justify-between">
-          &lt;div>
-            &lt;h2 class="text-xl font-bold mb-2">K65-Công nghệ thông tin 2&lt;/h2>
-            &lt;div class="flex gap-4 text-gray-600">
-              &lt;div>
-                &lt;span class="font-semibold">{{ $t('Khóa học') }}:&lt;/span> K65 (2021-2025)
-              &lt;/div>
-              &lt;div>
-                &lt;span class="font-semibold">{{ $t('Sĩ số') }}:&lt;/span> 45
-              &lt;/div>
-              &lt;div>
-                &lt;span class="font-semibold">{{ $t('GVCN') }}:&lt;/span> TS. Nguyễn Văn A
-              &lt;/div>
-            &lt;/div>
-          &lt;/div>
-          &lt;el-button type="primary" @click="showClassmates = true">
+    <!-- Study Class Info -->
+    <div v-if="activeTab === 'class'" class="space-y-6">
+      <!-- Main Class Card -->
+      <el-card class="w-full">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold mb-2">K65-Công nghệ thông tin 2</h2>
+            <div class="flex gap-4 text-gray-600">
+              <div>
+                <span class="font-semibold">{{ $t('Khóa học') }}:</span> K65 (2021-2025)
+              </div>
+              <div>
+                <span class="font-semibold">{{ $t('Sĩ số') }}:</span> 45
+              </div>
+              <div>
+                <span class="font-semibold">{{ $t('GVCN') }}:</span> TS. Nguyễn Văn A
+              </div>
+            </div>
+          </div>
+          <el-button type="primary" @click="showClassmates = true">
             {{ $t('Xem danh sách lớp') }}
-          &lt;/el-button>
-        &lt;/div>
-      &lt;/el-card>
+          </el-button>
+        </div>
+      </el-card>
 
-      &lt;!-- Class Statistics -->
-      &lt;div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        &lt;el-card class="text-center">
-          &lt;h3 class="text-lg font-semibold mb-2">{{ $t('Điểm TB lớp') }}&lt;/h3>
-          &lt;p class="text-3xl font-bold text-primary-600">3.42&lt;/p>
-        &lt;/el-card>
+      <!-- Class Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <el-card class="text-center">
+          <h3 class="text-lg font-semibold mb-2">{{ $t('Điểm TB lớp') }}</h3>
+          <p class="text-3xl font-bold text-primary-600">3.42</p>
+        </el-card>
 
-        &lt;el-card class="text-center">
-          &lt;h3 class="text-lg font-semibold mb-2">{{ $t('Xếp hạng') }}&lt;/h3>
-          &lt;p class="text-3xl font-bold text-success-600">15/45&lt;/p>
-        &lt;/el-card>
+        <el-card class="text-center">
+          <h3 class="text-lg font-semibold mb-2">{{ $t('Xếp hạng') }}</h3>
+          <p class="text-3xl font-bold text-success-600">15/45</p>
+        </el-card>
 
-        &lt;el-card class="text-center">
-          &lt;h3 class="text-lg font-semibold mb-2">{{ $t('Tín chỉ tích lũy') }}&lt;/h3>
-          &lt;p class="text-3xl font-bold text-warning-600">90/150&lt;/p>
-        &lt;/el-card>
+        <el-card class="text-center">
+          <h3 class="text-lg font-semibold mb-2">{{ $t('Tín chỉ tích lũy') }}</h3>
+          <p class="text-3xl font-bold text-warning-600">90/150</p>
+        </el-card>
 
-        &lt;el-card class="text-center">
-          &lt;h3 class="text-lg font-semibold mb-2">{{ $t('Điểm rèn luyện') }}&lt;/h3>
-          &lt;p class="text-3xl font-bold text-info-600">85&lt;/p>
-        &lt;/el-card>
-      &lt;/div>
+        <el-card class="text-center">
+          <h3 class="text-lg font-semibold mb-2">{{ $t('Điểm rèn luyện') }}</h3>
+          <p class="text-3xl font-bold text-info-600">85</p>
+        </el-card>
+      </div>
 
-      &lt;!-- Class Events -->
-      &lt;el-card>
-        &lt;template #header>
-          &lt;div class="flex items-center justify-between">
-            &lt;span class="font-bold">{{ $t('Hoạt động lớp') }}&lt;/span>
-            &lt;el-button type="primary" plain>{{ $t('Xem tất cả') }}&lt;/el-button>
-          &lt;/div>
-        &lt;/template>
-        &lt;el-timeline>
-          &lt;el-timeline-item
+      <!-- Class Events -->
+      <el-card>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <span class="font-bold">{{ $t('Hoạt động lớp') }}</span>
+            <el-button type="primary" plain>{{ $t('Xem tất cả') }}</el-button>
+          </div>
+        </template>
+        <el-timeline>
+          <el-timeline-item
             v-for="event in classEvents"
             :key="event.id"
             :timestamp="event.time"
             :type="event.type"
           >
             {{ event.content }}
-          &lt;/el-timeline-item>
-        &lt;/el-timeline>
-      &lt;/el-card>
-    &lt;/div>
+          </el-timeline-item>
+        </el-timeline>
+      </el-card>
+    </div>
 
-    &lt;!-- Course Classes -->
-    &lt;div v-else>
-      &lt;el-table :data="courseClasses" stripe>
-        &lt;el-table-column type="expand">
-          &lt;template #default="props">
-            &lt;div class="p-4">
-              &lt;h4 class="font-bold mb-4">{{ $t('Thông tin chi tiết') }}:&lt;/h4>
-              &lt;el-descriptions :column="3" border>
-                &lt;el-descriptions-item :label="$t('Mã lớp')">
+    <!-- Course Classes -->
+    <div v-else>
+      <el-table :data="courseClasses" stripe>
+        <el-table-column type="expand">
+          <template #default="props">
+            <div class="p-4">
+              <h4 class="font-bold mb-4">{{ $t('Thông tin chi tiết') }}:</h4>
+              <el-descriptions :column="3" border>
+                <el-descriptions-item :label="$t('Mã lớp')">
                   {{ props.row.classCode }}
-                &lt;/el-descriptions-item>
-                &lt;el-descriptions-item :label="$t('Phòng học')">
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('Phòng học')">
                   {{ props.row.room }}
-                &lt;/el-descriptions-item>
-                &lt;el-descriptions-item :label="$t('Sĩ số')">
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('Sĩ số')">
                   {{ props.row.enrolled }}/{{ props.row.capacity }}
-                &lt;/el-descriptions-item>
-                &lt;el-descriptions-item :label="$t('Lịch học')">
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('Lịch học')">
                   {{ props.row.schedule }}
-                &lt;/el-descriptions-item>
-                &lt;el-descriptions-item :label="$t('Giảng viên')">
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('Giảng viên')">
                   {{ props.row.instructor }}
-                &lt;/el-descriptions-item>
-                &lt;el-descriptions-item :label="$t('Trạng thái')">
-                  &lt;el-tag :type="props.row.status === 'Đang học' ? 'success' : 'info'">
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('Trạng thái')">
+                  <el-tag :type="props.row.status === 'Đang học' ? 'success' : 'info'">
                     {{ props.row.status }}
-                  &lt;/el-tag>
-                &lt;/el-descriptions-item>
-              &lt;/el-descriptions>
+                  </el-tag>
+                </el-descriptions-item>
+              </el-descriptions>
 
-              &lt;h4 class="font-bold mt-6 mb-4">{{ $t('Điểm quá trình') }}:&lt;/h4>
-              &lt;el-table :data="props.row.grades" border>
-                &lt;el-table-column prop="type" :label="$t('Loại điểm')" width="200" />
-                &lt;el-table-column prop="weight" :label="$t('Trọng số')" width="120" />
-                &lt;el-table-column prop="score" :label="$t('Điểm số')" width="120" />
-                &lt;el-table-column prop="date" :label="$t('Ngày cập nhật')" width="150" />
-                &lt;el-table-column prop="note" :label="$t('Ghi chú')" min-width="200" />
-              &lt;/el-table>
-            &lt;/div>
-          &lt;/template>
-        &lt;/el-table-column>
-        &lt;el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
-        &lt;el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="300" />
-        &lt;el-table-column prop="schedule" :label="$t('Lịch học')" width="200" />
-        &lt;el-table-column prop="instructor" :label="$t('Giảng viên')" width="200" />
-        &lt;el-table-column prop="status" :label="$t('Trạng thái')" width="120">
-          &lt;template #default="{ row }">
-            &lt;el-tag :type="row.status === 'Đang học' ? 'success' : 'info'">
+              <h4 class="font-bold mt-6 mb-4">{{ $t('Điểm quá trình') }}:</h4>
+              <el-table :data="props.row.grades" border>
+                <el-table-column prop="type" :label="$t('Loại điểm')" width="200" />
+                <el-table-column prop="weight" :label="$t('Trọng số')" width="120" />
+                <el-table-column prop="score" :label="$t('Điểm số')" width="120" />
+                <el-table-column prop="date" :label="$t('Ngày cập nhật')" width="150" />
+                <el-table-column prop="note" :label="$t('Ghi chú')" min-width="200" />
+              </el-table>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="courseCode" :label="$t('Mã học phần')" width="150" />
+        <el-table-column prop="courseName" :label="$t('Tên học phần')" min-width="300" />
+        <el-table-column prop="schedule" :label="$t('Lịch học')" width="200" />
+        <el-table-column prop="instructor" :label="$t('Giảng viên')" width="200" />
+        <el-table-column prop="status" :label="$t('Trạng thái')" width="120">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 'Đang học' ? 'success' : 'info'">
               {{ row.status }}
-            &lt;/el-tag>
-          &lt;/template>
-        &lt;/el-table-column>
-      &lt;/el-table>
-    &lt;/div>
+            </el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
-    &lt;!-- Classmates Dialog -->
-    &lt;el-dialog
+    <!-- Classmates Dialog -->
+    <el-dialog
       v-model="showClassmates"
       :title="$t('Danh sách lớp')"
       width="80%"
     >
-      &lt;el-table :data="classmates" stripe>
-        &lt;el-table-column prop="studentId" :label="$t('Mã sinh viên')" width="150" />
-        &lt;el-table-column prop="name" :label="$t('Họ và tên')" min-width="200" />
-        &lt;el-table-column prop="email" :label="$t('Email')" min-width="250" />
-        &lt;el-table-column prop="phone" :label="$t('Số điện thoại')" width="150" />
-        &lt;el-table-column prop="status" :label="$t('Trạng thái')" width="120">
-          &lt;template #default="{ row }">
-            &lt;el-tag :type="getStatusType(row.status)">{{ row.status }}&lt;/el-tag>
-          &lt;/template>
-        &lt;/el-table-column>
-      &lt;/el-table>
-    &lt;/el-dialog>
-  &lt;/div>
-&lt;/template>
+      <el-table :data="classmates" stripe>
+        <el-table-column prop="studentId" :label="$t('Mã sinh viên')" width="150" />
+        <el-table-column prop="name" :label="$t('Họ và tên')" min-width="200" />
+        <el-table-column prop="email" :label="$t('Email')" min-width="250" />
+        <el-table-column prop="phone" :label="$t('Số điện thoại')" width="150" />
+        <el-table-column prop="status" :label="$t('Trạng thái')" width="120">
+          <template #default="{ row }">
+            <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+  </div>
+</template>
 
-&lt;script setup lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue'
 
 const activeTab = ref('class')
@@ -272,9 +272,9 @@ const getStatusType = (status: string) => {
       return 'info'
   }
 }
-&lt;/script>
+</script>
 
-&lt;style scoped>
+<style scoped>
 .el-card {
   @apply rounded-lg;
 }
@@ -282,4 +282,4 @@ const getStatusType = (status: string) => {
 .el-table {
   @apply rounded-lg;
 }
-&lt;/style>
+</style>

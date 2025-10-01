@@ -1,5 +1,5 @@
-<template>
-  <div class="p-6">
+{
+  "template": `<div class="p-6">
     <!-- Page Header -->
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900">{{ $t('Học phí') }}</h1>
@@ -90,24 +90,16 @@
         </el-table-column>
       </el-table>
     </div>
-  </div>
-</template>
-
-<script setup lang="ts">
+  </div>`,
+  "script": `
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
-import type { PaymentHistory, TuitionDetail } from '@/types/websites/tuition'
-
-// Set page metadata
-definePageMeta({
-  layout: 'websites'
-})
 
 const { t: $t } = useI18n()
 
 // Sample payment history data
-const paymentHistory = ref<PaymentHistory[]>([
+const paymentHistory = ref([
   {
     date: '2024-01-15',
     amount: 12000000,
@@ -125,7 +117,7 @@ const paymentHistory = ref<PaymentHistory[]>([
 ])
 
 // Sample tuition details data
-const tuitionDetails = ref<TuitionDetail[]>([
+const tuitionDetails = ref([
   {
     courseCode: 'INT3306',
     courseName: 'Web Programming',
@@ -150,11 +142,11 @@ const tuitionDetails = ref<TuitionDetail[]>([
 ])
 
 // Helper functions
-const formatDate = (date: string): string => {
+const formatDate = (date: string) => {
   return dayjs(date).format('DD/MM/YYYY')
 }
 
-const formatCurrency = (amount: number): string => {
+const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
@@ -163,9 +155,7 @@ const formatCurrency = (amount: number): string => {
   }).format(amount)
 }
 
-type TagType = 'primary' | 'success' | 'warning' | 'info' | 'danger'
-
-const getPaymentMethodTag = (method: PaymentHistory['method']): TagType => {
+const getPaymentMethodTag = (method: string) => {
   switch (method) {
     case 'Chuyển khoản':
       return 'primary'
@@ -178,7 +168,7 @@ const getPaymentMethodTag = (method: PaymentHistory['method']): TagType => {
   }
 }
 
-const getStatusTag = (status: PaymentHistory['status']): TagType => {
+const getStatusTag = (status: string) => {
   switch (status) {
     case 'Thành công':
       return 'success'
@@ -191,7 +181,7 @@ const getStatusTag = (status: PaymentHistory['status']): TagType => {
   }
 }
 
-const getTuitionTypeTag = (type: TuitionDetail['type']): TagType => {
+const getTuitionTypeTag = (type: string) => {
   switch (type) {
     case 'Học phí':
       return 'primary'
@@ -201,9 +191,8 @@ const getTuitionTypeTag = (type: TuitionDetail['type']): TagType => {
       return 'info'
   }
 }
-</script>
-
-<style scoped>
+`,
+  "style": `
 .el-table {
   border-radius: 0.5rem;
 }
@@ -211,4 +200,5 @@ const getTuitionTypeTag = (type: TuitionDetail['type']): TagType => {
 .el-card {
   border-radius: 0.5rem;
 }
-</style>
+`
+}

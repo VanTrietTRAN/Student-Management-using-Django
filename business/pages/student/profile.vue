@@ -1,70 +1,70 @@
-&lt;template&gt;
-  &lt;div class="student-profile"&gt;
-    &lt;el-card class="profile-card"&gt;
-      &lt;template #header&gt;
-        &lt;div class="card-header"&gt;
-          &lt;span&gt;{{ $t('Thông tin sinh viên') }}&lt;/span&gt;
-          &lt;el-button type="primary" @click="editMode = !editMode"&gt;
+<template>
+  <div class="student-profile">
+    <el-card class="profile-card">
+      <template #header>
+        <div class="card-header">
+          <span>{{ $t('Thông tin sinh viên') }}</span>
+          <el-button type="primary" @click="editMode = !editMode">
             {{ editMode ? $t('Lưu') : $t('Chỉnh sửa') }}
-          &lt;/el-button&gt;
-        &lt;/div&gt;
-      &lt;/template&gt;
+          </el-button>
+        </div>
+      </template>
 
-      &lt;el-form 
+      <el-form 
         ref="formRef"
         :model="profileData"
         :disabled="!editMode"
         label-width="120px"
-      &gt;
-        &lt;el-form-item :label="$t('Mã sinh viên')"&gt;
-          &lt;el-input v-model="profileData.studentId" disabled /&gt;
-        &lt;/el-form-item&gt;
+      >
+        <el-form-item :label="$t('Mã sinh viên')">
+          <el-input v-model="profileData.studentId" disabled />
+        </el-form-item>
 
-        &lt;el-form-item :label="$t('Họ và tên')"&gt;
-          &lt;el-input v-model="profileData.fullName" /&gt;
-        &lt;/el-form-item&gt;
+        <el-form-item :label="$t('Họ và tên')">
+          <el-input v-model="profileData.fullName" />
+        </el-form-item>
 
-        &lt;el-form-item :label="$t('Ngày sinh')"&gt;
-          &lt;el-date-picker
+        <el-form-item :label="$t('Ngày sinh')">
+          <el-date-picker
             v-model="profileData.dateOfBirth"
             type="date"
             :placeholder="$t('Chọn ngày')"
-          /&gt;
-        &lt;/el-form-item&gt;
+          />
+        </el-form-item>
 
-        &lt;el-form-item :label="$t('Email')"&gt;
-          &lt;el-input v-model="profileData.email" /&gt;
-        &lt;/el-form-item&gt;
+        <el-form-item :label="$t('Email')">
+          <el-input v-model="profileData.email" />
+        </el-form-item>
 
-        &lt;el-form-item :label="$t('Số điện thoại')"&gt;
-          &lt;el-input v-model="profileData.phone" /&gt;
-        &lt;/el-form-item&gt;
+        <el-form-item :label="$t('Số điện thoại')">
+          <el-input v-model="profileData.phone" />
+        </el-form-item>
 
-        &lt;el-form-item :label="$t('Địa chỉ')"&gt;
-          &lt;el-input v-model="profileData.address" type="textarea" /&gt;
-        &lt;/el-form-item&gt;
-      &lt;/el-form&gt;
-    &lt;/el-card&gt;
+        <el-form-item :label="$t('Địa chỉ')">
+          <el-input v-model="profileData.address" type="textarea" />
+        </el-form-item>
+      </el-form>
+    </el-card>
 
-    &lt;el-card class="academic-history mt-4"&gt;
-      &lt;template #header&gt;
-        &lt;div class="card-header"&gt;
-          &lt;span&gt;{{ $t('Lịch sử học tập') }}&lt;/span&gt;
-        &lt;/div&gt;
-      &lt;/template&gt;
+    <el-card class="academic-history mt-4">
+      <template #header>
+        <div class="card-header">
+          <span>{{ $t('Lịch sử học tập') }}</span>
+        </div>
+      </template>
 
-      &lt;el-table :data="academicHistory" style="width: 100%"&gt;
-        &lt;el-table-column :label="$t('Học kỳ')" prop="semester" /&gt;
-        &lt;el-table-column :label="$t('Năm học')" prop="academicYear" /&gt;
-        &lt;el-table-column :label="$t('GPA')" prop="gpa" /&gt;
-        &lt;el-table-column :label="$t('Số tín chỉ')" prop="credits" /&gt;
-        &lt;el-table-column :label="$t('Xếp loại')" prop="classification" /&gt;
-      &lt;/el-table&gt;
-    &lt;/el-card&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
+      <el-table :data="academicHistory" style="width: 100%">
+        <el-table-column :label="$t('Học kỳ')" prop="semester" />
+        <el-table-column :label="$t('Năm học')" prop="academicYear" />
+        <el-table-column :label="$t('GPA')" prop="gpa" />
+        <el-table-column :label="$t('Số tín chỉ')" prop="credits" />
+        <el-table-column :label="$t('Xếp loại')" prop="classification" />
+      </el-table>
+    </el-card>
+  </div>
+</template>
 
-&lt;script setup lang="ts"&gt;
+<script setup lang="ts">
 import { ref } from 'vue'
 
 const editMode = ref(false)
@@ -88,9 +88,9 @@ const academicHistory = ref([
   },
   // Add more semesters here
 ])
-&lt;/script&gt;
+</script>
 
-&lt;style scoped&gt;
+<style scoped>
 .student-profile {
   padding: 20px;
 }
@@ -108,4 +108,4 @@ const academicHistory = ref([
 .mt-4 {
   margin-top: 1rem;
 }
-&lt;/style&gt;
+</style>

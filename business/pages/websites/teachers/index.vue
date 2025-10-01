@@ -270,6 +270,8 @@ definePageMeta({
     layout: 'websites'
 });
 
+import type { Teacher, NewTeacher, EditingTeacher } from '@/types/websites/teacher';
+
 // Reactive data
 const searchKeyword = ref('');
 const selectedDepartment = ref('');
@@ -279,31 +281,10 @@ const pageSize = ref(20);
 const showAddDialog = ref(false);
 const showViewDialog = ref(false);
 const showEditDialog = ref(false);
-const selectedTeacher = ref(null);
+const selectedTeacher = ref<Teacher | null>(null);
+const editingTeacher = ref<EditingTeacher>({} as EditingTeacher);
 
-interface TeacherForm {
-    id?: number;
-    teacherId: string;
-    fullName: string;
-    email: string;
-    phone: string;
-    department: string;
-    status?: string;
-    profile_picture?: File | string | null;
-    profile_picture_preview?: string | null;
-}
-
-const newTeacher = ref<TeacherForm>({
-    teacherId: '',
-    fullName: '',
-    email: '',
-    phone: '',
-    department: '',
-    profile_picture: null,
-    profile_picture_preview: null
-});
-
-const editingTeacher = ref<TeacherForm>({
+const newTeacher = ref<NewTeacher>({
     teacherId: '',
     fullName: '',
     email: '',
@@ -314,7 +295,7 @@ const editingTeacher = ref<TeacherForm>({
 });
 
 // Mock data
-const teachers = ref([
+const teachers = ref<Teacher[]>([
     {
         id: 1,
         teacherId: 'GV001',
@@ -394,12 +375,12 @@ const handleSearch = () => {
     ElMessage.success('Tìm kiếm hoàn tất');
 };
 
-const viewTeacher = (teacher: any) => {
+const viewTeacher = (teacher: Teacher) => {
     selectedTeacher.value = teacher;
     showViewDialog.value = true;
 };
 
-const editTeacher = (teacher: any) => {
+const editTeacher = (teacher: Teacher) => {
     editingTeacher.value = {
         ...teacher,
         profile_picture: null,
@@ -409,17 +390,19 @@ const editTeacher = (teacher: any) => {
 };
 
 const editTeacherFromView = () => {
-    showViewDialog.value = false;
-    editingTeacher.value = {
-        ...selectedTeacher.value,
-        profile_picture: null,
-        profile_picture_preview: null
-    };
-    showEditDialog.value = true;
+    if (selectedTeacher.value) {
+        showViewDialog.value = false;
+        editingTeacher.value = {
+            ...selectedTeacher.value,
+            profile_picture: null,
+            profile_picture_preview: null
+        };
+        showEditDialog.value = true;
+    }
 };
 
 
-const deleteTeacher = (teacher: any) => {
+const deleteTeacher = (teacher: Teacher) => {
     ElMessageBox.confirm(
         `Bạn có chắc chắn muốn xóa giảng viên "${teacher.fullName}"?`,
         'Xác nhận xóa',
@@ -428,11 +411,23 @@ const deleteTeacher = (teacher: any) => {
             cancelButtonText: 'Hủy',
             type: 'warning',
         }
-    ).then(() => {
-        const index = teachers.value.findIndex(t => t.id === teacher.id);
-        if (index > -1) {
-            teachers.value.splice(index, 1);
-            ElMessage.success(`Đã xóa giảng viên: ${teacher.fullName}`);
+    ).then(async () => {
+        try {
+            const res = await fetch(`/api/v1/websites/teachers/${teacher.id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                }
+            });
+            if (!res.ok) throw new Error('Lỗi khi xóa giảng viên');
+            const index = teachers.value.findIndex(t => t.id === teacher.id);
+            if (index > -1) {
+                teachers.value.splice(index, 1);
+                ElMessage.success(`Đã xóa giảng viên: ${teacher.fullName}`);
+            }
+        } catch (err) {
+            ElMessage.error('Lỗi khi xóa giảng viên');
         }
     }).catch(() => {
         ElMessage.info('Đã hủy xóa giảng viên');
@@ -440,10 +435,13 @@ const deleteTeacher = (teacher: any) => {
 };
 
 // Helper to get full image URL from backend
-const getProfilePictureUrl = (path: string) => {
+const getProfilePictureUrl = (path: string | File | null | undefined) => {
     if (!path) return '';
+    if (path instanceof File) return URL.createObjectURL(path);
+    if (typeof path !== 'string') return '';
     if (path.startsWith('http')) return path;
-    return `http://localhost:8000${path}`;
+    // Use relative path
+    return `/media/${path}`;
 };
 
 // Handle image file change for add
@@ -453,7 +451,7 @@ const onAddImageChange = (e: Event) => {
         newTeacher.value.profile_picture = file;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            newTeacher.value.profile_picture_preview = ev.target?.result;
+            newTeacher.value.profile_picture_preview = ev.target?.result as string;
         };
         reader.readAsDataURL(file);
     }
@@ -466,7 +464,7 @@ const onEditImageChange = (e: Event) => {
         editingTeacher.value.profile_picture = file;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            editingTeacher.value.profile_picture_preview = ev.target?.result;
+            editingTeacher.value.profile_picture_preview = ev.target?.result as string;
         };
         reader.readAsDataURL(file);
     }
@@ -477,15 +475,19 @@ const addTeacher = async () => {
     if (newTeacher.value.teacherId && newTeacher.value.fullName) {
         const formData = new FormData();
         for (const key in newTeacher.value) {
-            if (key === 'profile_picture' && newTeacher.value.profile_picture) {
+            if (key === 'profile_picture' && newTeacher.value.profile_picture instanceof File) {
                 formData.append('profile_picture', newTeacher.value.profile_picture);
             } else if (key !== 'profile_picture_preview') {
-                formData.append(key, newTeacher.value[key]);
+                formData.append(key, String(newTeacher.value[key as keyof NewTeacher]));
             }
         }
         try {
-            const res = await fetch('http://localhost:8000/api/v1/websites/teachers/', {
+            const res = await fetch('/api/v1/websites/teachers/', {
                 method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
                 body: formData
             });
             if (!res.ok) throw new Error('Lỗi khi thêm giảng viên');
@@ -516,15 +518,19 @@ const updateTeacher = async () => {
     if (index > -1) {
         const formData = new FormData();
         for (const key in editingTeacher.value) {
-            if (key === 'profile_picture' && editingTeacher.value.profile_picture) {
+            if (key === 'profile_picture' && editingTeacher.value.profile_picture instanceof File) {
                 formData.append('profile_picture', editingTeacher.value.profile_picture);
             } else if (key !== 'profile_picture_preview') {
-                formData.append(key, editingTeacher.value[key]);
+                formData.append(key, String(editingTeacher.value[key as keyof EditingTeacher]));
             }
         }
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/websites/teachers/${editingTeacher.value.id}/`, {
+            const res = await fetch(`/api/v1/websites/teachers/${editingTeacher.value.id}/`, {
                 method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
                 body: formData
             });
             if (!res.ok) throw new Error('Lỗi khi cập nhật giảng viên');
