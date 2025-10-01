@@ -25,7 +25,7 @@ class Student(models.Model):
     )
     major = models.CharField(max_length=50, verbose_name="Ngành")
     profile_picture = models.ImageField(
-        upload_to='students/profile_pictures/',
+        upload_to='profile_pictures/',
         null=True,
         blank=True,
         verbose_name="Ảnh đại diện"

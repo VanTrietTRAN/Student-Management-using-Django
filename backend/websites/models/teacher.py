@@ -9,7 +9,7 @@ class Teacher(models.Model):
         verbose_name="Môn giảng dạy"
     )
     profile_picture = models.ImageField(
-        upload_to='teachers/profile_pictures/',
+        upload_to='profile_pictures/',
         null=True,
         blank=True,
         verbose_name="Ảnh đại diện"

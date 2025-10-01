@@ -30,20 +30,24 @@
                             <span>{{ t('Thông tin cá nhân') }}</span>
                         </el-menu-item>
                         <el-menu-item index="/websites/student-grades">
-                            <IconAppraisal class="el-icon" />
+                            <IconChart class="el-icon" />
                             <span>{{ t('Điểm số') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/student-classes">
+                            <IconBook class="el-icon" />
+                            <span>{{ t('Lớp học') }}</span>
                         </el-menu-item>
                         <el-menu-item index="/websites/student-schedule">
                             <IconCalendar class="el-icon" />
-                            <span>{{ t('Lịch học') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="/websites/student-tuition">
-                            <IconFile class="el-icon" />
-                            <span>{{ t('Học phí') }}</span>
+                            <span>{{ t('Lịch học/thi') }}</span>
                         </el-menu-item>
                         <el-menu-item index="/websites/student-registration">
-                            <IconAppraisal class="el-icon" />
+                            <IconEdit class="el-icon" />
                             <span>{{ t('Đăng ký học phần') }}</span>
+                        </el-menu-item>
+                        <el-menu-item index="/websites/student-tuition">
+                            <IconWallet class="el-icon" />
+                            <span>{{ t('Học phí') }}</span>
                         </el-menu-item>
                     </Sidebar>
                 </aside>
@@ -63,8 +67,10 @@ import AmozLogo from "/assets/icons/Logo.svg";
 import IconUsers from "~/assets/icons/users.svg";
 import IconDashboard from "~/assets/icons/dashboard.svg";
 import IconCalendar from "~/assets/icons/calendar.svg";
-import IconAppraisal from "~/assets/icons/appraisal.svg";
-import IconFile from "~/assets/icons/file.svg";
+import IconChart from "~/assets/icons/chart.svg";
+import IconBook from "~/assets/icons/book.svg";
+import IconEdit from "~/assets/icons/edit.svg";
+import IconWallet from "~/assets/icons/wallet.svg";
 import { useOauthStore } from "@/stores/oauth";
 
 const { t } = useI18n();

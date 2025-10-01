@@ -158,6 +158,12 @@
                         <el-option label="Khoa ATTT" value="ATTT" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="Ảnh thẻ">
+                    <input type="file" accept="image/*" @change="onAddImageChange" />
+                    <div v-if="newTeacher.profile_picture_preview" class="mt-2">
+                        <img :src="newTeacher.profile_picture_preview" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showAddDialog = false">Hủy</el-button>
@@ -169,6 +175,11 @@
         <el-dialog v-model="showViewDialog" title="Thông tin giảng viên" width="800px">
             <div v-if="selectedTeacher" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col items-center">
+                        <label class="block text-sm font-medium text-gray-700">Ảnh thẻ</label>
+                        <img v-if="selectedTeacher.profile_picture" :src="getProfilePictureUrl(selectedTeacher.profile_picture)" alt="Ảnh thẻ" class="w-32 h-32 object-cover rounded-full border mb-2" />
+                        <span v-else class="text-gray-400">Chưa có ảnh</span>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Mã giảng viên</label>
                         <p class="mt-1 text-sm text-gray-900">{{ selectedTeacher.teacherId }}</p>
@@ -232,6 +243,12 @@
                         <el-option label="Tạm nghỉ" value="Tạm nghỉ" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="Ảnh thẻ">
+                    <input type="file" accept="image/*" @change="onEditImageChange" />
+                    <div v-if="editingTeacher.profile_picture_preview || editingTeacher.profile_picture" class="mt-2">
+                        <img :src="editingTeacher.profile_picture_preview || getProfilePictureUrl(editingTeacher.profile_picture)" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showEditDialog = false">Hủy</el-button>
@@ -263,14 +280,37 @@ const showAddDialog = ref(false);
 const showViewDialog = ref(false);
 const showEditDialog = ref(false);
 const selectedTeacher = ref(null);
-const editingTeacher = ref({});
 
-const newTeacher = ref({
+interface TeacherForm {
+    id?: number;
+    teacherId: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    department: string;
+    status?: string;
+    profile_picture?: File | string | null;
+    profile_picture_preview?: string | null;
+}
+
+const newTeacher = ref<TeacherForm>({
     teacherId: '',
     fullName: '',
     email: '',
     phone: '',
-    department: ''
+    department: '',
+    profile_picture: null,
+    profile_picture_preview: null
+});
+
+const editingTeacher = ref<TeacherForm>({
+    teacherId: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    department: '',
+    profile_picture: null,
+    profile_picture_preview: null
 });
 
 // Mock data
@@ -360,24 +400,24 @@ const viewTeacher = (teacher: any) => {
 };
 
 const editTeacher = (teacher: any) => {
-    editingTeacher.value = { ...teacher };
+    editingTeacher.value = {
+        ...teacher,
+        profile_picture: null,
+        profile_picture_preview: null
+    };
     showEditDialog.value = true;
 };
 
 const editTeacherFromView = () => {
     showViewDialog.value = false;
-    editingTeacher.value = { ...selectedTeacher.value };
+    editingTeacher.value = {
+        ...selectedTeacher.value,
+        profile_picture: null,
+        profile_picture_preview: null
+    };
     showEditDialog.value = true;
 };
 
-const updateTeacher = () => {
-    const index = teachers.value.findIndex(t => t.id === editingTeacher.value.id);
-    if (index > -1) {
-        teachers.value[index] = { ...editingTeacher.value };
-        showEditDialog.value = false;
-        ElMessage.success(`Cập nhật giảng viên: ${editingTeacher.value.fullName}`);
-    }
-};
 
 const deleteTeacher = (teacher: any) => {
     ElMessageBox.confirm(
@@ -399,24 +439,102 @@ const deleteTeacher = (teacher: any) => {
     });
 };
 
-const addTeacher = () => {
-    if (newTeacher.value.teacherId && newTeacher.value.fullName) {
-        teachers.value.push({
-            id: teachers.value.length + 1,
-            ...newTeacher.value,
-            status: 'Đang làm việc'
-        });
-        showAddDialog.value = false;
-        newTeacher.value = {
-            teacherId: '',
-            fullName: '',
-            email: '',
-            phone: '',
-            department: ''
+// Helper to get full image URL from backend
+const getProfilePictureUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:8000${path}`;
+};
+
+// Handle image file change for add
+const onAddImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        newTeacher.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            newTeacher.value.profile_picture_preview = ev.target?.result;
         };
-        ElMessage.success('Thêm giảng viên thành công');
+        reader.readAsDataURL(file);
+    }
+};
+
+// Handle image file change for edit
+const onEditImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        editingTeacher.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            editingTeacher.value.profile_picture_preview = ev.target?.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// Add teacher with image upload
+const addTeacher = async () => {
+    if (newTeacher.value.teacherId && newTeacher.value.fullName) {
+        const formData = new FormData();
+        for (const key in newTeacher.value) {
+            if (key === 'profile_picture' && newTeacher.value.profile_picture) {
+                formData.append('profile_picture', newTeacher.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, newTeacher.value[key]);
+            }
+        }
+        try {
+            const res = await fetch('http://localhost:8000/api/v1/websites/teachers/', {
+                method: 'POST',
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi thêm giảng viên');
+            const data = await res.json();
+            teachers.value.push(data);
+            showAddDialog.value = false;
+            newTeacher.value = {
+                teacherId: '',
+                fullName: '',
+                email: '',
+                phone: '',
+                department: '',
+                profile_picture: null,
+                profile_picture_preview: null
+            };
+            ElMessage.success('Thêm giảng viên thành công');
+        } catch (err) {
+            ElMessage.error('Lỗi khi thêm giảng viên');
+        }
     } else {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');
+    }
+};
+
+// Update teacher with image upload
+const updateTeacher = async () => {
+    const index = teachers.value.findIndex(t => t.id === editingTeacher.value.id);
+    if (index > -1) {
+        const formData = new FormData();
+        for (const key in editingTeacher.value) {
+            if (key === 'profile_picture' && editingTeacher.value.profile_picture) {
+                formData.append('profile_picture', editingTeacher.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, editingTeacher.value[key]);
+            }
+        }
+        try {
+            const res = await fetch(`http://localhost:8000/api/v1/websites/teachers/${editingTeacher.value.id}/`, {
+                method: 'PUT',
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi cập nhật giảng viên');
+            const data = await res.json();
+            teachers.value[index] = data;
+            showEditDialog.value = false;
+            ElMessage.success(`Cập nhật giảng viên: ${editingTeacher.value.fullName}`);
+        } catch (err) {
+            ElMessage.error('Lỗi khi cập nhật giảng viên');
+        }
     }
 };
 </script>

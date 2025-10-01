@@ -167,6 +167,12 @@
                         <el-option label="An toàn thông tin" value="ATTT" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="Ảnh đại diện">
+                    <input type="file" accept="image/*" @change="onAddImageChange" />
+                    <div v-if="newStudent.profile_picture_preview" class="mt-2">
+                        <img :src="newStudent.profile_picture_preview" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showAddDialog = false">Hủy</el-button>
@@ -178,6 +184,11 @@
         <el-dialog v-model="showViewDialog" title="Thông tin sinh viên" width="800px">
             <div v-if="selectedStudent" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col items-center">
+                        <label class="block text-sm font-medium text-gray-700">Ảnh thẻ</label>
+                        <img v-if="selectedStudent.profile_picture" :src="getProfilePictureUrl(selectedStudent.profile_picture)" alt="Ảnh đại diện" class="w-32 h-32 object-cover rounded-full border mb-2" />
+                        <span v-else class="text-gray-400">Chưa có ảnh</span>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Mã sinh viên</label>
                         <p class="mt-1 text-sm text-gray-900">{{ selectedStudent.studentId }}</p>
@@ -258,6 +269,12 @@
                 </el-form-item>
                 <el-form-item label="Điểm TB">
                     <el-input-number v-model="editingStudent.gpa" :min="0" :max="10" :step="0.1" />
+                </el-form-item>
+                <el-form-item label="Ảnh đại diện">
+                    <input type="file" accept="image/*" @change="onEditImageChange" />
+                    <div v-if="editingStudent.profile_picture_preview || editingStudent.profile_picture" class="mt-2">
+                        <img :src="editingStudent.profile_picture_preview || getProfilePictureUrl(editingStudent.profile_picture)" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -394,12 +411,36 @@ const editStudentFromView = () => {
     showEditDialog.value = true;
 };
 
-const updateStudent = () => {
+// Update student with image upload
+const updateStudent = async () => {
     const index = students.value.findIndex(s => s.id === editingStudent.value.id);
     if (index > -1) {
-        students.value[index] = { ...editingStudent.value };
-        showEditDialog.value = false;
-        ElMessage.success(`Cập nhật thông tin sinh viên: ${editingStudent.value.fullName}`);
+        const formData = new FormData();
+        for (const key in editingStudent.value) {
+            if (key === 'profile_picture' && editingStudent.value.profile_picture) {
+                formData.append('profile_picture', editingStudent.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, editingStudent.value[key]);
+            }
+        }
+        try {
+            // Adjust API endpoint as needed
+            const res = await fetch(`/api/v1/websites/students/${editingStudent.value.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi cập nhật sinh viên');
+            const data = await res.json();
+            students.value[index] = data;
+            showEditDialog.value = false;
+            ElMessage.success(`Cập nhật thông tin sinh viên: ${editingStudent.value.fullName}`);
+        } catch (err) {
+            ElMessage.error('Lỗi khi cập nhật sinh viên');
+        }
     }
 };
 
@@ -423,26 +464,81 @@ const deleteStudent = (student: any) => {
     });
 };
 
-const addStudent = () => {
+// Add student with image upload
+const addStudent = async () => {
     if (newStudent.value.studentId && newStudent.value.fullName) {
-        students.value.push({
-            id: students.value.length + 1,
-            ...newStudent.value,
-            status: 'Đang học',
-            gpa: 0
-        });
-        showAddDialog.value = false;
-        newStudent.value = {
-            studentId: '',
-            fullName: '',
-            email: '',
-            phone: '',
-            class: '',
-            major: ''
-        };
-        ElMessage.success('Thêm sinh viên thành công');
+        const formData = new FormData();
+        for (const key in newStudent.value) {
+            if (key === 'profile_picture' && newStudent.value.profile_picture) {
+                formData.append('profile_picture', newStudent.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, newStudent.value[key]);
+            }
+        }
+        try {
+            // Adjust API endpoint as needed
+            const res = await fetch('/api/v1/websites/students/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi thêm sinh viên');
+            const data = await res.json();
+            students.value.push(data);
+            showAddDialog.value = false;
+            newStudent.value = {
+                studentId: '',
+                fullName: '',
+                email: '',
+                phone: '',
+                class: '',
+                major: '',
+                profile_picture: null,
+                profile_picture_preview: null
+            };
+            ElMessage.success('Thêm sinh viên thành công');
+        } catch (err) {
+            ElMessage.error('Lỗi khi thêm sinh viên');
+        }
     } else {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');
+    }
+};
+// Helper to get full image URL from backend
+const getProfilePictureUrl = (path: string | null | undefined) => {
+    if (!path) return '';
+    if (typeof path !== 'string') return '';
+    if (path.startsWith('http')) return path;
+    // Use relative path
+    return `/media/${path}`;
+};
+
+// Handle image file change for add
+const onAddImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        newStudent.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            newStudent.value.profile_picture_preview = ev.target?.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// Handle image file change for edit
+const onEditImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        editingStudent.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            editingStudent.value.profile_picture_preview = ev.target?.result;
+        };
+        reader.readAsDataURL(file);
     }
 };
 </script>

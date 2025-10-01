@@ -18,6 +18,10 @@ from .views import (
 
 app_name = "websites"
 # Private
+
+from websites.views.student import StudentViewSet
+from websites.views.teacher import TeacherViewSet
+
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r"sites", SiteViewSet, basename="sites")
 router.register(r"categories", ArticleCategoryViewSet, basename="websites-categories")
@@ -26,6 +30,8 @@ router.register(r"menus", MenuViewSet, basename="websites-menus")
 router.register(r"articles", ArticleViewSet, basename="websites-articles")
 router.register(r"sections", SectionViewSet, basename="websites-sections")
 router.register(r"builds", BuildViewSet, basename="websites-builds")
+router.register(r"students", StudentViewSet, basename="websites-students")
+router.register(r"teachers", TeacherViewSet, basename="websites-teachers")
 
 site_router = routers.NestedSimpleRouter(router, r"sites", lookup="sites")
 site_router.register(r"routes", RouteViewSet, basename="websites-site-routes")
