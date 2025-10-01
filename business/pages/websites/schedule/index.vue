@@ -387,10 +387,19 @@ const editScheduleFromView = () => {
 
 const updateSchedule = async () => {
     const index = schedules.value.findIndex(s => s.id === editingSchedule.value.id)
-    if (index > -1) {
-        schedules.value[index] = { ...editingSchedule.value }
-        showEditDialog.value = false
+    if (index === -1) return
+    // optimistic backup
+    const old = { ...schedules.value[index] }
+    schedules.value[index] = { ...editingSchedule.value }
+    showEditDialog.value = false
+    try {
+        await AcademicService.updateSchedule(editingSchedule.value.id, editingSchedule.value)
         ElMessage.success(`Cập nhật lịch: ${editingSchedule.value.className}`)
+    } catch (err) {
+        // revert
+        schedules.value[index] = old
+        console.warn('updateSchedule failed, reverted', err)
+        ElMessage.error('Cập nhật thất bại, đã hoàn tác')
     }
 }
 
@@ -398,30 +407,44 @@ const deleteSchedule = (schedule: any) => {
     ElMessageBox.confirm(
         `Bạn có chắc chắn muốn xóa lịch "${schedule.className} - ${schedule.subjectName}"?`,
         'Xác nhận xóa',
-        {
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-            type: 'warning',
-        }
-    ).then(() => {
+        { confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', type: 'warning' }
+    ).then(async () => {
         const index = schedules.value.findIndex(s => s.id === schedule.id)
-        if (index > -1) {
-            schedules.value.splice(index, 1)
+        if (index === -1) return
+        const removed = schedules.value.splice(index, 1)[0]
+        try {
+            await AcademicService.deleteSchedule(schedule.id)
             ElMessage.success(`Đã xóa lịch: ${schedule.className}`)
+        } catch (err) {
+            // restore
+            schedules.value.splice(index, 0, removed)
+            console.warn('deleteSchedule failed, restored', err)
+            ElMessage.error('Xóa thất bại, đã hoàn tác')
         }
-    }).catch(() => {
-        ElMessage.info('Đã hủy xóa lịch')
-    })
+    }).catch(() => { ElMessage.info('Đã hủy xóa lịch') })
 }
 
-const addSchedule = () => {
-    if (newSchedule.value.className && newSchedule.value.subjectName) {
-        schedules.value.push({ id: schedules.value.length + 1, ...newSchedule.value, status: 'Đang diễn ra' })
-        showAddDialog.value = false
-        newSchedule.value = { className: '', subjectName: '', type: '', date: '', time: '', room: '', teacherName: '' }
-        ElMessage.success('Thêm lịch thành công')
-    } else {
+const addSchedule = async () => {
+    if (!(newSchedule.value.className && newSchedule.value.subjectName)) {
         ElMessage.error('Vui lòng điền đầy đủ thông tin')
+        return
+    }
+    // optimistic id (negative to avoid clash)
+    const tempId = -Date.now()
+    const payload = { ...newSchedule.value, status: 'Đang diễn ra' }
+    schedules.value.push({ id: tempId, ...payload })
+    showAddDialog.value = false
+    newSchedule.value = { className: '', subjectName: '', type: '', date: '', time: '', room: '', teacherName: '' }
+    try {
+        const res = await AcademicService.createSchedule(payload)
+        const data = res && res.data ? res.data : res
+        // replace temp entry with server one
+        const idx = schedules.value.findIndex(s => s.id === tempId)
+        if (idx > -1) schedules.value[idx] = data
+        ElMessage.success('Thêm lịch thành công')
+    } catch (err) {
+        console.warn('createSchedule failed, leaving local entry', err)
+        ElMessage.warning('Không thể lưu lên server; tạm lưu cục bộ')
     }
 }
 </script>

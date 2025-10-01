@@ -269,12 +269,19 @@ const viewRecord = (record: any) => { selectedRecord.value = record; showViewDia
 const editRecord = (record: any) => { editingRecord.value = { ...record }; showEditDialog.value = true }
 const editRecordFromView = () => { showViewDialog.value = false; editingRecord.value = { ...selectedRecord.value }; showEditDialog.value = true }
 
-const updateRecord = () => {
+const updateRecord = async () => {
     const index = records.value.findIndex(r => r.id === editingRecord.value.id)
-    if (index > -1) {
-        records.value[index] = { ...editingRecord.value }
-        showEditDialog.value = false
+    if (index === -1) return
+    const old = { ...records.value[index] }
+    records.value[index] = { ...editingRecord.value }
+    showEditDialog.value = false
+    try {
+        await AcademicService.updateReward(editingRecord.value.id, editingRecord.value)
         ElMessage.success(`Cập nhật: ${editingRecord.value.studentName}`)
+    } catch (err) {
+        records.value[index] = old
+        console.warn('updateReward failed, reverted', err)
+        ElMessage.error('Cập nhật thất bại, đã hoàn tác')
     }
 }
 
@@ -283,20 +290,40 @@ const deleteRecord = (record: any) => {
         `Bạn có chắc chắn muốn xóa hồ sơ "${record.studentName}"?`,
         'Xác nhận xóa',
         { confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', type: 'warning' }
-    ).then(() => {
+    ).then(async () => {
         const index = records.value.findIndex(r => r.id === record.id)
-        if (index > -1) { records.value.splice(index, 1); ElMessage.success(`Đã xóa: ${record.studentName}`) }
+        if (index === -1) return
+        const removed = records.value.splice(index, 1)[0]
+        try {
+            await AcademicService.deleteReward(record.id)
+            ElMessage.success(`Đã xóa: ${record.studentName}`)
+        } catch (err) {
+            records.value.splice(index, 0, removed)
+            console.warn('deleteReward failed, restored', err)
+            ElMessage.error('Xóa thất bại, đã hoàn tác')
+        }
     }).catch(() => { ElMessage.info('Đã hủy xóa') })
 }
 
-const addRecord = () => {
-    if (newRecord.value.studentName && newRecord.value.type && newRecord.value.description) {
-        records.value.push({ id: records.value.length + 1, ...newRecord.value, status: 'Đang xử lý' })
-        showAddDialog.value = false
-        newRecord.value = { studentName: '', type: '', description: '', date: '' }
-        ElMessage.success('Thêm thành công')
-    } else {
+const addRecord = async () => {
+    if (!(newRecord.value.studentName && newRecord.value.type && newRecord.value.description)) {
         ElMessage.error('Vui lòng điền đầy đủ thông tin')
+        return
+    }
+    const tempId = -Date.now()
+    const payload = { ...newRecord.value, status: 'Đang xử lý' }
+    records.value.push({ id: tempId, ...payload })
+    showAddDialog.value = false
+    newRecord.value = { studentName: '', type: '', description: '', date: '' }
+    try {
+        const res = await AcademicService.createReward(payload)
+        const data = res && res.data ? res.data : res
+        const idx = records.value.findIndex(r => r.id === tempId)
+        if (idx > -1) records.value[idx] = data
+        ElMessage.success('Thêm thành công')
+    } catch (err) {
+        console.warn('createReward failed, leaving local entry', err)
+        ElMessage.warning('Không thể lưu lên server; tạm lưu cục bộ')
     }
 }
 </script>

@@ -82,9 +82,33 @@ class AcademicService extends BaseService {
     return this.request().get(`${this.entity}/schedules`, params);
   }
 
+  createSchedule(data) {
+    return this.request().post(`${this.entity}/schedules`, data);
+  }
+
+  updateSchedule(id, data) {
+    return this.request().put(`${this.entity}/schedules/${id}`, data);
+  }
+
+  deleteSchedule(id) {
+    return this.request().delete(`${this.entity}/schedules/${id}`);
+  }
+
   // Rewards / Records
   getRewards(params = null) {
     return this.request().get(`${this.entity}/rewards`, params);
+  }
+
+  createReward(data) {
+    return this.request().post(`${this.entity}/rewards`, data);
+  }
+
+  updateReward(id, data) {
+    return this.request().put(`${this.entity}/rewards/${id}`, data);
+  }
+
+  deleteReward(id) {
+    return this.request().delete(`${this.entity}/rewards/${id}`);
   }
 }
 
