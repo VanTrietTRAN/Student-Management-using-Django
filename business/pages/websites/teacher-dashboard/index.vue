@@ -170,7 +170,7 @@ const totalStudents = ref<number | string>('—')
 const teachingSubjects = ref<number | string>('—')
 const unreadNotifications = ref<number | string>('—')
 
-const todaySchedule = ref<any[]>([])
+const todaySchedule = ref<any[]>([
     {
         id: 1,
         subject: 'Lập trình cơ bản',

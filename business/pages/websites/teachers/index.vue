@@ -312,6 +312,8 @@ onMounted(async () => {
         subjects.value = []
     }
 
+})
+
 // Computed properties
 const totalTeachers = computed(() => teachers.value.length);
 const activeTeachers = computed(() => teachers.value.filter(t => t.status === 'Đang làm việc').length);
@@ -418,7 +420,9 @@ const addTeacher = () => {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');
     }
 };
-</script>
+})
+
+// Computed properties
 
 <style scoped>
 .el-table {
