@@ -7,6 +7,10 @@
       class="student-nav"
     >
       <!-- Student menu -->
+      <el-menu-item v-if="isStudent" index="dashboard">
+        <el-icon><HomeFilled /></el-icon>
+        {{ $t('Trang chủ') }}
+      </el-menu-item>
       <el-menu-item v-if="isStudent" index="profile">
         <el-icon><User /></el-icon>
         {{ $t('Thông tin cá nhân') }}
@@ -63,9 +67,10 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { HomeFilled, User, Document, Collection, Calendar, Wallet, Edit } from '@element-plus/icons-vue'
 
 const router = useRouter()
-const activeIndex = ref('profile')
+const activeIndex = ref('dashboard')
 const auth = useAuthStore()
 
 const isStudent = computed(() => auth.user?.user_type === 'student')
