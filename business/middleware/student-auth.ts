@@ -9,37 +9,27 @@ export default defineNuxtRouteMiddleware((to) => {
     }
 
     // Student routes
-    if (to.path.startsWith('/student/')) {
+    if (to.path.startsWith('/student')) {
       if (!auth.isStudent) {
         return navigateTo('/unauthorized')
       }
     }
 
     // Admin routes
-    if (to.path.startsWith('/admin/')) {
-      if (auth.user?.user_type !== 'admin') {
-        return navigateTo('/unauthorized')
-      }
-    }
-
-    // Teacher routes
-    if (to.path.startsWith('/teacher/')) {
-      if (auth.user?.user_type !== 'teacher') {
+    if (to.path.startsWith('/websites') || to.path.startsWith('/admin')) {
+      if (!auth.isAdmin) {
         return navigateTo('/unauthorized')
       }
     }
 
     // After login, redirect to appropriate dashboard
     if (to.path === '/login' && auth.isAuthenticated) {
-      switch (auth.user?.user_type) {
-        case 'student':
-          return navigateTo('/student/dashboard')
-        case 'admin':
-          return navigateTo('/admin/dashboard')
-        case 'teacher':
-          return navigateTo('/teacher/dashboard')
-        default:
-          return navigateTo('/unauthorized')
+      if (auth.isAdmin) {
+        return navigateTo('/websites')
+      } else if (auth.isStudent) {
+        return navigateTo('/student')
+      } else {
+        return navigateTo('/unauthorized')
       }
     }
   }

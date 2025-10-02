@@ -17,6 +17,7 @@ interface AuthResponse {
 }
 
 export const useAuthStore = defineStore('auth', () => {
+  const config = useRuntimeConfig()
   const user = ref<User | null>(null)
   const token = ref<string | null>(null)
   const refreshToken = ref<string | null>(null)
@@ -35,7 +36,6 @@ export const useAuthStore = defineStore('auth', () => {
   const canViewSchedule = computed(() => true)
 
   async function login(email: string, password: string) {
-    const config = useRuntimeConfig()
     const baseUrl = config.public.apiBase as string
 
     try {
@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
         
         return { 
           success: true,
-          redirectTo: '/student'
+          redirectTo: '/student/dashboard'
         }
       } catch {
         // If student login fails, try admin login
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         return {
           success: true,
-          redirectTo: '/websites'
+          redirectTo: '/admin/dashboard' 
         }
       }
     } catch (error) {
@@ -104,7 +104,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function refreshAccessToken() {
-    const config = useRuntimeConfig()
     const baseUrl = config.public.apiBase as string
 
     try {
