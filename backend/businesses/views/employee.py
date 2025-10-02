@@ -52,6 +52,7 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
         "invite": [["admin:employees:edit"], ["employees:edit"]],
         "list": [["admin:employees:view"], ["employees:view"]],
         "retrieve": [["admin:employees:view"], ["employees:view"]]
+        ,"userinfo": [["users:view-mine"], ["users:edit-mine"]]
     }
 
     def create(self, request, *args, **kwargs):
@@ -249,8 +250,11 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
             access_token = body_json.get("access_token")
             if access_token is not None:
                 try:
-                    token = AccessToken.objects.get(token=access_token)
-                    app_authorized.send(sender=self, request=request, token=token)
+                    # avoid MultipleObjectsReturned: prefer the most recent matching token
+                    token_qs = AccessToken.objects.filter(token=access_token).order_by('-id')
+                    token = token_qs.first() if token_qs.exists() else None
+                    if token is not None:
+                        app_authorized.send(sender=self, request=request, token=token)
                 except Exception as e:
                     log.exception('failed to attach app_authorized', exc_info=e)
 
@@ -393,9 +397,48 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
     @action(detail=False, methods=[Http.HTTP_GET], url_path="userinfo", permission_classes=[IsAuthenticated])
     def userinfo(self, request, *args, **kwargs):
         try:
-            id = request.auth.user.id
-            user = get_object_or_404(User.objects.all(), id=id)
-            user_serializer= UserShortSerializer(user)
+            # request.user should be set by authentication (OAuthHeaderMiddleware helps ensure this)
+            user_obj = getattr(request, 'user', None)
+            if user_obj is None or not getattr(user_obj, 'is_authenticated', False):
+                return Response({"detail": "Authentication credentials were not provided."}, status=401)
+
+            user = get_object_or_404(User.objects.all(), id=user_obj.id)
+            user_serializer = UserShortSerializer(user)
+            user_data = user_serializer.data
+            return Response(user_data, status=HTTP_200_OK)
+        except Exception:
+            return Response({"message": _("Business not found.")}, status=HTTP_404_NOT_FOUND)
+
+        # Some clients/middlewares may not set request.auth the same way.
+        # Prefer request.user when present (standard Django auth), fall back to request.auth.user (oauth token).
+        try:
+            user_obj = None
+            if hasattr(request, 'user') and getattr(request.user, 'is_authenticated', False):
+                user_obj = request.user
+            elif getattr(request, 'auth', None) is not None and getattr(request.auth, 'user', None) is not None:
+                user_obj = request.auth.user
+
+            if user_obj is None:
+                # Fallback: if Authorization header present but DRF didn't set request.auth
+                auth_header = request.META.get('HTTP_AUTHORIZATION') or request.META.get('Authorization')
+                if auth_header and isinstance(auth_header, str) and auth_header.lower().startswith('bearer '):
+                    token_str = auth_header.split(None, 1)[1].strip()
+                    try:
+                        token_obj_qs = AccessToken.objects.filter(token=token_str).order_by('-id')
+                        token_obj = token_obj_qs.first() if token_obj_qs.exists() else None
+                        if token_obj is not None:
+                            # attach token to request like authentication would
+                            request.auth = token_obj
+                            request.user = token_obj.user
+                            user_obj = token_obj.user
+                    except Exception:
+                        token_obj = None
+
+                if user_obj is None:
+                    return Response({"detail": "Authentication credentials were not provided."}, status=401)
+
+            user = get_object_or_404(User.objects.all(), id=user_obj.id)
+            user_serializer = UserShortSerializer(user)
             user_data = user_serializer.data
             return Response(user_data, status=HTTP_200_OK)
         except Exception as e:

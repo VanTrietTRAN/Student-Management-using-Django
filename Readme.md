@@ -50,7 +50,18 @@ py -3 -m venv .venv
 
 # Cài đặt dependencies
 cd backend
-pip install -r requirements/base.txt
+
+# Cài đặt Pillow trước
+pip install Pillow==10.0.0
+
+# Cài đặt các package cơ bản
+pip install -r requirements/temp.txt
+
+# Cài đặt các package còn lại
+pip install -r requirements/base.txt --no-deps
+
+# Nếu gặp lỗi khi cài đặt package nào đó, có thể cài riêng package đó với lệnh:
+# pip install <tên-package>==<version>
 
 # Tạo file cấu hình
 Copy-Item config.env.template config.env

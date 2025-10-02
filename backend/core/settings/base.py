@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from os.path import join, dirname
-from oauth.tokens import signed_token_generator
-# from oauthlib.oauth2.rfc6749.tokens import signed_token_generator
+# from oauth.tokens import signed_token_generator
+from oauthlib.oauth2.rfc6749.tokens import signed_token_generator
 from . import env, BASE_DIR
 from ..scopes import scopes, default_scopes
 
@@ -278,6 +278,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    'middleware.oauth_header.OAuthHeaderMiddleware',
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware"
@@ -374,6 +375,7 @@ OAUTH2_PROVIDER = {
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["oauth.permissions.TokenHasActionScope"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "oauth.authentication.MiddlewareAuthAuthentication",
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
     ],
     "DEFAULT_RENDERER_CLASSES": (
