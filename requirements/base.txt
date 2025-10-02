@@ -65,7 +65,7 @@ numpy==1.26.4
 oauthlib==3.2.2
 onnx==1.16.0
 onnxconverter-common @ https://github.com/Skywoodthefifth/onnxconverter-common/archive/refs/heads/master.zip#sha256=5009802c93af0164de0f25e710128993db0731505f212631504e9d768abec4f7
-onnxruntime==1.17.3
+## Đã chuyển sang SQLite, không cần mysqlclient hoặc PyMySQL
 opensearch-py==2.8.0
 oscrypto==1.3.0
 packaging==24.0

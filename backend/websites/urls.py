@@ -13,11 +13,11 @@ from .views import (
     ArticlePublicViewSet,
     SectionViewSet,
     SectionPublicViewSet,
-    BuildViewSet
-    ,
+    BuildViewSet,
     SubjectViewSet,
     ClassroomViewSet,
     StudentViewSet,
+    attendance,
     RegistrationViewSet,
     TuitionViewSet,
     GradeViewSet
@@ -39,6 +39,7 @@ router.register(r"students", StudentViewSet, basename="websites-students")
 router.register(r"registrations", RegistrationViewSet, basename="websites-registrations")
 router.register(r"tuitions", TuitionViewSet, basename="websites-tuitions")
 router.register(r"grades", GradeViewSet, basename="websites-grades")
+router.register(r"attendance", attendance.AttendanceViewSet, basename="websites-attendance")
 
 site_router = routers.NestedSimpleRouter(router, r"sites", lookup="sites")
 site_router.register(r"routes", RouteViewSet, basename="websites-site-routes")

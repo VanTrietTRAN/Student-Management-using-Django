@@ -1,4 +1,5 @@
 import json
+import logging
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from django.contrib.auth import get_user_model
@@ -192,43 +193,82 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
     
     @action(detail=False, methods=[Http.HTTP_POST], url_path="login", permission_classes=[AllowAny], authentication_classes=[])
     def login(self, request, pk=None):
+        log = logging.getLogger('businesses.login')
+        log.info('login attempt', extra={'path': request.path, 'remote': request.META.get('REMOTE_ADDR')})
+
+        # Ensure oauthlib sees form-encoded data on request.POST
         try:
-            user_name = request.POST.get("username")
+            content_type = request.content_type or ''
+            if 'application/json' in content_type:
+                try:
+                    data = request.data
+                except Exception:
+                    data = {}
+                request.POST._mutable = True
+                for k, v in (data or {}).items():
+                    request.POST[k] = v
+
+            # read username from POST (populated) or fallback to request.data
+            user_name = request.POST.get("username") or getattr(request, 'data', {}).get('username')
+            log.debug('login payload username', extra={'username': user_name})
             user = User.objects.prefetch_related("employees").get(email=user_name)
         except User.DoesNotExist:
-            return Response(
-                    {"error": _("The user does not exist.")},
-                    status=HTTP_404_NOT_FOUND,
-                )
+            log.warning('login failed - user does not exist', extra={'username': user_name})
+            return Response({"error": _("The user does not exist.")}, status=HTTP_404_NOT_FOUND)
+
+        # Collect scopes from user's roles
         scopes = set()
-        # Employee permissions
         if user.employees:
             employee = user.employees.first()
-            if employee is not None:
-                if employee.roles is not None:
-                    for role in  employee.roles.all():
-                        scopes = scopes.union(set(role.scopes.keys()))
-           
+            if employee is not None and employee.roles is not None:
+                for role in employee.roles.all():
+                    scopes = scopes.union(set(role.scopes.keys()))
+
+        # Prepare POST for oauth token endpoint
         request.POST._mutable = True
-        request.POST.update(
-            {
-                "grant_type": "password",
-                "client_type": "confidential",
-                "client_id": BUSINESS_CLIENT_ID,
-                "client_secret": BUSINESS_CLIENT_SECRET
-            }
-        )
+        request.POST.update({
+            "grant_type": "password",
+            "client_type": "confidential",
+            "client_id": BUSINESS_CLIENT_ID,
+            "client_secret": BUSINESS_CLIENT_SECRET,
+        })
         if len(scopes) > 0:
             request.POST.update({"scope": list_to_scope(scopes)})
 
+        # Create token
         url, headers, body, status = self.create_token_response(request)
-        if status == 200:
-            access_token = json.loads(body).get("access_token")
-            if access_token is not None:
-                token = AccessToken.objects.get(token=access_token)
-                app_authorized.send(sender=self, request=request, token=token)
-        response = HttpResponse(content=body, status=status)
+        log.debug('oauth token response', extra={'status': status, 'body': body})
 
+        # parse body and attach redirect
+        try:
+            body_json = json.loads(body)
+        except Exception:
+            body_json = None
+
+        if status == 200 and body_json is not None:
+            access_token = body_json.get("access_token")
+            if access_token is not None:
+                try:
+                    token = AccessToken.objects.get(token=access_token)
+                    app_authorized.send(sender=self, request=request, token=token)
+                except Exception as e:
+                    log.exception('failed to attach app_authorized', exc_info=e)
+
+            # Determine redirect URL based on user type
+            user_type = getattr(user, 'user_type', None)
+            redirect_map = {
+                'student': '/student/dashboard',
+                'teacher': '/teacher/dashboard',
+                'admin': '/admin/dashboard',
+            }
+            if user_type == 'lecture':
+                user_type = 'teacher'
+            redirect_to = redirect_map.get(user_type, '/')
+            body_json['redirect_to'] = redirect_to
+            log.info('login success', extra={'user': user.email, 'redirect_to': redirect_to})
+            body = json.dumps(body_json)
+
+        response = HttpResponse(content=body, status=status, content_type='application/json')
         for k, v in headers.items():
             response[k] = v
         return response
@@ -344,7 +384,7 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
             return Response({"message": _("Password has been changed.")}, status=HTTP_200_OK)
 
         except ValueError as ve:
-            return Response({"message": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(ve)}, status=HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(e)

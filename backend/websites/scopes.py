@@ -19,6 +19,8 @@ approvable_scopes = {
     "websites:registrations:create": "Create registrations",
     "websites:registrations:delete": "Delete registrations",
     "websites:tuitions:view": "View tuition records",
+    "websites:attendance:view": "View attendance records",
+    "websites:attendance:enter": "Create/update attendance records",
     "websites:tuitions:pay": "Mark tuition as paid",
     "websites:grades:view": "View grades",
     "websites:grades:enter": "Enter/update grades",

@@ -1,160 +1,177 @@
-# Pandosima intern starter project
-We publish this repository to help students, who wisht to join Pandosima's intership/open training program, have chance to adtap with technologies and build something for yourself.
-* Checkout this project as a starter point.
-* Follow the guideline in Readme files to setup enviroment, build and run the backend, frontend. 
-* Then take a look on the project's structure, coding convention,...
-* Read the requirements in Todo.md files to implement/develop features and functions as your own.
+# Hệ thống Quản lý Sinh viên (Django + Nuxt.js)
 
-## Requirements
+Hệ thống quản lý sinh viên toàn diện với 3 vai trò: Admin, Giảng viên và Sinh viên.
 
-* MySQL Client 8.0
-* Python 3.12.2. Note: One Mac OSX, after install python, make sure to go to the `Applications/<your python folder>` and rund the command `Install Certificates.command`.
-* Node 22.14.0 (LTS) or later
-* [Gettex](https://mlocati.github.io/articles/gettext-iconv-windows.html)
-* You have to follow [this guide](./devtools/Readme.md) to setup local development environment before starting config or build source code.
-## Preparing accounts
-(Only creates these accounts for your local debuging puporse. On the server side, we already created these accounts for all environments.)
-1. Create account for mailing service
-    * Register an new [Google Account](https://accounts.google.com/) for mailing service 
-    * Turn on [2-Steps Verification](https://support.google.com/accounts/answer/185839) for your account
-    * Create an [App Passwords](https://support.google.com/mail/answer/185833) for your mailing service
-    * Remember [SMTP setup options](https://support.google.com/a/answer/176600?hl=en#zippy=%2Cuse-the-restricted-gmail-smtp-server%2Cuse-the-gmail-smtp-server) to fill in `backend/config.env` later.
+## Tính năng chính
 
-## Install dependencies
+### 1. Quản trị viên (Admin)
+- Quản lý người dùng (thêm/sửa/xóa tài khoản)
+- Quản lý môn học và phân công giảng viên
+- Quản lý lớp học và thời khóa biểu
+- Quản lý học phí và kết quả học tập
+- Cấu hình hệ thống và gửi thông báo
 
-### Create virtual environemnt
+### 2. Giảng viên
+- Xem danh sách lớp và sinh viên
+- Điểm danh và theo dõi chuyên cần
+- Nhập điểm và đánh giá sinh viên
+- Gửi thông báo đến lớp học
+- Xuất báo cáo điểm
 
-* For Linux:
+### 3. Sinh viên
+- Quản lý thông tin cá nhân
+- Đăng ký/hủy đăng ký môn học
+- Xem thời khóa biểu và lịch thi
+- Xem điểm và học phí
+- Nhận thông báo
 
-```
-    python3 -m venv .venv
-    source .venv/bin/activate
-```
+## Yêu cầu hệ thống
 
-* For Mac OS:
+- Python 3.12+
+- Node.js 18+
+- MySQL 8.0+
+- Git
 
-```
-    python3 -m venv .venv
-    source .venv/bin/activate
-```
+## Cài đặt và Chạy
 
-* For Windows:
-
-```
-    py -3 -m venv .venv
-    .venv\scripts\activate
-```
-
-### Install dependencies
-
-```
-    pip3 install -r requirements/base.txt
-```
-Note: For Mac OSX, before installing python libraries, you might have to install addition tools and export environment variables
-#### Install addition tools:
-```
-brew install mysql-client pkg-config
-```
-#### Export environment variables:
-```
-export CFLAGS="-isysroot $(xcrun --show-sdk-path) -I/usr/include -I/usr/local/include/ ${CFLAGS}"
-export LDFLAGS="-isysroot $(xcrun --show-sdk-path) -L/usr/local/lib -L/usr/lib"
-export CPPFLAGS="-isysroot $(xcrun --show-sdk-path) -I/usr/include -L/usr/lib"
-export LDFLAGS="-L/opt/homebrew/opt/mysql-client/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/mysql-client/include"
-export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client/lib/pkgconfig"
-```
-
-## Config and build
-
-### Create RSA private key
-
-Go to the [backend](./backend/) folder and runt the command below on your terminal. If you are using Windows, the command below should be run in git bash shell instead.
-
-```
-    openssl genrsa -out oidc.key 4096
-```
-
-### Config environment variables
-Copy the [backend/config.env.sample](backend/config.env.sample) to `backend/config.env`, then open the file and change values for environment variables.
-
-### Migrate data
-From the [backend](backend) folder, runt this command:
-```
-# Student Management (Pandosima starter)
-
-Hướng dẫn rút gọn, tập trung vào phát triển cục bộ trên Windows (PowerShell).
-
-Mục đích: cung cấp các bước cần thiết để chạy backend (Django) và frontend (Nuxt) trên Windows.
-
-## Yêu cầu cơ bản
-- Python 3.12+ (sử dụng `py` trên Windows)
-- Node.js (khuyến nghị phiên bản tương thích với `package.json` trong `business/`)
-- MySQL client / MySQL server (hoặc cấu hình DB tương ứng trong `backend/config.env`)
-
-## Thiết lập & chạy trên Windows (PowerShell)
-
-1) Chuẩn bị backend
+### 1. Clone dự án
 
 ```powershell
-# vào thư mục backend
-cd .\backend
+git clone https://github.com/VanTrietTRAN/Student-Management-using-Django.git
+cd Student-Management-using-Django
+```
 
-# tạo virtual environment và kích hoạt
+### 2. Thiết lập Backend (Django)
+
+```powershell
+# Tạo và kích hoạt môi trường ảo
 py -3 -m venv .venv
-.\.venv\Scripts\Activate
+.venv\Scripts\Activate.ps1
 
-# cài Python dependencies
+# Cài đặt dependencies
+cd backend
 pip install -r requirements/base.txt
 
-# sao chép file mẫu cấu hình và chỉnh lại các biến môi trường (DB, EMAIL, BUSINESS_HOST...)
-Copy-Item -Path .\config.env.sample -Destination .\config.env
-# (Mở .\config.env và chỉnh các giá trị phù hợp với máy của bạn)
+# Tạo file cấu hình
+Copy-Item config.env.template config.env
+# Chỉnh sửa config.env với thông tin database và cấu hình khác
 
-# áp dụng migrations
-py manage.py migrate
+# Tạo RSA key cho OAuth
+openssl genrsa -out oidc.key 4096
 
-# tạo các tài khoản mặc định (dùng cho phát triển cục bộ)
-py create_default_accounts.py
+# Tạo migrations và apply
+python manage.py makemigrations
+python manage.py migrate
 
-# chạy backend
-py manage.py runserver 127.0.0.1:8000
+# Tạo tài khoản mặc định
+python create_default_accounts.py
+
+# Chạy server
+python manage.py runserver
 ```
 
-2) Chạy frontend (business)
-
-Mở PowerShell mới và chạy:
+### 3. Thiết lập Frontend (Nuxt.js)
 
 ```powershell
-cd .\business
+# Di chuyển vào thư mục frontend
+cd ../business
+
+# Cài đặt dependencies
 npm install
+
+# Chạy ở chế độ development
 npm run dev
-# dev server theo package.json sẽ lắng nghe ở 127.0.0.1:3008 (mở http://127.0.0.1:3008/ để truy cập)
 ```
 
-3) Lưu ý tạo RSA key cho OIDC
+## Tài khoản mặc định
 
-Nếu dự án yêu cầu `oidc.key`, bạn có thể tạo bằng OpenSSL. Trên Windows, dùng Git Bash hoặc WSL để chạy:
+Hệ thống được tạo sẵn với 3 tài khoản mặc định:
 
-```bash
-openssl genrsa -out oidc.key 4096
+1. Admin:
+   - Email: admin@university.edu
+   - Mật khẩu: admin123
+
+2. Giảng viên:
+   - Email: lecture@university.edu
+   - Mật khẩu: lecture123
+
+3. Sinh viên:
+   - Email: student@university.edu
+   - Mật khẩu: student123
+
+## Cấu trúc dự án
+
+```
+Student-Management-using-Django/
+├── backend/                 # Django backend
+│   ├── base/               # Core components
+│   ├── businesses/         # Business logic
+│   ├── contents/           # Content management
+│   ├── websites/          # Main application
+│   └── manage.py
+├── business/              # Nuxt.js frontend
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   └── nuxt.config.ts
+└── requirements/         # Python dependencies
 ```
 
-## Tài khoản mặc định (dành cho môi trường dev)
-- Student: student@university.edu / student123  (is_staff=False, is_superuser=False)
-- Lecture: lecture@university.edu / lecture123  (is_staff=True, is_superuser=False)
-- Admin: admin@university.edu / admin123  (is_staff=True, is_superuser=True)
+## Phát triển
 
-Những tài khoản này được tạo bởi `backend/create_default_accounts.py`. Chỉ dùng cho phát triển cục bộ.
+### Backend Development
 
-## Debug / Dev mode
-- Nếu muốn phát triển frontend song song với backend, bật trong `backend/config.env`:
+1. API Endpoints:
+   - Admin API: `http://localhost:8000/websites/admin/`
+   - Student API: `http://localhost:8000/websites/student/`
+   - Teacher API: `http://localhost:8000/websites/teacher/`
 
+2. Database Migrations:
+```powershell
+python manage.py makemigrations
+python manage.py migrate
 ```
-BUSINESS_FRONTEND_DEV_MODE=True
+
+### Frontend Development
+
+1. Cấu trúc thư mục:
+   - `pages/`: Các trang chính
+   - `components/`: Components có thể tái sử dụng
+   - `services/`: Các service gọi API
+   - `stores/`: Vuex stores
+
+2. Biên dịch và chạy:
+```powershell
+# Development
+npm run dev
+
+# Production build
+npm run build
+npm run start
 ```
 
-Sau đó chạy `npm run dev` trong `business/`.
+## Xử lý sự cố
 
-## Ghi chú ngắn
-- Tài liệu gốc chứa nhiều phần dành cho Mac/Linux, Docker và localization. README này đã được rút gọn để chỉ giữ các phần thiết yếu cho phát triển cục bộ trên Windows. Nếu bạn cần các hướng dẫn cho Docker hoặc macOS, tôi có thể khôi phục hoặc thêm vào file riêng.
+### Backend
+
+1. Lỗi Database:
+   - Kiểm tra cấu hình trong `config.env`
+   - Đảm bảo MySQL đang chạy
+   - Thử xóa và tạo lại migrations
+
+2. Lỗi Authentication:
+   - Kiểm tra `oidc.key` đã được tạo
+   - Đảm bảo các tài khoản mặc định đã được tạo
+   - Xóa token và đăng nhập lại
+
+### Frontend
+
+1. Lỗi API:
+   - Kiểm tra backend đang chạy
+   - Xem console để debug
+   - Kiểm tra cấu hình API trong `nuxt.config.ts`
+
+2. Lỗi Build:
+   - Xóa `.nuxt`, `node_modules`
+   - Cài lại dependencies
+   - Chạy lại với `npm run dev`

@@ -55,6 +55,13 @@ def create_default_accounts():
     ]
     
     print("Creating default user accounts...")
+
+    # Ensure OAuth client applications exist (business/ecommerce)
+    try:
+        call_command('init_oauth_clients')
+        print('OAuth client applications initialized')
+    except Exception as e:
+        print('Failed to initialize OAuth clients:', e)
     
     for account in accounts:
         email = account['email']

@@ -32,62 +32,82 @@
 import OAuthService from '@/services/oauth';
 import { useOauthStore } from '~/stores/oauth';
 import { getErrorMessage } from '@/utils/error';
+import type { FormInstance, FormRules } from 'element-plus';
 
-const props = defineProps({
-    redirectTo: {
-        type: String,
-        required: false
-    },
-})
+interface LoginForm {
+    email: string | null;
+    password: string | null;
+}
+
+interface LoginResponse {
+    access_token: string;
+    refresh_token: string;
+    redirect_to?: string;
+}
+
+interface User {
+    id: string;
+    email: string;
+    [key: string]: any;
+}
+
+const props = defineProps<{
+    redirectTo?: string;
+}>();
 
 const { t } = useI18n();
-const store = useOauthStore()
+const store = useOauthStore();
 
-const formRef = ref(null);
-const formData = ref({
+const formRef = ref<FormInstance>();
+const formData = ref<LoginForm>({
     email: null,
     password: null
-})
-const error = ref(null);
+});
+const error = ref<string | null>(null);
+
 const login = async () => {
     if (!formRef.value) {
         return;
     }
-    formRef.value.validate(async (valid: any, fields: any) => {
-        if (!valid) {
+
+    try {
+        await formRef.value.validate();
+        
+        const { email, password } = formData.value;
+        if (!email || !password) {
             return;
         }
-        let { email: username, password } = formData.value;
-        const { redirectTo } = props
+
         store.setFirstLogin(false);
         error.value = null;
-        let data = { username, password }
-        OAuthService.login(data)
-            .then((response: any) => {
-                const { access_token, refresh_token } = response;
-                if (access_token && refresh_token) {
-                    store.setTokenInfo({ access_token, refresh_token });
-                }
-                OAuthService.userinfo()
-                    .then((user: any) => {
-                        store.setUser(user)
-                    })
-                    .catch((e: any) => {
-                        error.value = getErrorMessage(e, t('an_error_occurred'));
-                    })
-                    .finally(() => {
-                        if (!!redirectTo && redirectTo.length > 0) {
-                            navigateTo(redirectTo);
-                        }
-                    })
-            })
-            .catch((e: any) => {
-                error.value = getErrorMessage(e, t('an_error_occurred'));
-            })
-    });
 
-}
-const rules = {
+        try {
+            const response = await OAuthService.login({ username: email, password }) as LoginResponse;
+            const { access_token, refresh_token } = response;
+            
+            if (access_token && refresh_token) {
+                store.setTokenInfo({ access_token, refresh_token });
+                try {
+                    const user = await OAuthService.userinfo() as User;
+                    store.setUser(user);
+                    
+                    if (props.redirectTo) {
+                        navigateTo(props.redirectTo);
+                    }
+                } catch (e) {
+                    error.value = getErrorMessage(e, t('an_error_occurred'));
+                }
+            }
+        } catch (e) {
+            error.value = getErrorMessage(e, t('an_error_occurred'));
+        }
+    } catch {
+        // Form validation failed
+        return;
+    }
+};
+
+const rules = reactive<FormRules>({
     email: [
         { required: true, message: t('validate_error_required'), trigger: 'blur' },
         { type: 'email', message: t('validate_error_email_format'), trigger: ['blur'] },
@@ -95,7 +115,7 @@ const rules = {
     password: [
         { required: true, message: t('validate_error_required'), trigger: 'blur' },
     ],
-};
+});
 </script>
 
 <style scoped>
