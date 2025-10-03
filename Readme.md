@@ -186,3 +186,8 @@ npm run start
    - Xóa `.nuxt`, `node_modules`
    - Cài lại dependencies
    - Chạy lại với `npm run dev`
+
+
+
+
+   Hẹ hẹ hẹ
