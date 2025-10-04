@@ -36,10 +36,7 @@ Hệ thống quản lý sinh viên toàn diện với 3 vai trò: Admin, Giảng
 
 ### 1. Clone dự án
 
-```powershell
-git clone https://github.com/VanTrietTRAN/Student-Management-using-Django.git
 cd Student-Management-using-Django
-```
 
 ### 2. Thiết lập Backend (Django)
 
