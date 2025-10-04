@@ -30,8 +30,7 @@ Hệ thống quản lý sinh viên toàn diện với 3 vai trò: Admin, Giảng
 - Python 3.12+
 - Node.js 18+
 - MySQL 8.0+
-- Git
-- SQLite
+- Github
 
 ## Cài đặt và Chạy
 
