@@ -40,7 +40,6 @@ cd Student-Management-using-Django
 
 ### 2. Thiết lập Backend (Django)
 
-```powershell
 # Tạo và kích hoạt môi trường ảo
 py -3 -m venv .venv
 .venv\Scripts\Activate.ps1
