@@ -57,13 +57,8 @@ if LOCAL_BUILD and not BUSINESS_FRONTEND_DEV_MODE:
 if LOCAL_BUILD and not DOCS_FRONTEND_DEV_MODE:
     urlpatterns += static("/static/admin/", document_root=DOCS_STATIC)
 
-if DEFAULT_FILE_STORAGE == "binary_database_files.storage.DatabaseStorage":
-    urlpatterns += [
-        re_path(r'^api/v1/', include('binary_database_files.urls')),
-    ]
-if LOCAL_BUILD and not DEBUG:
-    urlpatterns += static(STATIC_URL, documents_root=STATIC_ROOT)
-    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+# Always serve media files
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
 urlpatterns += [
     re_path(r"^healthcheck/", include(health_check_urls)),
     re_path(r"^.*$", single_page_view),

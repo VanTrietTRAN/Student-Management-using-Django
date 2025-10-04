@@ -34,6 +34,7 @@
     "nuxt-lodash": "^2.5.3",
     "nuxt-socket-io": "^3.0.13",
     "nuxt-svgo": "^4.0.1",
+    "ofetch": "^1.4.1",
     "pinia": "^2.1.7",
     "pluralize": "^8.0.0",
     "quill": "^1.3.7",

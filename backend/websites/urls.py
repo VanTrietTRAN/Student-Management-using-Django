@@ -25,6 +25,10 @@ from .views import (
 
 app_name = "websites"
 # Private
+
+from websites.views.student import StudentViewSet
+from websites.views.teacher import TeacherViewSet
+
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r"sites", SiteViewSet, basename="sites")
 router.register(r"categories", ArticleCategoryViewSet, basename="websites-categories")
@@ -33,6 +37,7 @@ router.register(r"menus", MenuViewSet, basename="websites-menus")
 router.register(r"articles", ArticleViewSet, basename="websites-articles")
 router.register(r"sections", SectionViewSet, basename="websites-sections")
 router.register(r"builds", BuildViewSet, basename="websites-builds")
+<<<<<<< HEAD
 router.register(r"subjects", SubjectViewSet, basename="websites-subjects")
 router.register(r"classrooms", ClassroomViewSet, basename="websites-classrooms")
 router.register(r"students", StudentViewSet, basename="websites-students")
@@ -40,6 +45,10 @@ router.register(r"registrations", RegistrationViewSet, basename="websites-regist
 router.register(r"tuitions", TuitionViewSet, basename="websites-tuitions")
 router.register(r"grades", GradeViewSet, basename="websites-grades")
 router.register(r"attendance", attendance.AttendanceViewSet, basename="websites-attendance")
+=======
+router.register(r"students", StudentViewSet, basename="websites-students")
+router.register(r"teachers", TeacherViewSet, basename="websites-teachers")
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
 
 site_router = routers.NestedSimpleRouter(router, r"sites", lookup="sites")
 site_router.register(r"routes", RouteViewSet, basename="websites-site-routes")

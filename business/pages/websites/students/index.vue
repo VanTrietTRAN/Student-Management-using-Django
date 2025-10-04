@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
+    <div class="min-h-screen bg-gray-50 pt-32 px-4 md:px-6 pb-6">
         <!-- Header Section -->
         <div class="mb-8">
             <div class="flex justify-between items-center">
@@ -167,6 +167,12 @@
                         <el-option label="An toàn thông tin" value="ATTT" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="Ảnh đại diện">
+                    <input type="file" accept="image/*" @change="onAddImageChange" />
+                    <div v-if="newStudent.profile_picture_preview" class="mt-2">
+                        <img :src="newStudent.profile_picture_preview" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showAddDialog = false">Hủy</el-button>
@@ -178,6 +184,11 @@
         <el-dialog v-model="showViewDialog" title="Thông tin sinh viên" width="800px">
             <div v-if="selectedStudent" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col items-center">
+                        <label class="block text-sm font-medium text-gray-700">Ảnh thẻ</label>
+                        <img v-if="selectedStudent.profile_picture" :src="getProfilePictureUrl(selectedStudent.profile_picture)" alt="Ảnh đại diện" class="w-32 h-32 object-cover rounded-full border mb-2" />
+                        <span v-else class="text-gray-400">Chưa có ảnh</span>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Mã sinh viên</label>
                         <p class="mt-1 text-sm text-gray-900">{{ selectedStudent.studentId }}</p>
@@ -259,6 +270,12 @@
                 <el-form-item label="Điểm TB">
                     <el-input-number v-model="editingStudent.gpa" :min="0" :max="10" :step="0.1" />
                 </el-form-item>
+                <el-form-item label="Ảnh đại diện">
+                    <input type="file" accept="image/*" @change="onEditImageChange" />
+                    <div v-if="editingStudent.profile_picture_preview || editingStudent.profile_picture" class="mt-2">
+                        <img :src="editingStudent.profile_picture_preview || getProfilePictureUrl(editingStudent.profile_picture)" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showEditDialog = false">Hủy</el-button>
@@ -273,6 +290,7 @@ import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconUsers from '@/assets/icons/users.svg';
+import type { Student, NewStudent, EditingStudent } from '@/types/websites/student';
 
 definePageMeta({
     layout: 'websites'
@@ -287,18 +305,19 @@ const pageSize = ref(20);
 const showAddDialog = ref(false);
 const showViewDialog = ref(false);
 const showEditDialog = ref(false);
-const selectedStudent = ref(null);
-const editingStudent = ref({});
+const selectedStudent = ref<Student | null>(null);
+const editingStudent = ref<EditingStudent>({} as EditingStudent);
 
-const newStudent = ref({
+const newStudent = ref<NewStudent>({
     studentId: '',
     fullName: '',
     email: '',
     phone: '',
     class: '',
-    major: ''
+    major: '',
 });
 
+<<<<<<< HEAD
 import AcademicService from '@/services/websites/academic';
 
 // Students data from API
@@ -311,6 +330,42 @@ onMounted(async () => {
     } catch (error) {
         ElMessage.error('Không thể tải danh sách sinh viên');
         console.error(error);
+=======
+// Mock data
+const students = ref<Student[]>([
+    {
+        id: 1,
+        studentId: 'SV001',
+        fullName: 'Nguyễn Văn An',
+        email: 'an.nguyen@email.com',
+        phone: '0123456789',
+        class: 'CNTT21A',
+        major: 'CNTT',
+        status: 'Đang học',
+        gpa: 8.5
+    },
+    {
+        id: 2,
+        studentId: 'SV002',
+        fullName: 'Trần Thị Bình',
+        email: 'binh.tran@email.com',
+        phone: '0987654321',
+        class: 'CNTT21B',
+        major: 'KTPM',
+        status: 'Đang học',
+        gpa: 7.8
+    },
+    {
+        id: 3,
+        studentId: 'SV003',
+        fullName: 'Lê Văn Cường',
+        email: 'cuong.le@email.com',
+        phone: '0369852147',
+        class: 'CNTT22A',
+        major: 'ATTT',
+        status: 'Tốt nghiệp',
+        gpa: 9.2
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
     }
 });
 
@@ -356,25 +411,29 @@ const handleSearch = () => {
     ElMessage.success('Tìm kiếm hoàn tất');
 };
 
-const viewStudent = (student: any) => {
+const viewStudent = (student: Student) => {
     selectedStudent.value = student;
     showViewDialog.value = true;
 };
 
-const editStudent = (student: any) => {
+const editStudent = (student: Student) => {
     editingStudent.value = { ...student };
     showEditDialog.value = true;
 };
 
 const editStudentFromView = () => {
-    showViewDialog.value = false;
-    editingStudent.value = { ...selectedStudent.value };
-    showEditDialog.value = true;
+    if (selectedStudent.value) {
+        showViewDialog.value = false;
+        editingStudent.value = { ...selectedStudent.value };
+        showEditDialog.value = true;
+    }
 };
 
-const updateStudent = () => {
+// Update student with image upload
+const updateStudent = async () => {
     const index = students.value.findIndex(s => s.id === editingStudent.value.id);
     if (index > -1) {
+<<<<<<< HEAD
         // optimistic update
         students.value[index] = { ...editingStudent.value };
         showEditDialog.value = false;
@@ -383,6 +442,34 @@ const updateStudent = () => {
             ElMessage.error('Cập nhật sinh viên thất bại');
             console.error(err);
         });
+=======
+        const formData = new FormData();
+        for (const key in editingStudent.value) {
+            if (key === 'profile_picture' && editingStudent.value.profile_picture instanceof File) {
+                formData.append('profile_picture', editingStudent.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, String(editingStudent.value[key as keyof EditingStudent]));
+            }
+        }
+        try {
+            // Adjust API endpoint as needed
+            const res = await fetch(`/api/v1/websites/students/${editingStudent.value.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi cập nhật sinh viên');
+            const data = await res.json();
+            students.value[index] = data;
+            showEditDialog.value = false;
+            ElMessage.success(`Cập nhật thông tin sinh viên: ${editingStudent.value.fullName}`);
+        } catch (err) {
+            ElMessage.error('Lỗi khi cập nhật sinh viên');
+        }
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
     }
 };
 
@@ -406,6 +493,7 @@ const deleteStudent = (student: any) => {
     });
 };
 
+<<<<<<< HEAD
 const addStudent = async () => {
     if (newStudent.value.studentId && newStudent.value.fullName) {
         const payload = { ...newStudent.value };
@@ -420,9 +508,84 @@ const addStudent = async () => {
         } catch (err) {
             ElMessage.error('Thêm sinh viên thất bại');
             console.error(err);
+=======
+// Add student with image upload
+const addStudent = async () => {
+    if (newStudent.value.studentId && newStudent.value.fullName) {
+        const formData = new FormData();
+        for (const key in newStudent.value) {
+            if (key === 'profile_picture' && newStudent.value.profile_picture instanceof File) {
+                formData.append('profile_picture', newStudent.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, String(newStudent.value[key as keyof NewStudent]));
+            }
+        }
+        try {
+            // Adjust API endpoint as needed
+            const res = await fetch('/api/v1/websites/students/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi thêm sinh viên');
+            const data = await res.json();
+            students.value.push(data);
+            showAddDialog.value = false;
+            newStudent.value = {
+                studentId: '',
+                fullName: '',
+                email: '',
+                phone: '',
+                class: '',
+                major: '',
+                profile_picture: null,
+                profile_picture_preview: null
+            };
+            ElMessage.success('Thêm sinh viên thành công');
+        } catch (err) {
+            ElMessage.error('Lỗi khi thêm sinh viên');
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
         }
     } else {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');
+    }
+};
+// Helper to get full image URL from backend
+const getProfilePictureUrl = (path: string | File | null | undefined) => {
+    if (!path) return '';
+    if (path instanceof File) return URL.createObjectURL(path);
+    if (typeof path !== 'string') return '';
+    if (path.startsWith('http')) return path;
+    // Use relative path
+    return `/media/${path}`;
+};
+
+// Handle image file change for add
+const onAddImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        newStudent.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            newStudent.value.profile_picture_preview = ev.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// Handle image file change for edit
+const onEditImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        editingStudent.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            editingStudent.value.profile_picture_preview = ev.target?.result as string;
+        };
+        reader.readAsDataURL(file);
     }
 };
 </script>

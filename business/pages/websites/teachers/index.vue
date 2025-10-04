@@ -158,6 +158,12 @@
                         <el-option label="Khoa ATTT" value="ATTT" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="Ảnh thẻ">
+                    <input type="file" accept="image/*" @change="onAddImageChange" />
+                    <div v-if="newTeacher.profile_picture_preview" class="mt-2">
+                        <img :src="newTeacher.profile_picture_preview" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showAddDialog = false">Hủy</el-button>
@@ -169,6 +175,11 @@
         <el-dialog v-model="showViewDialog" title="Thông tin giảng viên" width="800px">
             <div v-if="selectedTeacher" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 flex flex-col items-center">
+                        <label class="block text-sm font-medium text-gray-700">Ảnh thẻ</label>
+                        <img v-if="selectedTeacher.profile_picture" :src="getProfilePictureUrl(selectedTeacher.profile_picture)" alt="Ảnh thẻ" class="w-32 h-32 object-cover rounded-full border mb-2" />
+                        <span v-else class="text-gray-400">Chưa có ảnh</span>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Mã giảng viên</label>
                         <p class="mt-1 text-sm text-gray-900">{{ selectedTeacher.teacherId }}</p>
@@ -232,6 +243,12 @@
                         <el-option label="Tạm nghỉ" value="Tạm nghỉ" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="Ảnh thẻ">
+                    <input type="file" accept="image/*" @change="onEditImageChange" />
+                    <div v-if="editingTeacher.profile_picture_preview || editingTeacher.profile_picture" class="mt-2">
+                        <img :src="editingTeacher.profile_picture_preview || getProfilePictureUrl(editingTeacher.profile_picture)" alt="Preview" class="w-24 h-24 object-cover rounded-full border" />
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showEditDialog = false">Hủy</el-button>
@@ -253,6 +270,8 @@ import AcademicService from '@/services/websites/academic'
 
 definePageMeta({ layout: 'websites' });
 
+import type { Teacher, NewTeacher, EditingTeacher } from '@/types/websites/teacher';
+
 // Reactive data
 const searchKeyword = ref('');
 const selectedDepartment = ref('');
@@ -262,17 +281,20 @@ const pageSize = ref(20);
 const showAddDialog = ref(false);
 const showViewDialog = ref(false);
 const showEditDialog = ref(false);
-const selectedTeacher = ref(null);
-const editingTeacher = ref({});
+const selectedTeacher = ref<Teacher | null>(null);
+const editingTeacher = ref<EditingTeacher>({} as EditingTeacher);
 
-const newTeacher = ref({
+const newTeacher = ref<NewTeacher>({
     teacherId: '',
     fullName: '',
     email: '',
     phone: '',
-    department: ''
+    department: '',
+    profile_picture: null,
+    profile_picture_preview: null
 });
 
+<<<<<<< HEAD
 // Teachers list (will be loaded from API)
 const teachers = ref<any[]>([])
 
@@ -291,6 +313,45 @@ onMounted(async () => {
     } catch (err) {
         console.warn('Failed to load teachers', err)
         teachers.value = fallbackTeachers
+=======
+// Mock data
+const teachers = ref<Teacher[]>([
+    {
+        id: 1,
+        teacherId: 'GV001',
+        fullName: 'ThS. Nguyễn Văn A',
+        email: 'a.nguyen@university.edu',
+        phone: '0123456789',
+        department: 'CNTT',
+        status: 'Đang làm việc'
+    },
+    {
+        id: 2,
+        teacherId: 'GV002',
+        fullName: 'TS. Trần Thị B',
+        email: 'b.tran@university.edu',
+        phone: '0987654321',
+        department: 'CNTT',
+        status: 'Đang làm việc'
+    },
+    {
+        id: 3,
+        teacherId: 'GV003',
+        fullName: 'ThS. Lê Văn C',
+        email: 'c.le@university.edu',
+        phone: '0369852147',
+        department: 'KTPM',
+        status: 'Đang làm việc'
+    },
+    {
+        id: 4,
+        teacherId: 'GV004',
+        fullName: 'TS. Phạm Thị D',
+        email: 'd.pham@university.edu',
+        phone: '0741235698',
+        department: 'ATTT',
+        status: 'Đang làm việc'
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
     }
 })
 
@@ -355,32 +416,34 @@ const handleSearch = () => {
     ElMessage.success('Tìm kiếm hoàn tất');
 };
 
-const viewTeacher = (teacher: any) => {
+const viewTeacher = (teacher: Teacher) => {
     selectedTeacher.value = teacher;
     showViewDialog.value = true;
 };
 
-const editTeacher = (teacher: any) => {
-    editingTeacher.value = { ...teacher };
+const editTeacher = (teacher: Teacher) => {
+    editingTeacher.value = {
+        ...teacher,
+        profile_picture: null,
+        profile_picture_preview: null
+    };
     showEditDialog.value = true;
 };
 
 const editTeacherFromView = () => {
-    showViewDialog.value = false;
-    editingTeacher.value = { ...selectedTeacher.value };
-    showEditDialog.value = true;
-};
-
-const updateTeacher = () => {
-    const index = teachers.value.findIndex(t => t.id === editingTeacher.value.id);
-    if (index > -1) {
-        teachers.value[index] = { ...editingTeacher.value };
-        showEditDialog.value = false;
-        ElMessage.success(`Cập nhật giảng viên: ${editingTeacher.value.fullName}`);
+    if (selectedTeacher.value) {
+        showViewDialog.value = false;
+        editingTeacher.value = {
+            ...selectedTeacher.value,
+            profile_picture: null,
+            profile_picture_preview: null
+        };
+        showEditDialog.value = true;
     }
 };
 
-const deleteTeacher = (teacher: any) => {
+
+const deleteTeacher = (teacher: Teacher) => {
     ElMessageBox.confirm(
         `Bạn có chắc chắn muốn xóa giảng viên "${teacher.fullName}"?`,
         'Xác nhận xóa',
@@ -389,40 +452,143 @@ const deleteTeacher = (teacher: any) => {
             cancelButtonText: 'Hủy',
             type: 'warning',
         }
-    ).then(() => {
-        const index = teachers.value.findIndex(t => t.id === teacher.id);
-        if (index > -1) {
-            teachers.value.splice(index, 1);
-            ElMessage.success(`Đã xóa giảng viên: ${teacher.fullName}`);
+    ).then(async () => {
+        try {
+            const res = await fetch(`/api/v1/websites/teachers/${teacher.id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                }
+            });
+            if (!res.ok) throw new Error('Lỗi khi xóa giảng viên');
+            const index = teachers.value.findIndex(t => t.id === teacher.id);
+            if (index > -1) {
+                teachers.value.splice(index, 1);
+                ElMessage.success(`Đã xóa giảng viên: ${teacher.fullName}`);
+            }
+        } catch (err) {
+            ElMessage.error('Lỗi khi xóa giảng viên');
         }
     }).catch(() => {
         ElMessage.info('Đã hủy xóa giảng viên');
     });
 };
 
-const addTeacher = () => {
-    if (newTeacher.value.teacherId && newTeacher.value.fullName) {
-        teachers.value.push({
-            id: teachers.value.length + 1,
-            ...newTeacher.value,
-            status: 'Đang làm việc'
-        });
-        showAddDialog.value = false;
-        newTeacher.value = {
-            teacherId: '',
-            fullName: '',
-            email: '',
-            phone: '',
-            department: ''
+// Helper to get full image URL from backend
+const getProfilePictureUrl = (path: string | File | null | undefined) => {
+    if (!path) return '';
+    if (path instanceof File) return URL.createObjectURL(path);
+    if (typeof path !== 'string') return '';
+    if (path.startsWith('http')) return path;
+    // Use relative path
+    return `/media/${path}`;
+};
+
+// Handle image file change for add
+const onAddImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        newTeacher.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            newTeacher.value.profile_picture_preview = ev.target?.result as string;
         };
-        ElMessage.success('Thêm giảng viên thành công');
+        reader.readAsDataURL(file);
+    }
+};
+
+// Handle image file change for edit
+const onEditImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+        editingTeacher.value.profile_picture = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            editingTeacher.value.profile_picture_preview = ev.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+// Add teacher with image upload
+const addTeacher = async () => {
+    if (newTeacher.value.teacherId && newTeacher.value.fullName) {
+        const formData = new FormData();
+        for (const key in newTeacher.value) {
+            if (key === 'profile_picture' && newTeacher.value.profile_picture instanceof File) {
+                formData.append('profile_picture', newTeacher.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, String(newTeacher.value[key as keyof NewTeacher]));
+            }
+        }
+        try {
+            const res = await fetch('/api/v1/websites/teachers/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi thêm giảng viên');
+            const data = await res.json();
+            teachers.value.push(data);
+            showAddDialog.value = false;
+            newTeacher.value = {
+                teacherId: '',
+                fullName: '',
+                email: '',
+                phone: '',
+                department: '',
+                profile_picture: null,
+                profile_picture_preview: null
+            };
+            ElMessage.success('Thêm giảng viên thành công');
+        } catch (err) {
+            ElMessage.error('Lỗi khi thêm giảng viên');
+        }
     } else {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');
     }
 };
 
+<<<<<<< HEAD
 // Computed properties
 
+=======
+// Update teacher with image upload
+const updateTeacher = async () => {
+    const index = teachers.value.findIndex(t => t.id === editingTeacher.value.id);
+    if (index > -1) {
+        const formData = new FormData();
+        for (const key in editingTeacher.value) {
+            if (key === 'profile_picture' && editingTeacher.value.profile_picture instanceof File) {
+                formData.append('profile_picture', editingTeacher.value.profile_picture);
+            } else if (key !== 'profile_picture_preview') {
+                formData.append(key, String(editingTeacher.value[key as keyof EditingTeacher]));
+            }
+        }
+        try {
+            const res = await fetch(`/api/v1/websites/teachers/${editingTeacher.value.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Lỗi khi cập nhật giảng viên');
+            const data = await res.json();
+            teachers.value[index] = data;
+            showEditDialog.value = false;
+            ElMessage.success(`Cập nhật giảng viên: ${editingTeacher.value.fullName}`);
+        } catch (err) {
+            ElMessage.error('Lỗi khi cập nhật giảng viên');
+        }
+    }
+};
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
 </script>
 
 <style scoped>
