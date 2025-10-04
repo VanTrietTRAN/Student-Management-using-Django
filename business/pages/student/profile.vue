@@ -93,6 +93,7 @@ const academicHistory = ref([
 <style scoped>
 .student-profile {
   padding: 20px;
+  margin-top: 80px;
 }
 
 .card-header {
