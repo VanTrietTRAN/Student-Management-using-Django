@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
+    <div class="min-h-screen bg-gray-50 pt-32 px-4 md:px-6 pb-6">
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Thông tin cá nhân</h1>
@@ -25,28 +25,53 @@
                                 <IconCamera class="w-4 h-4" />
                             </button>
                         </div>
-                    </div>
-                    
-                    <!-- Student Info -->
-                    <div class="flex-1 text-center md:text-left">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ studentInfo.fullName }}</h2>
-                        <p class="text-xl text-gray-600 mb-1">{{ studentInfo.studentId }}</p>
-                        <p class="text-lg text-gray-500 mb-4">{{ studentInfo.classroom }} - {{ studentInfo.major }}</p>
-                        <div class="flex flex-wrap justify-center md:justify-start gap-4">
-                            <el-tag :type="getStatusType(studentInfo.status)" size="large">
-                                {{ studentInfo.status }}
-                            </el-tag>
-                            <el-tag type="info" size="large">
-                                GPA: {{ studentInfo.gpa }}
-                            </el-tag>
+                        <div class="mt-2 text-center text-gray-400 text-sm">
+                            Ảnh thẻ<br>
+                            <span v-if="!studentInfo.profilePicture">Chưa có ảnh</span>
                         </div>
                     </div>
-                    
-                    <!-- Edit Button -->
-                    <div class="flex-shrink-0">
-                        <el-button type="primary" @click="showEditDialog = true">
-                            Chỉnh sửa thông tin
-                        </el-button>
+                    <!-- Student Info -->
+                    <div class="flex-1">
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-2">
+                            <div>
+                                <span class="text-gray-600">Mã sinh viên</span><br>
+                                <span class="font-medium">{{ studentInfo.studentId }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Họ và tên</span><br>
+                                <span class="font-medium">{{ studentInfo.fullName }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Email</span><br>
+                                <span class="font-medium">{{ studentInfo.email }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Số điện thoại</span><br>
+                                <span class="font-medium">{{ studentInfo.phone }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Lớp</span><br>
+                                <span class="font-medium">{{ studentInfo.classroom }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Ngành</span><br>
+                                <span class="font-medium">{{ studentInfo.major }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Trạng thái</span><br>
+                                <el-tag :type="getStatusType(studentInfo.status)">
+                                    {{ studentInfo.status }}
+                                </el-tag>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Điểm TB</span><br>
+                                <span class="font-bold text-lg" :class="getGPAClass(studentInfo.gpa)">{{ studentInfo.gpa }}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-6">
+                            <el-button type="primary" @click="showEditDialog = true">Sửa</el-button>
+                            <el-button type="danger" @click="confirmDelete">Xóa</el-button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -204,7 +229,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import IconCamera from '@element-plus/icons-vue/Camera'
+import { Camera as IconCamera } from '@element-plus/icons-vue'
 
 definePageMeta({
     layout: 'websites'
@@ -233,6 +258,28 @@ const studentInfo = ref({
 })
 
 const editingInfo = ref({ ...studentInfo.value })
+
+import { ElMessageBox } from 'element-plus'
+
+const confirmDelete = () => {
+    ElMessageBox.confirm(
+        'Bạn có chắc chắn muốn xóa sinh viên này?',
+        'Xác nhận xóa',
+        {
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+            type: 'warning',
+        }
+    ).then(() => {
+        // Xóa thông tin sinh viên (ở đây chỉ reset dữ liệu demo)
+        Object.keys(studentInfo.value).forEach(key => studentInfo.value[key] = '')
+        studentInfo.value.gpa = 0
+        studentInfo.value.status = 'Đã xóa'
+        ElMessage.success('Đã xóa sinh viên')
+    }).catch(() => {
+        // Hủy xóa
+    })
+}
 
 const completedCredits = ref(45)
 const totalCredits = ref(120)

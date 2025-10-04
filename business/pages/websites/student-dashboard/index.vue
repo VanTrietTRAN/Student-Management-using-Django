@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
+    <div class="min-h-screen bg-gray-50 pt-32 px-4 md:px-6 pb-6">
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Sinh viên</h1>
@@ -8,11 +8,11 @@
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <NuxtLink to="/websites/student-profile" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <NuxtLink to="/websites/student-profile" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow block">
                 <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-full">
+                    <span class="p-3 bg-blue-100 rounded-full">
                         <IconUsers class="w-8 h-8 text-blue-600" />
-                    </div>
+                    </span>
                     <div class="ml-4">
                         <h3 class="text-lg font-semibold text-gray-900">Thông tin cá nhân</h3>
                         <p class="text-sm text-gray-600">Xem và cập nhật thông tin</p>

@@ -28,7 +28,7 @@ def create_default_accounts():
             'email': 'student@gmail.com',
             'password': '123456',
             'first_name': 'Sinh viên',
-            'last_name': 'student',
+            'last_name': 'Nguyễn Văn An',
             'is_staff': False,
             'is_superuser': False
         },

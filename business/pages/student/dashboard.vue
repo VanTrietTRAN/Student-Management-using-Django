@@ -9,7 +9,7 @@
           <template #header>
             <div class="card-header">
               <h3>Thông tin cá nhân</h3>
-              <el-button type="primary" @click="router.push('/student/profile')">
+              <el-button type="primary" @click="router.push('/websites/student-profile')">
                 Chi tiết
               </el-button>
             </div>
@@ -34,7 +34,7 @@
           <template #header>
             <div class="card-header">
               <h3>Điểm số gần đây</h3>
-              <el-button type="primary" @click="router.push('/student/grades')">
+              <el-button type="primary" @click="router.push('/websites/student-grades')">
                 Xem tất cả
               </el-button>
             </div>
@@ -64,7 +64,7 @@
           <template #header>
             <div class="card-header">
               <h3>Học phí</h3>
-              <el-button type="primary" @click="router.push('/student/tuition')">
+              <el-button type="primary" @click="router.push('/websites/student-tuition')">
                 Chi tiết
               </el-button>
             </div>
