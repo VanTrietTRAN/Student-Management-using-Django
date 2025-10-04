@@ -2,7 +2,7 @@
 
 Hệ thống quản lý sinh viên toàn diện với 3 vai trò: Admin, Giảng viên và Sinh viên.
 
-## Tính năng chính
+## Tính năng tổng quan
 
 ### 1. Quản trị viên (Admin)
 - Quản lý người dùng (thêm/sửa/xóa tài khoản)
