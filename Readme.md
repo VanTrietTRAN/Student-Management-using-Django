@@ -10,7 +10,7 @@ Hệ thống quản lý sinh viên toàn diện với 3 vai trò: Admin, Giảng
 - Quản lý lớp học và thời khóa biểu
 - Quản lý học phí và kết quả học tập
 - Cấu hình hệ thống và gửi thông báo
-- Quản trị hệ thống 
+- Quản trị hệ thống theo phân quyền
 
 ### 2. Giảng viên
 - Xem danh sách lớp và sinh viên
