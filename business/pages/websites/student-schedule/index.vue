@@ -189,6 +189,26 @@ const schedules = ref([
         room: 'A101',
         teacher: 'ThS. Nguyễn Văn A',
         status: 'Sắp tới'
+    },
+    {
+        id: 4,
+        date: '2024-01-16',
+        time: '08:00-10:00',
+        subject: 'Toán cao cấp',
+        type: 'Lịch học',
+        room: 'B201',
+        teacher: 'ThS. Lê Văn C',
+        status: 'Sắp tới'
+    },
+    {
+        id: 5,
+        date: '2024-01-17',
+        time: '13:00-15:00',
+        subject: 'Hệ điều hành',
+        type: 'Lịch học',
+        room: 'C301',
+        teacher: 'TS. Phạm Thị D',
+        status: 'Sắp tới'
     }
 ]);
 
@@ -196,7 +216,8 @@ const weekDays = ref([
     {
         name: 'Thứ 2',
         schedules: [
-            { id: 1, subject: 'Lập trình cơ bản', time: '08:00-10:00', room: 'A101', type: 'study' }
+            { id: 1, subject: 'Lập trình cơ bản', time: '08:00-10:00', room: 'A101', type: 'study' },
+            { id: 4, subject: 'Toán cao cấp', time: '08:00-10:00', room: 'B201', type: 'study' }
         ]
     },
     {
@@ -207,7 +228,9 @@ const weekDays = ref([
     },
     {
         name: 'Thứ 4',
-        schedules: []
+        schedules: [
+            { id: 5, subject: 'Hệ điều hành', time: '13:00-15:00', room: 'C301', type: 'study' }
+        ]
     },
     {
         name: 'Thứ 5',
@@ -218,7 +241,7 @@ const weekDays = ref([
     {
         name: 'Thứ 6',
         schedules: [
-            { id: 4, subject: 'An toàn thông tin', time: '08:00-10:00', room: 'C301', type: 'study' }
+            { id: 6, subject: 'An toàn thông tin', time: '08:00-10:00', room: 'C301', type: 'study' }
         ]
     },
     {
