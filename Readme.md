@@ -1,162 +1,188 @@
-# Pandosima intern starter project
-We publish this repository to help students, who wisht to join Pandosima's intership/open training program, have chance to adtap with technologies and build something for yourself.
-* Checkout this project as a starter point.
-* Follow the guideline in Readme files to setup enviroment, build and run the backend, frontend. 
-* Then take a look on the project's structure, coding convention,...
-* Read the requirements in Todo.md files to implement/develop features and functions as your own.
+# Hệ thống Quản lý Sinh viên (Django + Nuxt.js)
 
-## Requirements
+Hệ thống quản lý sinh viên toàn diện với 3 vai trò: Admin, Giảng viên và Sinh viên.
 
-* MySQL Client 8.0
-* Python 3.12.2. Note: One Mac OSX, after install python, make sure to go to the `Applications/<your python folder>` and rund the command `Install Certificates.command`.
-* Node 22.14.0 (LTS) or later
-* [Gettex](https://mlocati.github.io/articles/gettext-iconv-windows.html)
-* You have to follow [this guide](./devtools/Readme.md) to setup local development environment before starting config or build source code.
-## Preparing accounts
-(Only creates these accounts for your local debuging puporse. On the server side, we already created these accounts for all environments.)
-1. Create account for mailing service
-    * Register an new [Google Account](https://accounts.google.com/) for mailing service 
-    * Turn on [2-Steps Verification](https://support.google.com/accounts/answer/185839) for your account
-    * Create an [App Passwords](https://support.google.com/mail/answer/185833) for your mailing service
-    * Remember [SMTP setup options](https://support.google.com/a/answer/176600?hl=en#zippy=%2Cuse-the-restricted-gmail-smtp-server%2Cuse-the-gmail-smtp-server) to fill in `backend/config.env` later.
+## Tính năng chính
 
-## Install dependencies
+### 1. Quản trị viên (Admin)
+- Quản lý người dùng (thêm/sửa/xóa tài khoản)
+- Quản lý môn học và phân công giảng viên
+- Quản lý lớp học và thời khóa biểu
+- Quản lý học phí và kết quả học tập
+- Cấu hình hệ thống và gửi thông báo
 
-### Create virtual environemnt
+### 2. Giảng viên
+- Xem danh sách lớp và sinh viên
+- Điểm danh và theo dõi chuyên cần
+- Nhập điểm và đánh giá sinh viên
+- Gửi thông báo đến lớp học
+- Xuất báo cáo điểm
 
-* For Linux:
+### 3. Sinh viên
+- Quản lý thông tin cá nhân
+- Đăng ký/hủy đăng ký môn học
+- Xem thời khóa biểu và lịch thi
+- Xem điểm và học phí
+- Nhận thông báo
 
-```
-    python3 -m venv .venv
-    source .venv/bin/activate
-```
+## Yêu cầu hệ thống
 
-* For Mac OS:
+- Python 3.12+
+- Node.js 18+
+- MySQL 8.0+
+- Git
 
-```
-    python3 -m venv .venv
-    source .venv/bin/activate
-```
+## Cài đặt và Chạy
 
-* For Windows:
+### 1. Clone dự án
 
-```
-    py -3 -m venv .venv
-    .venv\scripts\activate
+```powershell
+git clone https://github.com/VanTrietTRAN/Student-Management-using-Django.git
+cd Student-Management-using-Django
 ```
 
-### Install dependencies
+### 2. Thiết lập Backend (Django)
 
-```
-    pip3 install -r requirements/base.txt
-```
-Note: For Mac OSX, before installing python libraries, you might have to install addition tools and export environment variables
-#### Install addition tools:
-```
-brew install mysql-client pkg-config
-```
-#### Export environment variables:
-```
-export CFLAGS="-isysroot $(xcrun --show-sdk-path) -I/usr/include -I/usr/local/include/ ${CFLAGS}"
-export LDFLAGS="-isysroot $(xcrun --show-sdk-path) -L/usr/local/lib -L/usr/lib"
-export CPPFLAGS="-isysroot $(xcrun --show-sdk-path) -I/usr/include -L/usr/lib"
-export LDFLAGS="-L/opt/homebrew/opt/mysql-client/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/mysql-client/include"
-export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client/lib/pkgconfig"
-```
+```powershell
+# Tạo và kích hoạt môi trường ảo
+py -3 -m venv .venv
+.venv\Scripts\Activate.ps1
 
-## Config and build
+# Cài đặt dependencies
+cd backend
 
-### Create RSA private key
+# Cài đặt Pillow trước
+pip install Pillow==10.0.0
 
-Go to the [backend](./backend/) folder and runt the command below on your terminal. If you are using Windows, the command below should be run in git bash shell instead.
+# Cài đặt các package cơ bản
+pip install -r requirements/temp.txt
 
-```
-    openssl genrsa -out oidc.key 4096
-```
+# Cài đặt các package còn lại
+pip install -r requirements/base.txt --no-deps
 
-### Config environment variables
-Copy the [backend/config.env.sample](backend/config.env.sample) to `backend/config.env`, then open the file and change values for environment variables.
+# Nếu gặp lỗi khi cài đặt package nào đó, có thể cài riêng package đó với lệnh:
+# pip install <tên-package>==<version>
 
-### Migrate data
-From the [backend](backend) folder, runt this command:
-```
+# Tạo file cấu hình
+Copy-Item config.env.template config.env
+# Chỉnh sửa config.env với thông tin database và cấu hình khác
+
+# Tạo RSA key cho OAuth
+openssl genrsa -out oidc.key 4096
+
+# Tạo migrations và apply
+python manage.py makemigrations
 python manage.py migrate
-```
-### Build business site frontend
-From the [business](business) folder, runt these commands:
-```
-npm install
-npm run build
-```
 
-### Collect static files
-(For production only)
-From the [backend](backend) folder, runt this command:
-```
-python manage.py collectstatic --settings=core.settings.base
-```
+# Tạo tài khoản mặc định
+python create_default_accounts.py
 
-### Run
-From the [backend](backend) folder, runt this command:
-```
+# Chạy server
 python manage.py runserver
 ```
-You can also open the project with Visual Studio Code, Open the `Run and Debug tab` and run the config `Run Dev`
 
-## Access the webstites
-* Access the host pointed by the `BUSINESS_HOST` environemnt variable, you will see the business site. Example: http://127.0.0.1:8008
+### 3. Thiết lập Frontend (Nuxt.js)
 
-## Debuging
-In case you want to debug frontend in paralell with backend, make sure to follow these step:
-1. Turn on these evironement variable (in `backend/config.env`):
-```
-BUSINESS_FRONTEND_DEV_MODE=True
-DOCS_FRONTEND_DEV_MODE=True
-```
-2. Run the business site (frontend)
-From visual studio terminal, at the folder [business](business):
-```
+```powershell
+# Di chuyển vào thư mục frontend
+cd ../business
+
+# Cài đặt dependencies
 npm install
+
+# Chạy ở chế độ development
 npm run dev
 ```
-3. Run the document site (frontend)
-From visual studio terminal, at the folder [docs](docs):
+
+## Tài khoản mặc định
+
+Hệ thống được tạo sẵn với 3 tài khoản mặc định:
+
+1. Admin:
+   - Email: admin@university.edu
+   - Mật khẩu: admin123
+
+2. Giảng viên:
+   - Email: lecture@university.edu
+   - Mật khẩu: lecture123
+
+3. Sinh viên:
+   - Email: student@university.edu
+   - Mật khẩu: student123
+
+## Cấu trúc dự án
+
 ```
-npm install
+Student-Management-using-Django/
+├── backend/                 # Django backend
+│   ├── base/               # Core components
+│   ├── businesses/         # Business logic
+│   ├── contents/           # Content management
+│   ├── websites/          # Main application
+│   └── manage.py
+├── business/              # Nuxt.js frontend
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   └── nuxt.config.ts
+└── requirements/         # Python dependencies
+```
+
+## Phát triển
+
+### Backend Development
+
+1. API Endpoints:
+   - Admin API: `http://localhost:8000/websites/admin/`
+   - Student API: `http://localhost:8000/websites/student/`
+   - Teacher API: `http://localhost:8000/websites/teacher/`
+
+2. Database Migrations:
+```powershell
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### Frontend Development
+
+1. Cấu trúc thư mục:
+   - `pages/`: Các trang chính
+   - `components/`: Components có thể tái sử dụng
+   - `services/`: Các service gọi API
+   - `stores/`: Vuex stores
+
+2. Biên dịch và chạy:
+```powershell
+# Development
 npm run dev
-```
-4. On Visual studio, in the `Run and Debug` tag, chose `Run Dev` and click the run button next to it.
 
-Note: Copy [launch config tempalte](./.vscode/launch-template.json) to [launch config file](./.vscode/launch.json). Depend on your Operation System, you might have to modify the [launch config](./.vscode/launch.json), change path separator from '/' to '\\\\' and versa.
-
-## Using docker
-If you want to use docker, copy these file to the root folder and rename it:
-- [ci/docker-compose.yml.local](ci/docker-compose.yml.local) -> `docker-compose.yml`
-- [ci/Dockerfile.template](ci/Dockerfile.template) -> `Dockerfile`
-- [ci/docker.env.template](docker.env.template) -> `docker.env`. Then open it and change the environment variable's values acord to your environment.
-
-Build and run the container:
-```
-docker-compose up -d --build
+# Production build
+npm run build
+npm run start
 ```
 
-## Localization
-To translate your response content to other langueages:
-1. Create [language files](https://docs.djangoproject.com/en/5.0/topics/i18n/translation/#localization-how-to-create-language-files) inside each app folder.
+## Xử lý sự cố
 
-    For example: [backend/businesses/locale/vi/LC_MESSAGES/django.po](./backend/businesses/locale/vi/LC_MESSAGES/django.po)
-Note that you can use [django-admin makemessages](https://docs.djangoproject.com/en/5.0/topics/i18n/translation/#localization-how-to-create-language-files) command to create this file. It will collect the text from python/html/js files and generate the languague file for you. But sometime, we traslate dynamic text from database or external services too. They are not available in your source code, so make sure to put these text to the file manually.
+### Backend
 
-2. From your app folder, call this command to compile the texts
-```
-django-admin compilemessages
-```
+1. Lỗi Database:
+   - Kiểm tra cấu hình trong `config.env`
+   - Đảm bảo MySQL đang chạy
+   - Thử xóa và tạo lại migrations
 
-3. Use translate APIs
+2. Lỗi Authentication:
+   - Kiểm tra `oidc.key` đã được tạo
+   - Đảm bảo các tài khoản mặc định đã được tạo
+   - Xóa token và đăng nhập lại
 
-    Use [translate APIs](https://docs.djangoproject.com/en/5.0/topics/i18n/translation/) to translate your response or your templates.
+### Frontend
 
-4. Consum translated contents
+1. Lỗi API:
+   - Kiểm tra backend đang chạy
+   - Xem console để debug
+   - Kiểm tra cấu hình API trong `nuxt.config.ts`
 
-    On client side (frontend or mobile app), put `Accept-Language` to your request, you will see the translated contents.
+2. Lỗi Build:
+   - Xóa `.nuxt`, `node_modules`
+   - Cài lại dependencies
+   - Chạy lại với `npm run dev`

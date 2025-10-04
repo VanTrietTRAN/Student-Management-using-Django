@@ -155,23 +155,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import IconCalendar from '@/assets/icons/calendar.svg'
 import IconUsers from '@/assets/icons/users.svg'
 import IconAppraisal from '@/assets/icons/appraisal.svg'
 import IconBulb from '@/assets/icons/bulb.svg'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'websites'
-})
+definePageMeta({ layout: 'websites' })
 
-// Mock data for teacher dashboard
-const teachingClasses = ref(4)
-const totalStudents = ref(120)
-const teachingSubjects = ref(3)
-const unreadNotifications = ref(2)
+// State
+const teachingClasses = ref<number | string>('—')
+const totalStudents = ref<number | string>('—')
+const teachingSubjects = ref<number | string>('—')
+const unreadNotifications = ref<number | string>('—')
 
-const todaySchedule = ref([
+const todaySchedule = ref<any[]>([
     {
         id: 1,
         subject: 'Lập trình cơ bản',
@@ -198,11 +197,58 @@ const todaySchedule = ref([
     }
 ])
 
-const recentNotifications = ref([
-    { id: 1, title: 'Thay đổi lịch học CNTT21A', time: '2 giờ trước' },
-    { id: 2, title: 'Nhắc nhở nộp điểm giữa kỳ', time: '1 ngày trước' },
-    { id: 3, title: 'Thông báo nghỉ bù ngày 15/01', time: '2 ngày trước' }
-])
+const recentNotifications = ref<any[]>([])
+
+onMounted(async () => {
+    try {
+        // classrooms (teachingClasses)
+        try {
+            const cRes = await AcademicService.getClassrooms({ page_size: 100 })
+            const cData = cRes && cRes.data ? cRes.data : cRes
+            teachingClasses.value = Array.isArray(cData) ? cData.length : (cData.count ?? '—')
+        } catch (err) {
+            console.warn('classrooms fetch failed', err)
+            teachingClasses.value = 4
+        }
+
+        // students
+        try {
+            const sRes = await AcademicService.getStudents({ page_size: 1 })
+            const sData = sRes && sRes.data ? sRes.data : sRes
+            totalStudents.value = Array.isArray(sData) ? sData.length : (sData.count ?? 120)
+        } catch (err) {
+            console.warn('students fetch failed', err)
+            totalStudents.value = 120
+        }
+
+        // subjects
+        try {
+            const subRes = await AcademicService.getSubjects({ page_size: 1 })
+            const subData = subRes && subRes.data ? subRes.data : subRes
+            teachingSubjects.value = Array.isArray(subData) ? subData.length : (subData.count ?? 3)
+        } catch (err) {
+            console.warn('subjects fetch failed', err)
+            teachingSubjects.value = 3
+        }
+
+        // notifications
+        try {
+            const nRes = await AcademicService.getNotifications({ page_size: 5 })
+            const nData = nRes && nRes.data ? nRes.data : nRes
+            recentNotifications.value = Array.isArray(nData) ? nData : (nData.results || [])
+            unreadNotifications.value = recentNotifications.value.filter((n:any) => !n.isRead).length
+        } catch (err) {
+            console.warn('notifications fetch failed', err)
+            recentNotifications.value = [
+                { id: 1, title: 'Thay đổi lịch học CNTT21A', time: '2 giờ trước' },
+                { id: 2, title: 'Nhắc nhở nộp điểm giữa kỳ', time: '1 ngày trước' }
+            ]
+            unreadNotifications.value = 2
+        }
+    } catch (err) {
+        console.error(err)
+    }
+})
 
 const getStatusType = (status: string) => {
     switch (status) {

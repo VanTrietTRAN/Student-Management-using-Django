@@ -248,11 +248,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconFile from '@/assets/icons/file.svg';
 import IconUsers from '@/assets/icons/users.svg';
+import AcademicService from '@/services/websites/academic';
 
 definePageMeta({
     layout: 'websites'
@@ -277,36 +278,18 @@ const newTuition = ref({
     dueDate: ''
 });
 
-// Mock data
-const tuition = ref([
-    {
-        id: 1,
-        studentName: 'Nguyễn Văn An',
-        amount: 5000000,
-        semester: '1',
-        dueDate: '2024-01-15',
-        paymentDate: '2024-01-10',
-        status: 'Đã đóng'
-    },
-    {
-        id: 2,
-        studentName: 'Trần Thị Bình',
-        amount: 5000000,
-        semester: '1',
-        dueDate: '2024-01-15',
-        paymentDate: null,
-        status: 'Chưa đóng'
-    },
-    {
-        id: 3,
-        studentName: 'Lê Văn Cường',
-        amount: 5000000,
-        semester: '2',
-        dueDate: '2024-02-15',
-        paymentDate: null,
-        status: 'Quá hạn'
+// Tuition data from API
+const tuition = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getTuitions();
+        tuition.value = res && res.data ? res.data : res;
+    } catch (err) {
+        ElMessage.error('Không thể tải danh sách học phí');
+        console.error(err);
     }
-]);
+});
 
 // Computed properties
 const totalTuition = computed(() => tuition.value.length);
@@ -400,9 +383,14 @@ const markAsPaid = (tuitionItem: any) => {
     ).then(() => {
         const index = tuition.value.findIndex(t => t.id === tuitionItem.id);
         if (index > -1) {
-            tuition.value[index].status = 'Đã đóng';
-            tuition.value[index].paymentDate = new Date().toISOString().split('T')[0];
-            ElMessage.success(`Đã đánh dấu học phí: ${tuitionItem.studentName}`);
+            AcademicService.payTuition(tuitionItem.id).then(() => {
+                tuition.value[index].status = 'Đã đóng';
+                tuition.value[index].paymentDate = new Date().toISOString().split('T')[0];
+                ElMessage.success(`Đã đánh dấu học phí: ${tuitionItem.studentName}`);
+            }).catch(err => {
+                ElMessage.error('Đánh dấu đóng học phí thất bại');
+                console.error(err);
+            });
         }
     }).catch(() => {
         ElMessage.info('Đã hủy');

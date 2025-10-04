@@ -181,67 +181,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import IconUsers from '@/assets/icons/users.svg'
 import IconAppraisal from '@/assets/icons/appraisal.svg'
 import IconCalendar from '@/assets/icons/calendar.svg'
 import IconFile from '@/assets/icons/file.svg'
 import IconBulb from '@/assets/icons/bulb.svg'
+import AcademicService from '@/services/websites/academic'
+import { useOauthStore } from '@/stores/oauth'
 
-definePageMeta({
-    layout: 'websites'
-})
+definePageMeta({ layout: 'websites' })
 
-// Mock data for student dashboard
-const studentInfo = ref({
-    fullName: 'Nguyễn Văn An',
-    studentId: 'SV001',
-    classroom: 'CNTT21A',
-    major: 'Công nghệ thông tin',
-    gpa: 8.5,
-    status: 'Đang học',
-    profilePicture: null
-})
+// Reactive state
+const studentInfo = ref<any>({ fullName: '', studentId: '', classroom: '', major: '', gpa: 0, status: '', profilePicture: null })
+const currentSubjects = ref(0)
+const remainingTuition = ref(0)
+const newNotifications = ref(0)
+const todaySchedule = ref<any[]>([])
+const recentGrades = ref<any[]>([])
 
-const currentSubjects = ref(5)
-const remainingTuition = ref(2500000)
-const newNotifications = ref(3)
+const oauth = useOauthStore()
 
-const todaySchedule = ref([
-    {
-        id: 1,
-        subject: 'Lập trình cơ bản',
-        time: '08:00-10:00',
-        room: 'A101',
-        teacher: 'ThS. Nguyễn Văn A',
-        status: 'Đang diễn ra'
-    },
-    {
-        id: 2,
-        subject: 'Cấu trúc dữ liệu',
-        time: '10:00-12:00',
-        room: 'A102',
-        teacher: 'TS. Trần Thị B',
-        status: 'Sắp tới'
-    }
-])
-
-const recentGrades = ref([
-    {
-        id: 1,
-        subject: 'Lập trình cơ bản',
-        semester: 'Học kỳ 1',
-        gpa: 8.5,
-        status: 'Hoàn thành'
-    },
-    {
-        id: 2,
-        subject: 'Cấu trúc dữ liệu',
-        semester: 'Học kỳ 1',
-        gpa: 7.8,
-        status: 'Hoàn thành'
-    }
-])
+const formatCurrency = (amount: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
 
 const getStatusType = (status: string) => {
     switch (status) {
@@ -260,12 +222,38 @@ const getGPAClass = (gpa: number) => {
     return 'text-red-600'
 }
 
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    }).format(amount)
-}
+onMounted(async () => {
+    const userId = oauth.userId
+    if (!userId) return
+
+    try {
+        const sRes = await AcademicService.getStudent(userId)
+        const sData = sRes && sRes.data ? sRes.data : sRes
+        studentInfo.value = sData || studentInfo.value
+
+        // grades
+        try {
+            const gRes = await AcademicService.getGrades({ student: userId })
+            const gData = gRes && gRes.data ? gRes.data : gRes
+            recentGrades.value = Array.isArray(gData) ? gData.slice(0,5) : (gData.results || []).slice(0,5)
+        } catch (err) {
+            console.warn('grades fetch failed', err)
+        }
+
+        // tuitions
+        try {
+            const tRes = await AcademicService.getTuitions({ student: userId })
+            const tData = tRes && tRes.data ? tRes.data : tRes
+            const tList = Array.isArray(tData) ? tData : (tData.results || [])
+            remainingTuition.value = tList.reduce((sum:any, t:any) => sum + ((t.amount || 0) - (t.paid_amount || 0)), 0)
+        } catch (err) {
+            console.warn('tuitions fetch failed', err)
+        }
+    } catch (err) {
+        ElMessage.error('Không thể tải dashboard sinh viên')
+        console.error(err)
+    }
+})
 </script>
 
 <style scoped>

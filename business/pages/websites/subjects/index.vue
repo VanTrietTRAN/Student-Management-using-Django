@@ -290,7 +290,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import { Document } from '@element-plus/icons-vue';
@@ -324,53 +324,21 @@ const newSubject = ref({
     teacherName: ''
 });
 
-// Mock data
-const subjects = ref([
-    {
-        id: 1,
-        subjectCode: 'CS101',
-        subjectName: 'Lập trình cơ bản',
-        credits: 3,
-        major: 'CNTT',
-        type: 'Bắt buộc',
-        semester: '1',
-        teacherName: 'ThS. Nguyễn Văn A',
-        status: 'Đang mở'
-    },
-    {
-        id: 2,
-        subjectCode: 'CS102',
-        subjectName: 'Cấu trúc dữ liệu',
-        credits: 4,
-        major: 'CNTT',
-        type: 'Bắt buộc',
-        semester: '2',
-        teacherName: 'TS. Trần Thị B',
-        status: 'Đang mở'
-    },
-    {
-        id: 3,
-        subjectCode: 'SE201',
-        subjectName: 'Phát triển phần mềm',
-        credits: 3,
-        major: 'KTPM',
-        type: 'Bắt buộc',
-        semester: '3',
-        teacherName: 'ThS. Lê Văn C',
-        status: 'Đang mở'
-    },
-    {
-        id: 4,
-        subjectCode: 'IT301',
-        subjectName: 'An toàn thông tin',
-        credits: 3,
-        major: 'ATTT',
-        type: 'Bắt buộc',
-        semester: '4',
-        teacherName: 'TS. Phạm Thị D',
-        status: 'Đang mở'
+import AcademicService from '@/services/websites/academic';
+
+// Subjects data from API
+const subjects = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getSubjects();
+        // assume API returns array directly or wrapped in data
+        subjects.value = res && res.data ? res.data : res;
+    } catch (error) {
+        ElMessage.error('Không thể tải danh sách môn học');
+        console.error(error);
     }
-]);
+});
 
 // Computed properties
 const totalSubjects = computed(() => subjects.value.length);

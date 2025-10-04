@@ -67,7 +67,17 @@ class AccessToken(AbstractAccessToken):
         if not self.expires:
             return True
 
-        return  timezone.now() >= utc.localize(self.expires)
+        expires = self.expires
+        # If expires is naive, localize to UTC. If already aware, leave as is.
+        try:
+            tzinfo = getattr(expires, 'tzinfo', None)
+        except Exception:
+            tzinfo = None
+
+        if tzinfo is None or tzinfo.utcoffset(expires) is None:
+            expires = utc.localize(expires)
+
+        return timezone.now() >= expires
 
 class RefreshToken(AbstractRefreshToken):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="refresh_tokens")

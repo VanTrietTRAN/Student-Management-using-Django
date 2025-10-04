@@ -24,8 +24,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from os.path import join, dirname
-from oauth.tokens import signed_token_generator
-# from oauthlib.oauth2.rfc6749.tokens import signed_token_generator
+# from oauth.tokens import signed_token_generator
+from oauthlib.oauth2.rfc6749.tokens import signed_token_generator
 from . import env, BASE_DIR
 from ..scopes import scopes, default_scopes
 
@@ -199,7 +199,11 @@ OPEN_SEARCH_HOST = (
 OPEN_SEARCH_SECURE_SCHEME = (
     os.environ["OPEN_SEARCH_SECURE_SCHEME"]
     if "OPEN_SEARCH_SECURE_SCHEME" in os.environ
+<<<<<<< HEAD
+    else env.str("OPEN_SEARCH_SECURE_SCHEME", default="https")
+=======
     else env.int("OPEN_SEARCH_SECURE_SCHEME", default=Http.HTTPS)
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
 )
 OPEN_SEARCH_SECURE_HOST = (
     os.environ["OPEN_SEARCH_SECURE_HOST"]
@@ -261,12 +265,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+    'oauth2_provider',
+    'binary_database_files',
+=======
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
     'rest_framework',
     'django_vite', 
     'corsheaders',
     'django_filters',
     'oauth',
-    'oauth2_provider',
     'rest_framework_api_key',
     'otp',
     'django_opensearch_dsl',
@@ -290,6 +298,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    'middleware.oauth_header.OAuthHeaderMiddleware',
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware"
@@ -322,22 +331,38 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 # https://docs.djangoproject.com/en/5.0/ref/databases/#mysql-notes
-DB_NAME = os.environ["DB_NAME"] if "DB_NAME" in os.environ else env("DB_NAME")
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": DB_NAME,
-        "USER": os.environ["DB_USER"] if "DB_USER" in os.environ else env("DB_USER"),
-        "PASSWORD": (
-            os.environ["DB_PASSWORD"]
-            if "DB_PASSWORD" in os.environ
-            else env("DB_PASSWORD")
-        ),
-        "HOST": os.environ["DB_HOST"] if "DB_HOST" in os.environ else env("DB_HOST"),
-        "PORT": os.environ["DB_PORT"] if "DB_PORT" in os.environ else env("DB_PORT"),
-        "OPTIONS": {"charset": "utf8mb4"},
+# Allow switching to SQLite for local/dev by setting USE_SQLITE=1 in env or config.env
+USE_SQLITE = (
+    os.environ["USE_SQLITE"] == "1"
+    if "USE_SQLITE" in os.environ
+    else env.bool("USE_SQLITE", default=False)
+)
+
+if USE_SQLITE:
+    # Use a file-based SQLite DB in the project root for simple local development
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": join(BASE_DIR, "db.sqlite3"),
+        }
     }
-}
+else:
+    DB_NAME = os.environ["DB_NAME"] if "DB_NAME" in os.environ else env("DB_NAME")
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": DB_NAME,
+            "USER": os.environ["DB_USER"] if "DB_USER" in os.environ else env("DB_USER"),
+            "PASSWORD": (
+                os.environ["DB_PASSWORD"]
+                if "DB_PASSWORD" in os.environ
+                else env("DB_PASSWORD")
+            ),
+            "HOST": os.environ["DB_HOST"] if "DB_HOST" in os.environ else env("DB_HOST"),
+            "PORT": os.environ["DB_PORT"] if "DB_PORT" in os.environ else env("DB_PORT"),
+            "OPTIONS": {"charset": "utf8mb4"},
+        }
+    }
 
 AUTH_USER_MODEL = "oauth.User"
 OAUTH2_PROVIDER_APPLICATION_MODEL = "oauth.Application"
@@ -370,6 +395,7 @@ OAUTH2_PROVIDER = {
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["oauth.permissions.TokenHasActionScope"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "oauth.authentication.MiddlewareAuthAuthentication",
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
     ],
     "DEFAULT_RENDERER_CLASSES": (

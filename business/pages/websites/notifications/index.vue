@@ -223,61 +223,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { Plus, Search } from '@element-plus/icons-vue';
-import IconBulb from '@/assets/icons/bulb.svg';
-import IconUsers from '@/assets/icons/users.svg';
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Search } from '@element-plus/icons-vue'
+import IconBulb from '@/assets/icons/bulb.svg'
+import IconUsers from '@/assets/icons/users.svg'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'websites'
-});
+definePageMeta({ layout: 'websites' })
 
 // Reactive data
-const searchKeyword = ref('');
-const selectedTarget = ref('');
-const selectedStatus = ref('');
-const currentPage = ref(1);
-const pageSize = ref(20);
-const showAddDialog = ref(false);
-const showViewDialog = ref(false);
-const showEditDialog = ref(false);
-const selectedNotification = ref(null);
-const editingNotification = ref({});
+const searchKeyword = ref('')
+const selectedTarget = ref('')
+const selectedStatus = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
+const showAddDialog = ref(false)
+const showViewDialog = ref(false)
+const showEditDialog = ref(false)
+const selectedNotification = ref(null)
+const editingNotification = ref({})
 
-const newNotification = ref({
-    title: '',
-    content: '',
-    targetRole: ''
-});
+const newNotification = ref({ title: '', content: '', targetRole: '' })
 
-// Mock data
-const notifications = ref([
-    {
-        id: 1,
-        title: 'Thông báo lịch thi cuối kỳ',
-        content: 'Kỳ thi cuối kỳ sẽ diễn ra từ ngày 15/01/2024 đến 25/01/2024. Sinh viên vui lòng chuẩn bị đầy đủ giấy tờ và đến đúng giờ.',
-        targetRole: 'Toàn trường',
-        createdAt: '2024-01-10',
-        isRead: true
-    },
-    {
-        id: 2,
-        title: 'Cập nhật học phí học kỳ mới',
-        content: 'Học phí học kỳ 2 năm học 2023-2024 đã được cập nhật. Sinh viên vui lòng đóng học phí trước ngày 15/02/2024.',
-        targetRole: 'Khoa CNTT',
-        createdAt: '2024-01-08',
-        isRead: false
-    },
-    {
-        id: 3,
-        title: 'Thông báo nghỉ lễ 30/4',
-        content: 'Nhà trường thông báo nghỉ lễ 30/4 và 1/5. Các lớp học sẽ được điều chỉnh lịch học phù hợp.',
-        targetRole: 'Toàn trường',
-        createdAt: '2024-01-05',
-        isRead: true
+// Notifications list (API-driven, with fallback)
+const notifications = ref<any[]>([])
+const fallback = [
+    { id: 1, title: 'Thông báo lịch thi cuối kỳ', content: 'Kỳ thi...', targetRole: 'Toàn trường', createdAt: '2024-01-10', isRead: true },
+    { id: 2, title: 'Cập nhật học phí học kỳ mới', content: 'Học phí...', targetRole: 'Khoa CNTT', createdAt: '2024-01-08', isRead: false }
+]
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getNotifications({ page_size: 100 })
+        const data = res && res.data ? res.data : res
+        notifications.value = Array.isArray(data) ? data : (data.results || [])
+        if (!notifications.value.length) notifications.value = fallback
+    } catch (err) {
+        console.warn('notifications fetch failed', err)
+        notifications.value = fallback
     }
-]);
+})
 
 // Computed properties
 const totalNotifications = computed(() => notifications.value.length);

@@ -1,95 +1,19 @@
 <template>
-    <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
-        <!-- Header Section -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Khen thưởng & Kỷ luật</h1>
-                    <p class="text-gray-600">Quản lý quá trình rèn luyện, khen thưởng và kỷ luật sinh viên</p>
-                </div>
-                <el-button type="primary" :icon="Plus" @click="showAddDialog = true">
-                    Thêm mới
-                </el-button>
-            </div>
+  <div class="min-h-screen bg-gray-50 pt-20 px-4 md:px-6 pb-6">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Khen thưởng & Kỷ luật</h1>
+          <p class="text-gray-600">Quản lý quá trình rèn luyện, khen thưởng và kỷ luật sinh viên</p>
         </div>
-
-        <!-- Search and Filter Section -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <el-input
-                    v-model="searchKeyword"
-                    placeholder="Tìm kiếm theo tên sinh viên..."
-                    :prefix-icon="Search"
-                    clearable
-                />
-                <el-select v-model="selectedType" placeholder="Chọn loại" clearable>
-                    <el-option label="Tất cả loại" value="" />
-                    <el-option label="Khen thưởng" value="Khen thưởng" />
-                    <el-option label="Kỷ luật" value="Kỷ luật" />
-                </el-select>
-                <el-select v-model="selectedStatus" placeholder="Chọn trạng thái" clearable>
-                    <el-option label="Tất cả trạng thái" value="" />
-                    <el-option label="Đang xử lý" value="Đang xử lý" />
-                    <el-option label="Đã xử lý" value="Đã xử lý" />
-                </el-select>
-                <el-button type="primary" :icon="Search" @click="handleSearch">
-                    Tìm kiếm
-                </el-button>
-            </div>
+        <div>
+          <el-button type="primary" :icon="Plus" @click="showAddDialog = true">Thêm mới</el-button>
         </div>
+      </div>
+    </div>
 
-        <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                <div class="flex items-center">
-                    <div class="p-3 bg-blue-100 rounded-full">
-                        <IconAppraisal class="w-8 h-8 text-blue-600" />
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Tổng hồ sơ</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ totalRecords }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-                <div class="flex items-center">
-                    <div class="p-3 bg-green-100 rounded-full">
-                        <IconAppraisal class="w-8 h-8 text-green-600" />
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Khen thưởng</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ rewardCount }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
-                <div class="flex items-center">
-                    <div class="p-3 bg-red-100 rounded-full">
-                        <IconAppraisal class="w-8 h-8 text-red-600" />
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Kỷ luật</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ disciplineCount }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-                <div class="flex items-center">
-                    <div class="p-3 bg-orange-100 rounded-full">
-                        <IconUsers class="w-8 h-8 text-orange-600" />
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Đang xử lý</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ pendingCount }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Rewards/Discipline Table -->
+    <!-- Rewards/Discipline Table -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">Danh sách khen thưởng & kỷ luật</h3>
@@ -240,174 +164,150 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { Plus, Search } from '@element-plus/icons-vue';
-import IconAppraisal from '@/assets/icons/appraisal.svg';
-import IconUsers from '@/assets/icons/users.svg';
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Search } from '@element-plus/icons-vue'
+import IconAppraisal from '@/assets/icons/appraisal.svg'
+import IconUsers from '@/assets/icons/users.svg'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'websites'
-});
+definePageMeta({ layout: 'websites' })
 
 // Reactive data
-const searchKeyword = ref('');
-const selectedType = ref('');
-const selectedStatus = ref('');
-const currentPage = ref(1);
-const pageSize = ref(20);
-const showAddDialog = ref(false);
-const showViewDialog = ref(false);
-const showEditDialog = ref(false);
-const selectedRecord = ref(null);
-const editingRecord = ref({});
+const searchKeyword = ref('')
+const selectedType = ref('')
+const selectedStatus = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
+const showAddDialog = ref(false)
+const showViewDialog = ref(false)
+const showEditDialog = ref(false)
+const selectedRecord = ref<any | null>(null)
+const editingRecord = ref<any>({})
 
-const newRecord = ref({
-    studentName: '',
-    type: '',
-    description: '',
-    date: ''
-});
+const newRecord = ref({ studentName: '', type: '', description: '', date: '' })
 
-// Mock data
-const records = ref([
-    {
-        id: 1,
-        studentName: 'Nguyễn Văn An',
-        type: 'Khen thưởng',
-        description: 'Đạt giải nhất cuộc thi lập trình cấp trường',
-        date: '2024-01-15',
-        status: 'Đã xử lý'
-    },
-    {
-        id: 2,
-        studentName: 'Trần Thị Bình',
-        type: 'Kỷ luật',
-        description: 'Vi phạm nội quy thi cử - gian lận trong kỳ thi',
-        date: '2024-01-10',
-        status: 'Đang xử lý'
-    },
-    {
-        id: 3,
-        studentName: 'Lê Văn Cường',
-        type: 'Khen thưởng',
-        description: 'Thành tích học tập xuất sắc - GPA 9.0',
-        date: '2024-01-08',
-        status: 'Đã xử lý'
+// Records list (API driven with fallback)
+const records = ref<any[]>([])
+const fallbackRecords = [
+    { id:1, studentName: 'Nguyễn Văn An', type: 'Khen thưởng', description: 'Đạt giải nhất cuộc thi lập trình cấp trường', date: '2024-01-15', status: 'Đã xử lý' },
+    { id:2, studentName: 'Trần Thị Bình', type: 'Kỷ luật', description: 'Vi phạm nội quy thi cử - gian lận trong kỳ thi', date: '2024-01-10', status: 'Đang xử lý' },
+    { id:3, studentName: 'Lê Văn Cường', type: 'Khen thưởng', description: 'Thành tích học tập xuất sắc - GPA 9.0', date: '2024-01-08', status: 'Đã xử lý' }
+]
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getRewards({ page_size: 100 })
+        const data = res && res.data ? res.data : res
+        records.value = Array.isArray(data) ? data : (data.results || [])
+        if (!records.value.length) records.value = fallbackRecords
+    } catch (err) {
+        console.warn('rewards fetch failed', err)
+        records.value = fallbackRecords
     }
-]);
+})
 
 // Computed properties
-const totalRecords = computed(() => records.value.length);
-const rewardCount = computed(() => records.value.filter(r => r.type === 'Khen thưởng').length);
-const disciplineCount = computed(() => records.value.filter(r => r.type === 'Kỷ luật').length);
-const pendingCount = computed(() => records.value.filter(r => r.status === 'Đang xử lý').length);
+const totalRecords = computed(() => records.value.length)
+const rewardCount = computed(() => records.value.filter(r => r.type === 'Khen thưởng').length)
+const disciplineCount = computed(() => records.value.filter(r => r.type === 'Kỷ luật').length)
+const pendingCount = computed(() => records.value.filter(r => r.status === 'Đang xử lý').length)
 
 const filteredRecords = computed(() => {
-    let filtered = records.value;
-    
+    let filtered = records.value
+
     if (searchKeyword.value) {
-        filtered = filtered.filter(record => 
-            record.studentName.toLowerCase().includes(searchKeyword.value.toLowerCase())
-        );
+        filtered = filtered.filter(record => (record.studentName || '').toLowerCase().includes(searchKeyword.value.toLowerCase()))
     }
-    
-    if (selectedType.value) {
-        filtered = filtered.filter(record => record.type === selectedType.value);
-    }
-    
-    if (selectedStatus.value) {
-        filtered = filtered.filter(record => record.status === selectedStatus.value);
-    }
-    
-    return filtered;
-});
+
+    if (selectedType.value) filtered = filtered.filter(record => record.type === selectedType.value)
+    if (selectedStatus.value) filtered = filtered.filter(record => record.status === selectedStatus.value)
+
+    return filtered
+})
 
 // Methods
 const getStatusType = (status: string) => {
     switch (status) {
-        case 'Đã xử lý': return 'success';
-        case 'Đang xử lý': return 'warning';
-        default: return 'info';
+        case 'Đã xử lý': return 'success'
+        case 'Đang xử lý': return 'warning'
+        default: return 'info'
     }
-};
+}
 
 const getTypeColor = (type: string) => {
     switch (type) {
-        case 'Khen thưởng': return 'success';
-        case 'Kỷ luật': return 'danger';
-        default: return 'info';
+        case 'Khen thưởng': return 'success'
+        case 'Kỷ luật': return 'danger'
+        default: return 'info'
     }
-};
+}
 
 const handleSearch = () => {
-    ElMessage.success('Tìm kiếm hoàn tất');
-};
+    ElMessage.success('Tìm kiếm hoàn tất')
+}
 
-const viewRecord = (record: any) => {
-    selectedRecord.value = record;
-    showViewDialog.value = true;
-};
+const viewRecord = (record: any) => { selectedRecord.value = record; showViewDialog.value = true }
+const editRecord = (record: any) => { editingRecord.value = { ...record }; showEditDialog.value = true }
+const editRecordFromView = () => { showViewDialog.value = false; editingRecord.value = { ...selectedRecord.value }; showEditDialog.value = true }
 
-const editRecord = (record: any) => {
-    editingRecord.value = { ...record };
-    showEditDialog.value = true;
-};
-
-const editRecordFromView = () => {
-    showViewDialog.value = false;
-    editingRecord.value = { ...selectedRecord.value };
-    showEditDialog.value = true;
-};
-
-const updateRecord = () => {
-    const index = records.value.findIndex(r => r.id === editingRecord.value.id);
-    if (index > -1) {
-        records.value[index] = { ...editingRecord.value };
-        showEditDialog.value = false;
-        ElMessage.success(`Cập nhật: ${editingRecord.value.studentName}`);
+const updateRecord = async () => {
+    const index = records.value.findIndex(r => r.id === editingRecord.value.id)
+    if (index === -1) return
+    const old = { ...records.value[index] }
+    records.value[index] = { ...editingRecord.value }
+    showEditDialog.value = false
+    try {
+        await AcademicService.updateReward(editingRecord.value.id, editingRecord.value)
+        ElMessage.success(`Cập nhật: ${editingRecord.value.studentName}`)
+    } catch (err) {
+        records.value[index] = old
+        console.warn('updateReward failed, reverted', err)
+        ElMessage.error('Cập nhật thất bại, đã hoàn tác')
     }
-};
+}
 
 const deleteRecord = (record: any) => {
     ElMessageBox.confirm(
         `Bạn có chắc chắn muốn xóa hồ sơ "${record.studentName}"?`,
         'Xác nhận xóa',
-        {
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-            type: 'warning',
+        { confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', type: 'warning' }
+    ).then(async () => {
+        const index = records.value.findIndex(r => r.id === record.id)
+        if (index === -1) return
+        const removed = records.value.splice(index, 1)[0]
+        try {
+            await AcademicService.deleteReward(record.id)
+            ElMessage.success(`Đã xóa: ${record.studentName}`)
+        } catch (err) {
+            records.value.splice(index, 0, removed)
+            console.warn('deleteReward failed, restored', err)
+            ElMessage.error('Xóa thất bại, đã hoàn tác')
         }
-    ).then(() => {
-        const index = records.value.findIndex(r => r.id === record.id);
-        if (index > -1) {
-            records.value.splice(index, 1);
-            ElMessage.success(`Đã xóa: ${record.studentName}`);
-        }
-    }).catch(() => {
-        ElMessage.info('Đã hủy xóa');
-    });
-};
+    }).catch(() => { ElMessage.info('Đã hủy xóa') })
+}
 
-const addRecord = () => {
-    if (newRecord.value.studentName && newRecord.value.type && newRecord.value.description) {
-        records.value.push({
-            id: records.value.length + 1,
-            ...newRecord.value,
-            status: 'Đang xử lý'
-        });
-        showAddDialog.value = false;
-        newRecord.value = {
-            studentName: '',
-            type: '',
-            description: '',
-            date: ''
-        };
-        ElMessage.success('Thêm thành công');
-    } else {
-        ElMessage.error('Vui lòng điền đầy đủ thông tin');
+const addRecord = async () => {
+    if (!(newRecord.value.studentName && newRecord.value.type && newRecord.value.description)) {
+        ElMessage.error('Vui lòng điền đầy đủ thông tin')
+        return
     }
-};
+    const tempId = -Date.now()
+    const payload = { ...newRecord.value, status: 'Đang xử lý' }
+    records.value.push({ id: tempId, ...payload })
+    showAddDialog.value = false
+    newRecord.value = { studentName: '', type: '', description: '', date: '' }
+    try {
+        const res = await AcademicService.createReward(payload)
+        const data = res && res.data ? res.data : res
+        const idx = records.value.findIndex(r => r.id === tempId)
+        if (idx > -1) records.value[idx] = data
+        ElMessage.success('Thêm thành công')
+    } catch (err) {
+        console.warn('createReward failed, leaving local entry', err)
+        ElMessage.warning('Không thể lưu lên server; tạm lưu cục bộ')
+    }
+}
 </script>
 
 <style scoped>

@@ -286,7 +286,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconUsers from '@/assets/icons/users.svg';
@@ -317,6 +317,20 @@ const newStudent = ref<NewStudent>({
     major: '',
 });
 
+<<<<<<< HEAD
+import AcademicService from '@/services/websites/academic';
+
+// Students data from API
+const students = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getStudents();
+        students.value = res && res.data ? res.data : res;
+    } catch (error) {
+        ElMessage.error('Không thể tải danh sách sinh viên');
+        console.error(error);
+=======
 // Mock data
 const students = ref<Student[]>([
     {
@@ -351,8 +365,9 @@ const students = ref<Student[]>([
         major: 'ATTT',
         status: 'Tốt nghiệp',
         gpa: 9.2
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
     }
-]);
+});
 
 // Computed properties
 const totalStudents = computed(() => students.value.length);
@@ -418,6 +433,16 @@ const editStudentFromView = () => {
 const updateStudent = async () => {
     const index = students.value.findIndex(s => s.id === editingStudent.value.id);
     if (index > -1) {
+<<<<<<< HEAD
+        // optimistic update
+        students.value[index] = { ...editingStudent.value };
+        showEditDialog.value = false;
+        ElMessage.success(`Cập nhật thông tin sinh viên: ${editingStudent.value.fullName}`);
+        AcademicService.updateStudent(editingStudent.value.id, editingStudent.value).catch(err => {
+            ElMessage.error('Cập nhật sinh viên thất bại');
+            console.error(err);
+        });
+=======
         const formData = new FormData();
         for (const key in editingStudent.value) {
             if (key === 'profile_picture' && editingStudent.value.profile_picture instanceof File) {
@@ -444,6 +469,7 @@ const updateStudent = async () => {
         } catch (err) {
             ElMessage.error('Lỗi khi cập nhật sinh viên');
         }
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
     }
 };
 
@@ -467,6 +493,22 @@ const deleteStudent = (student: any) => {
     });
 };
 
+<<<<<<< HEAD
+const addStudent = async () => {
+    if (newStudent.value.studentId && newStudent.value.fullName) {
+        const payload = { ...newStudent.value };
+        try {
+            const res = await AcademicService.createStudent(payload);
+            const created = res && res.data ? res.data : res;
+            // push created student or fallback
+            students.value.push(created || { id: students.value.length + 1, ...payload, status: 'Đang học', gpa: 0 });
+            showAddDialog.value = false;
+            newStudent.value = { studentId: '', fullName: '', email: '', phone: '', class: '', major: '' };
+            ElMessage.success('Thêm sinh viên thành công');
+        } catch (err) {
+            ElMessage.error('Thêm sinh viên thất bại');
+            console.error(err);
+=======
 // Add student with image upload
 const addStudent = async () => {
     if (newStudent.value.studentId && newStudent.value.fullName) {
@@ -505,6 +547,7 @@ const addStudent = async () => {
             ElMessage.success('Thêm sinh viên thành công');
         } catch (err) {
             ElMessage.error('Lỗi khi thêm sinh viên');
+>>>>>>> 3b3381a6d34ff10ab244e9176bf5c5305c89c0c0
         }
     } else {
         ElMessage.error('Vui lòng điền đầy đủ thông tin');

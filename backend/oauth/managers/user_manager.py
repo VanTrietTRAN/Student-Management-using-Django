@@ -14,21 +14,28 @@ class UserManager(BaseUserManager):
         is_superuser=False,
         is_staff=False,
         active=True,
-        role_ids=[]
+        role_ids=None,
     ):
+        """Create and save a User with the given email and password."""
         if not email:
             raise ValueError("User must have an email address")
         if not password:
-            raise ValueError("User must have an password")
+            raise ValueError("User must have a password")
+
         user = self.model(email=self.normalize_email(email))
-        user.fist_name = first_name
-        user.last_name =  last_name
+        # assign names properly
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
         user.is_superuser = is_superuser
-        user.is_staff =  is_staff
-        user.set_password(password)  # change user password
+        user.is_staff = is_staff
+        user.set_password(password)
         user.active = active
         user.save(using=self._db)
-        if role_ids is not None and len(role_ids) > 0:
+
+        if role_ids:
             role_ids = [UUID(hex=item) if isinstance(item, str) else item for item in role_ids]
             user.roles.add(*role_ids)
+
         return user

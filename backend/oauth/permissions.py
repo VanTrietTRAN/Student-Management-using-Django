@@ -61,3 +61,48 @@ class IsAdministrator(TokenMatchesOASRequirements):
         if token is not None and token.application is not None and token.application.id == settings.BUSINESS_CLIENT_ID:
             return True
         return False
+
+
+class IsOwnerOrHasActionScope(object):
+    """
+    Allows access to object when the token belongs to the resource owner
+    or when the token has one of the required_alternate_scopes for the view action.
+
+    This permission is intended to be used together with TokenHasActionScope
+    in viewsets. has_permission returns True (so it doesn't block top-level
+    checks) while has_object_permission enforces owner-or-scope checks.
+    """
+
+    def has_permission(self, request, view):
+        # Do not block initial permission checks; rely on TokenHasActionScope
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        token = request.auth
+        if token is None:
+            return False
+
+        # First allow if token satisfies required scopes for the action
+        action = view.action.lower() if getattr(view, 'action', None) else None
+        required = getattr(view, 'required_alternate_scopes', {})
+        if action in required:
+            for alt in required[action]:
+                if token.is_valid(alt):
+                    return True
+
+        # Next, try owner check. The view may define `owner_field` to indicate
+        # which attribute on the object references the owner (e.g., 'student' or 'user').
+        owner_field = getattr(view, 'owner_field', None)
+        if owner_field and hasattr(obj, owner_field):
+            owner = getattr(obj, owner_field)
+            owner_id = getattr(owner, 'id', getattr(owner, 'pk', owner))
+            return str(owner_id) == str(token.user.id)
+
+        # Generic fallbacks for common owner attributes
+        for f in ('student', 'user', 'owner'):
+            if hasattr(obj, f):
+                owner = getattr(obj, f)
+                owner_id = getattr(owner, 'id', getattr(owner, 'pk', owner))
+                return str(owner_id) == str(token.user.id)
+
+        return False

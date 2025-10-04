@@ -277,191 +277,176 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { Plus, Search } from '@element-plus/icons-vue';
-import IconCalendar from '@/assets/icons/calendar.svg';
-import IconUsers from '@/assets/icons/users.svg';
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Search } from '@element-plus/icons-vue'
+import IconCalendar from '@/assets/icons/calendar.svg'
+import IconUsers from '@/assets/icons/users.svg'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'websites'
-});
+definePageMeta({ layout: 'websites' })
 
 // Reactive data
-const searchKeyword = ref('');
-const selectedType = ref('');
-const selectedClass = ref('');
-const currentPage = ref(1);
-const pageSize = ref(20);
-const showAddDialog = ref(false);
-const showViewDialog = ref(false);
-const showEditDialog = ref(false);
-const selectedSchedule = ref(null);
-const editingSchedule = ref({});
+const searchKeyword = ref('')
+const selectedType = ref('')
+const selectedClass = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
+const showAddDialog = ref(false)
+const showViewDialog = ref(false)
+const showEditDialog = ref(false)
+const selectedSchedule = ref<any | null>(null)
+const editingSchedule = ref<any>({})
 
-const newSchedule = ref({
-    className: '',
-    subjectName: '',
-    type: '',
-    date: '',
-    time: '',
-    room: '',
-    teacherName: ''
-});
+const newSchedule = ref({ className: '', subjectName: '', type: '', date: '', time: '', room: '', teacherName: '' })
 
-// Mock data
-const schedules = ref([
-    {
-        id: 1,
-        className: 'CNTT21A',
-        subjectName: 'Lập trình cơ bản',
-        type: 'Lịch học',
-        date: '2024-01-15',
-        time: '08:00-10:00',
-        room: 'A101',
-        teacherName: 'ThS. Nguyễn Văn A',
-        status: 'Đang diễn ra'
-    },
-    {
-        id: 2,
-        className: 'CNTT21B',
-        subjectName: 'Cấu trúc dữ liệu',
-        type: 'Lịch thi',
-        date: '2024-01-20',
-        time: '14:00-16:00',
-        room: 'A102',
-        teacherName: 'TS. Trần Thị B',
-        status: 'Đang diễn ra'
-    },
-    {
-        id: 3,
-        className: 'CNTT22A',
-        subjectName: 'Phát triển phần mềm',
-        type: 'Lịch học',
-        date: '2024-01-18',
-        time: '10:00-12:00',
-        room: 'B201',
-        teacherName: 'ThS. Lê Văn C',
-        status: 'Đang diễn ra'
+// Schedules list (API driven with fallback)
+const schedules = ref<any[]>([])
+const fallbackSchedules = [
+    { id:1, className: 'CNTT21A', subjectName: 'Lập trình cơ bản', type: 'Lịch học', date: '2024-01-15', time: '08:00-10:00', room: 'A101', teacherName: 'ThS. Nguyễn Văn A', status: 'Đang diễn ra' },
+    { id:2, className: 'CNTT21B', subjectName: 'Cấu trúc dữ liệu', type: 'Lịch thi', date: '2024-01-20', time: '14:00-16:00', room: 'A102', teacherName: 'TS. Trần Thị B', status: 'Đang diễn ra' },
+    { id:3, className: 'CNTT22A', subjectName: 'Phát triển phần mềm', type: 'Lịch học', date: '2024-01-18', time: '10:00-12:00', room: 'B201', teacherName: 'ThS. Lê Văn C', status: 'Đang diễn ra' }
+]
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getSchedules({ page_size: 200 })
+        const data = res && res.data ? res.data : res
+        schedules.value = Array.isArray(data) ? data : (data.results || [])
+        if (!schedules.value.length) schedules.value = fallbackSchedules
+    } catch (err) {
+        console.warn('schedules fetch failed', err)
+        schedules.value = fallbackSchedules
     }
-]);
+})
 
 // Computed properties
-const totalSchedules = computed(() => schedules.value.length);
-const studySchedules = computed(() => schedules.value.filter(s => s.type === 'Lịch học').length);
-const examSchedules = computed(() => schedules.value.filter(s => s.type === 'Lịch thi').length);
-const activeClasses = computed(() => new Set(schedules.value.map(s => s.className)).size);
+const totalSchedules = computed(() => schedules.value.length)
+const studySchedules = computed(() => schedules.value.filter(s => s.type === 'Lịch học').length)
+const examSchedules = computed(() => schedules.value.filter(s => s.type === 'Lịch thi').length)
+const activeClasses = computed(() => new Set(schedules.value.map(s => s.className)).size)
 
 const filteredSchedules = computed(() => {
-    let filtered = schedules.value;
-    
-    if (searchKeyword.value) {
-        filtered = filtered.filter(schedule => 
-            schedule.className.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-            schedule.subjectName.toLowerCase().includes(searchKeyword.value.toLowerCase())
-        );
-    }
-    
-    if (selectedType.value) {
-        filtered = filtered.filter(schedule => schedule.type === selectedType.value);
-    }
-    
-    if (selectedClass.value) {
-        filtered = filtered.filter(schedule => schedule.className === selectedClass.value);
-    }
-    
-    return filtered;
-});
+    let filtered = schedules.value
 
-// Methods
+    if (searchKeyword.value) {
+        filtered = filtered.filter(schedule =>
+            (schedule.className || '').toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+            (schedule.subjectName || '').toLowerCase().includes(searchKeyword.value.toLowerCase())
+        )
+    }
+
+    if (selectedType.value) {
+        filtered = filtered.filter(schedule => schedule.type === selectedType.value)
+    }
+
+    if (selectedClass.value) {
+        filtered = filtered.filter(schedule => schedule.className === selectedClass.value)
+    }
+
+    return filtered
+})
+
+// Methods (local optimistic edits; backend integration can be added)
 const getStatusType = (status: string) => {
     switch (status) {
-        case 'Đang diễn ra': return 'success';
-        case 'Đã kết thúc': return 'info';
-        case 'Tạm hoãn': return 'warning';
-        default: return 'danger';
+        case 'Đang diễn ra': return 'success'
+        case 'Đã kết thúc': return 'info'
+        case 'Tạm hoãn': return 'warning'
+        default: return 'danger'
     }
-};
+}
 
 const getTypeColor = (type: string) => {
     switch (type) {
-        case 'Lịch học': return 'success';
-        case 'Lịch thi': return 'danger';
-        default: return 'info';
+        case 'Lịch học': return 'success'
+        case 'Lịch thi': return 'danger'
+        default: return 'info'
     }
-};
+}
 
 const handleSearch = () => {
-    ElMessage.success('Tìm kiếm hoàn tất');
-};
+    ElMessage.success('Tìm kiếm hoàn tất')
+}
 
 const viewSchedule = (schedule: any) => {
-    selectedSchedule.value = schedule;
-    showViewDialog.value = true;
-};
+    selectedSchedule.value = schedule
+    showViewDialog.value = true
+}
 
 const editSchedule = (schedule: any) => {
-    editingSchedule.value = { ...schedule };
-    showEditDialog.value = true;
-};
+    editingSchedule.value = { ...schedule }
+    showEditDialog.value = true
+}
 
 const editScheduleFromView = () => {
-    showViewDialog.value = false;
-    editingSchedule.value = { ...selectedSchedule.value };
-    showEditDialog.value = true;
-};
+    showViewDialog.value = false
+    editingSchedule.value = { ...selectedSchedule.value }
+    showEditDialog.value = true
+}
 
-const updateSchedule = () => {
-    const index = schedules.value.findIndex(s => s.id === editingSchedule.value.id);
-    if (index > -1) {
-        schedules.value[index] = { ...editingSchedule.value };
-        showEditDialog.value = false;
-        ElMessage.success(`Cập nhật lịch: ${editingSchedule.value.className}`);
+const updateSchedule = async () => {
+    const index = schedules.value.findIndex(s => s.id === editingSchedule.value.id)
+    if (index === -1) return
+    // optimistic backup
+    const old = { ...schedules.value[index] }
+    schedules.value[index] = { ...editingSchedule.value }
+    showEditDialog.value = false
+    try {
+        await AcademicService.updateSchedule(editingSchedule.value.id, editingSchedule.value)
+        ElMessage.success(`Cập nhật lịch: ${editingSchedule.value.className}`)
+    } catch (err) {
+        // revert
+        schedules.value[index] = old
+        console.warn('updateSchedule failed, reverted', err)
+        ElMessage.error('Cập nhật thất bại, đã hoàn tác')
     }
-};
+}
 
 const deleteSchedule = (schedule: any) => {
     ElMessageBox.confirm(
         `Bạn có chắc chắn muốn xóa lịch "${schedule.className} - ${schedule.subjectName}"?`,
         'Xác nhận xóa',
-        {
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-            type: 'warning',
+        { confirmButtonText: 'Xóa', cancelButtonText: 'Hủy', type: 'warning' }
+    ).then(async () => {
+        const index = schedules.value.findIndex(s => s.id === schedule.id)
+        if (index === -1) return
+        const removed = schedules.value.splice(index, 1)[0]
+        try {
+            await AcademicService.deleteSchedule(schedule.id)
+            ElMessage.success(`Đã xóa lịch: ${schedule.className}`)
+        } catch (err) {
+            // restore
+            schedules.value.splice(index, 0, removed)
+            console.warn('deleteSchedule failed, restored', err)
+            ElMessage.error('Xóa thất bại, đã hoàn tác')
         }
-    ).then(() => {
-        const index = schedules.value.findIndex(s => s.id === schedule.id);
-        if (index > -1) {
-            schedules.value.splice(index, 1);
-            ElMessage.success(`Đã xóa lịch: ${schedule.className}`);
-        }
-    }).catch(() => {
-        ElMessage.info('Đã hủy xóa lịch');
-    });
-};
+    }).catch(() => { ElMessage.info('Đã hủy xóa lịch') })
+}
 
-const addSchedule = () => {
-    if (newSchedule.value.className && newSchedule.value.subjectName) {
-        schedules.value.push({
-            id: schedules.value.length + 1,
-            ...newSchedule.value,
-            status: 'Đang diễn ra'
-        });
-        showAddDialog.value = false;
-        newSchedule.value = {
-            className: '',
-            subjectName: '',
-            type: '',
-            date: '',
-            time: '',
-            room: '',
-            teacherName: ''
-        };
-        ElMessage.success('Thêm lịch thành công');
-    } else {
-        ElMessage.error('Vui lòng điền đầy đủ thông tin');
+const addSchedule = async () => {
+    if (!(newSchedule.value.className && newSchedule.value.subjectName)) {
+        ElMessage.error('Vui lòng điền đầy đủ thông tin')
+        return
     }
-};
+    // optimistic id (negative to avoid clash)
+    const tempId = -Date.now()
+    const payload = { ...newSchedule.value, status: 'Đang diễn ra' }
+    schedules.value.push({ id: tempId, ...payload })
+    showAddDialog.value = false
+    newSchedule.value = { className: '', subjectName: '', type: '', date: '', time: '', room: '', teacherName: '' }
+    try {
+        const res = await AcademicService.createSchedule(payload)
+        const data = res && res.data ? res.data : res
+        // replace temp entry with server one
+        const idx = schedules.value.findIndex(s => s.id === tempId)
+        if (idx > -1) schedules.value[idx] = data
+        ElMessage.success('Thêm lịch thành công')
+    } catch (err) {
+        console.warn('createSchedule failed, leaving local entry', err)
+        ElMessage.warning('Không thể lưu lên server; tạm lưu cục bộ')
+    }
+}
 </script>
 
 <style scoped>

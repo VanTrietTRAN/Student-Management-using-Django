@@ -1,4 +1,5 @@
 import json
+import logging
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from django.contrib.auth import get_user_model
@@ -51,6 +52,7 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
         "invite": [["admin:employees:edit"], ["employees:edit"]],
         "list": [["admin:employees:view"], ["employees:view"]],
         "retrieve": [["admin:employees:view"], ["employees:view"]]
+        ,"userinfo": [["users:view-mine"], ["users:edit-mine"]]
     }
 
     def create(self, request, *args, **kwargs):
@@ -192,43 +194,85 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
     
     @action(detail=False, methods=[Http.HTTP_POST], url_path="login", permission_classes=[AllowAny], authentication_classes=[])
     def login(self, request, pk=None):
+        log = logging.getLogger('businesses.login')
+        log.info('login attempt', extra={'path': request.path, 'remote': request.META.get('REMOTE_ADDR')})
+
+        # Ensure oauthlib sees form-encoded data on request.POST
         try:
-            user_name = request.POST.get("username")
+            content_type = request.content_type or ''
+            if 'application/json' in content_type:
+                try:
+                    data = request.data
+                except Exception:
+                    data = {}
+                request.POST._mutable = True
+                for k, v in (data or {}).items():
+                    request.POST[k] = v
+
+            # read username from POST (populated) or fallback to request.data
+            user_name = request.POST.get("username") or getattr(request, 'data', {}).get('username')
+            log.debug('login payload username', extra={'username': user_name})
             user = User.objects.prefetch_related("employees").get(email=user_name)
         except User.DoesNotExist:
-            return Response(
-                    {"error": _("The user does not exist.")},
-                    status=HTTP_404_NOT_FOUND,
-                )
+            log.warning('login failed - user does not exist', extra={'username': user_name})
+            return Response({"error": _("The user does not exist.")}, status=HTTP_404_NOT_FOUND)
+
+        # Collect scopes from user's roles
         scopes = set()
-        # Employee permissions
         if user.employees:
             employee = user.employees.first()
-            if employee is not None:
-                if employee.roles is not None:
-                    for role in  employee.roles.all():
-                        scopes = scopes.union(set(role.scopes.keys()))
-           
+            if employee is not None and employee.roles is not None:
+                for role in employee.roles.all():
+                    scopes = scopes.union(set(role.scopes.keys()))
+
+        # Prepare POST for oauth token endpoint
         request.POST._mutable = True
-        request.POST.update(
-            {
-                "grant_type": "password",
-                "client_type": "confidential",
-                "client_id": BUSINESS_CLIENT_ID,
-                "client_secret": BUSINESS_CLIENT_SECRET
-            }
-        )
+        request.POST.update({
+            "grant_type": "password",
+            "client_type": "confidential",
+            "client_id": BUSINESS_CLIENT_ID,
+            "client_secret": BUSINESS_CLIENT_SECRET,
+        })
         if len(scopes) > 0:
             request.POST.update({"scope": list_to_scope(scopes)})
 
+        # Create token
         url, headers, body, status = self.create_token_response(request)
-        if status == 200:
-            access_token = json.loads(body).get("access_token")
-            if access_token is not None:
-                token = AccessToken.objects.get(token=access_token)
-                app_authorized.send(sender=self, request=request, token=token)
-        response = HttpResponse(content=body, status=status)
+        log.debug('oauth token response', extra={'status': status, 'body': body})
 
+        # parse body and attach redirect
+        try:
+            body_json = json.loads(body)
+        except Exception:
+            body_json = None
+
+        if status == 200 and body_json is not None:
+            access_token = body_json.get("access_token")
+            if access_token is not None:
+                try:
+                    # avoid MultipleObjectsReturned: prefer the most recent matching token
+                    token_qs = AccessToken.objects.filter(token=access_token).order_by('-id')
+                    token = token_qs.first() if token_qs.exists() else None
+                    if token is not None:
+                        app_authorized.send(sender=self, request=request, token=token)
+                except Exception as e:
+                    log.exception('failed to attach app_authorized', exc_info=e)
+
+            # Determine redirect URL based on user type
+            user_type = getattr(user, 'user_type', None)
+            redirect_map = {
+                'student': '/student/dashboard',
+                'teacher': '/teacher/dashboard',
+                'admin': '/admin/dashboard',
+            }
+            if user_type == 'lecture':
+                user_type = 'teacher'
+            redirect_to = redirect_map.get(user_type, '/')
+            body_json['redirect_to'] = redirect_to
+            log.info('login success', extra={'user': user.email, 'redirect_to': redirect_to})
+            body = json.dumps(body_json)
+
+        response = HttpResponse(content=body, status=status, content_type='application/json')
         for k, v in headers.items():
             response[k] = v
         return response
@@ -344,7 +388,7 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
             return Response({"message": _("Password has been changed.")}, status=HTTP_200_OK)
 
         except ValueError as ve:
-            return Response({"message": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(ve)}, status=HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(e)
@@ -353,9 +397,48 @@ class EmployeeViewSet(OAuthLibMixin, BaseViewSet):
     @action(detail=False, methods=[Http.HTTP_GET], url_path="userinfo", permission_classes=[IsAuthenticated])
     def userinfo(self, request, *args, **kwargs):
         try:
-            id = request.auth.user.id
-            user = get_object_or_404(User.objects.all(), id=id)
-            user_serializer= UserShortSerializer(user)
+            # request.user should be set by authentication (OAuthHeaderMiddleware helps ensure this)
+            user_obj = getattr(request, 'user', None)
+            if user_obj is None or not getattr(user_obj, 'is_authenticated', False):
+                return Response({"detail": "Authentication credentials were not provided."}, status=401)
+
+            user = get_object_or_404(User.objects.all(), id=user_obj.id)
+            user_serializer = UserShortSerializer(user)
+            user_data = user_serializer.data
+            return Response(user_data, status=HTTP_200_OK)
+        except Exception:
+            return Response({"message": _("Business not found.")}, status=HTTP_404_NOT_FOUND)
+
+        # Some clients/middlewares may not set request.auth the same way.
+        # Prefer request.user when present (standard Django auth), fall back to request.auth.user (oauth token).
+        try:
+            user_obj = None
+            if hasattr(request, 'user') and getattr(request.user, 'is_authenticated', False):
+                user_obj = request.user
+            elif getattr(request, 'auth', None) is not None and getattr(request.auth, 'user', None) is not None:
+                user_obj = request.auth.user
+
+            if user_obj is None:
+                # Fallback: if Authorization header present but DRF didn't set request.auth
+                auth_header = request.META.get('HTTP_AUTHORIZATION') or request.META.get('Authorization')
+                if auth_header and isinstance(auth_header, str) and auth_header.lower().startswith('bearer '):
+                    token_str = auth_header.split(None, 1)[1].strip()
+                    try:
+                        token_obj_qs = AccessToken.objects.filter(token=token_str).order_by('-id')
+                        token_obj = token_obj_qs.first() if token_obj_qs.exists() else None
+                        if token_obj is not None:
+                            # attach token to request like authentication would
+                            request.auth = token_obj
+                            request.user = token_obj.user
+                            user_obj = token_obj.user
+                    except Exception:
+                        token_obj = None
+
+                if user_obj is None:
+                    return Response({"detail": "Authentication credentials were not provided."}, status=401)
+
+            user = get_object_or_404(User.objects.all(), id=user_obj.id)
+            user_serializer = UserShortSerializer(user)
             user_data = user_serializer.data
             return Response(user_data, status=HTTP_200_OK)
         except Exception as e:

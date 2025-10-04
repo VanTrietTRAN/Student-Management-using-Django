@@ -255,11 +255,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Search } from '@element-plus/icons-vue';
 import IconCalendar from '@/assets/icons/calendar.svg';
 import IconUsers from '@/assets/icons/users.svg';
+import AcademicService from '@/services/websites/academic';
 
 definePageMeta({
     layout: 'websites'
@@ -285,49 +286,17 @@ const newClass = ref({
     room: ''
 });
 
-// Mock data
-const classes = ref([
-    {
-        id: 1,
-        className: 'CNTT21A',
-        major: 'CNTT',
-        year: '2021',
-        studentCount: 45,
-        teacherName: 'ThS. Nguyễn Văn A',
-        room: 'A101',
-        status: 'Đang hoạt động'
-    },
-    {
-        id: 2,
-        className: 'CNTT21B',
-        major: 'CNTT',
-        year: '2021',
-        studentCount: 42,
-        teacherName: 'TS. Trần Thị B',
-        room: 'A102',
-        status: 'Đang hoạt động'
-    },
-    {
-        id: 3,
-        className: 'KTPM22A',
-        major: 'KTPM',
-        year: '2022',
-        studentCount: 38,
-        teacherName: 'ThS. Lê Văn C',
-        room: 'B201',
-        status: 'Đang hoạt động'
-    },
-    {
-        id: 4,
-        className: 'ATTT23A',
-        major: 'ATTT',
-        year: '2023',
-        studentCount: 35,
-        teacherName: 'TS. Phạm Thị D',
-        room: 'C301',
-        status: 'Đang hoạt động'
+const classes = ref([]);
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getClassrooms();
+        classes.value = res && res.data ? res.data : res;
+    } catch (err) {
+        ElMessage.error('Không thể tải danh sách lớp');
+        console.error(err);
     }
-]);
+});
 
 // Computed properties
 const totalClasses = computed(() => classes.value.length);

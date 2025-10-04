@@ -138,28 +138,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { ElMessage } from 'element-plus';
-import { Search } from '@element-plus/icons-vue';
-import IconCalendar from '@/assets/icons/calendar.svg';
-import IconUsers from '@/assets/icons/users.svg';
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
+import IconCalendar from '@/assets/icons/calendar.svg'
+import IconUsers from '@/assets/icons/users.svg'
+import AcademicService from '@/services/websites/academic'
 
-definePageMeta({
-    layout: 'student'
-});
+definePageMeta({ layout: 'student' })
 
 // Reactive data
-const selectedWeek = ref('');
-const selectedType = ref('');
-const selectedDate = ref('');
+const selectedWeek = ref('')
+const selectedType = ref('')
+const selectedDate = ref('')
 
-// Mock data
-const todayClasses = ref(2);
-const weekClasses = ref(8);
-const upcomingExams = ref(3);
-const totalSubjects = ref(5);
+// Stats
+const todayClasses = ref(0)
+const weekClasses = ref(0)
+const upcomingExams = ref(0)
+const totalSubjects = ref(0)
 
-const schedules = ref([
+const schedules = ref<any[]>([])
+
+const fallbackSchedules = [
     {
         id: 1,
         date: '2024-01-15',
@@ -210,7 +211,7 @@ const schedules = ref([
         teacher: 'TS. Phạm Thị D',
         status: 'Sắp tới'
     }
-]);
+]
 
 const weekDays = ref([
     {
@@ -256,45 +257,70 @@ const weekDays = ref([
 
 // Computed properties
 const filteredSchedules = computed(() => {
-    let filtered = schedules.value;
-    
+    let filtered = schedules.value
     if (selectedType.value) {
-        const typeMap = { 'study': 'Lịch học', 'exam': 'Lịch thi' };
-        filtered = filtered.filter(schedule => schedule.type === typeMap[selectedType.value]);
+        const typeMap:any = { 'study': 'Lịch học', 'exam': 'Lịch thi' }
+        filtered = filtered.filter(schedule => schedule.type === typeMap[selectedType.value])
     }
-    
-    return filtered;
-});
+    return filtered
+})
 
 // Methods
 const getStatusType = (status: string) => {
     switch (status) {
-        case 'Đang diễn ra': return 'success';
-        case 'Sắp tới': return 'warning';
-        case 'Đã kết thúc': return 'info';
-        default: return 'danger';
+        case 'Đang diễn ra': return 'success'
+        case 'Sắp tới': return 'warning'
+        case 'Đã kết thúc': return 'info'
+        default: return 'danger'
     }
-};
+}
 
 const getTypeColor = (type: string) => {
     switch (type) {
-        case 'Lịch học': return 'success';
-        case 'Lịch thi': return 'danger';
-        default: return 'info';
+        case 'Lịch học': return 'success'
+        case 'Lịch thi': return 'danger'
+        default: return 'info'
     }
-};
+}
 
 const getScheduleClass = (type: string) => {
     switch (type) {
-        case 'study': return 'bg-blue-50 border-blue-200';
-        case 'exam': return 'bg-red-50 border-red-200';
-        default: return 'bg-gray-50 border-gray-200';
+        case 'study': return 'bg-blue-50 border-blue-200'
+        case 'exam': return 'bg-red-50 border-red-200'
+        default: return 'bg-gray-50 border-gray-200'
     }
-};
+}
 
-const handleFilter = () => {
-    ElMessage.success('Lọc kết quả hoàn tất');
-};
+const handleFilter = () => { ElMessage.success('Lọc kết quả hoàn tất') }
+
+onMounted(async () => {
+    try {
+        const res = await AcademicService.getSchedules({ page_size: 200 })
+        const data = res && res.data ? res.data : res
+        const list = Array.isArray(data) ? data : (data.results || [])
+        if (list.length) {
+            schedules.value = list
+            const today = new Date().toISOString().split('T')[0]
+            todayClasses.value = list.filter((s:any) => s.date === today).length
+            weekClasses.value = list.length
+            upcomingExams.value = list.filter((s:any) => (s.type || '').toLowerCase().includes('exam')).length
+            totalSubjects.value = new Set(list.map((s:any) => s.subject)).size
+        } else {
+            schedules.value = fallbackSchedules
+            todayClasses.value = 2
+            weekClasses.value = 8
+            upcomingExams.value = 3
+            totalSubjects.value = 5
+        }
+    } catch (err) {
+        console.warn('schedules fetch failed', err)
+        schedules.value = fallbackSchedules
+        todayClasses.value = 2
+        weekClasses.value = 8
+        upcomingExams.value = 3
+        totalSubjects.value = 5
+    }
+})
 </script>
 
 <style scoped>
