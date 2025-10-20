@@ -176,3 +176,167 @@ def student_view_result(request):
     student=Students.objects.get(admin=request.user.id)
     studentresult=StudentResult.objects.filter(student_id=student.id)
     return render(request,"student_template/student_result.html",{"studentresult":studentresult})
+
+
+# ============= COURSE ENROLLMENT =============
+def student_view_subjects(request):
+    """Xem danh sách môn học có thể đăng ký"""
+    student = Students.objects.get(admin=request.user.id)
+    course = student.course_id
+    session_year = student.session_year_id
+    
+    # Lấy tất cả môn học của khóa
+    all_subjects = Subjects.objects.filter(course_id=course)
+    
+    # Lấy các môn đã đăng ký
+    enrolled_subjects = StudentEnrollment.objects.filter(
+        student_id=student,
+        session_year_id=session_year,
+        is_active=True
+    ).values_list('subject_id', flat=True)
+    
+    return render(request, "student_template/view_subjects.html", {
+        "subjects": all_subjects,
+        "enrolled_subjects": enrolled_subjects,
+        "student": student
+    })
+
+
+def student_enroll_subject(request, subject_id):
+    """Đăng ký môn học"""
+    try:
+        student = Students.objects.get(admin=request.user.id)
+        subject = Subjects.objects.get(id=subject_id)
+        session_year = student.session_year_id
+        
+        # Kiểm tra đã đăng ký chưa
+        existing = StudentEnrollment.objects.filter(
+            student_id=student,
+            subject_id=subject,
+            session_year_id=session_year
+        ).exists()
+        
+        if existing:
+            messages.warning(request, "You have already enrolled in this subject")
+        else:
+            enrollment = StudentEnrollment(
+                student_id=student,
+                subject_id=subject,
+                session_year_id=session_year,
+                is_active=True
+            )
+            enrollment.save()
+            messages.success(request, f"Successfully enrolled in {subject.subject_name}")
+    except Exception as e:
+        messages.error(request, f"Failed to enroll: {str(e)}")
+    
+    return HttpResponseRedirect(reverse("student_view_subjects"))
+
+
+def student_drop_subject(request, subject_id):
+    """Hủy đăng ký môn học"""
+    try:
+        student = Students.objects.get(admin=request.user.id)
+        subject = Subjects.objects.get(id=subject_id)
+        session_year = student.session_year_id
+        
+        enrollment = StudentEnrollment.objects.get(
+            student_id=student,
+            subject_id=subject,
+            session_year_id=session_year
+        )
+        enrollment.is_active = False
+        enrollment.save()
+        
+        messages.success(request, f"Successfully dropped {subject.subject_name}")
+    except:
+        messages.error(request, "Failed to drop subject")
+    
+    return HttpResponseRedirect(reverse("student_view_subjects"))
+
+
+def student_view_fees(request):
+    """Xem học phí của các môn đã đăng ký"""
+    student = Students.objects.get(admin=request.user.id)
+    session_year = student.session_year_id
+    
+    # Lấy các môn đã đăng ký
+    enrollments = StudentEnrollment.objects.filter(
+        student_id=student,
+        session_year_id=session_year,
+        is_active=True
+    ).select_related('subject_id')
+    
+    # Tính tổng học phí
+    total_credits = 0
+    total_fee = 0
+    fee_details = []
+    
+    for enrollment in enrollments:
+        subject = enrollment.subject_id
+        subject_fee = subject.get_total_fee()
+        total_credits += subject.credit_hours
+        total_fee += subject_fee
+        
+        fee_details.append({
+            'subject': subject,
+            'credit_hours': subject.credit_hours,
+            'fee_per_credit': subject.fee_per_credit,
+            'total_fee': subject_fee
+        })
+    
+    return render(request, "student_template/view_fees.html", {
+        "fee_details": fee_details,
+        "total_credits": total_credits,
+        "total_fee": total_fee,
+        "student": student
+    })
+
+
+def student_view_schedule(request):
+    """Xem thời khóa biểu"""
+    student = Students.objects.get(admin=request.user.id)
+    session_year = student.session_year_id
+    
+    # Lấy các môn đã đăng ký
+    enrolled_subjects = StudentEnrollment.objects.filter(
+        student_id=student,
+        session_year_id=session_year,
+        is_active=True
+    ).values_list('subject_id', flat=True)
+    
+    # Lấy lịch học của các môn đã đăng ký
+    schedules = Schedule.objects.filter(
+        subject_id__in=enrolled_subjects,
+        session_year_id=session_year
+    ).order_by('weekday', 'start_time')
+    
+    # Sắp xếp theo thứ trong tuần
+    schedule_by_day = {}
+    for schedule in schedules:
+        day = schedule.get_weekday_display()
+        if day not in schedule_by_day:
+            schedule_by_day[day] = []
+        schedule_by_day[day].append(schedule)
+    
+    return render(request, "student_template/view_schedule.html", {
+        "schedule_by_day": schedule_by_day,
+        "student": student
+    })
+
+
+def student_view_subject_description(request, subject_id):
+    """Xem/Download file mô tả môn học"""
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+        
+        if subject.subject_description_file:
+            return render(request, "student_template/view_subject_description.html", {
+                "subject": subject
+            })
+        else:
+            messages.warning(request, "No description file available for this subject")
+            return HttpResponseRedirect(reverse("student_view_subjects"))
+    except:
+        messages.error(request, "Subject not found")
+        return HttpResponseRedirect(reverse("student_view_subjects"))

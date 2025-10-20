@@ -81,6 +81,12 @@ urlpatterns = [
     path('admin_send_notification_student', HodViews.admin_send_notification_student,name="admin_send_notification_student"),
     path('send_student_notification', HodViews.send_student_notification,name="send_student_notification"),
     path('send_staff_notification', HodViews.send_staff_notification,name="send_staff_notification"),
+    path('manage_schedule', HodViews.manage_schedule,name="manage_schedule"),
+    path('add_schedule', HodViews.add_schedule,name="add_schedule"),
+    path('add_schedule_save', HodViews.add_schedule_save,name="add_schedule_save"),
+    path('edit_schedule/<str:schedule_id>', HodViews.edit_schedule,name="edit_schedule"),
+    path('edit_schedule_save', HodViews.edit_schedule_save,name="edit_schedule_save"),
+    path('delete_schedule/<str:schedule_id>', HodViews.delete_schedule,name="delete_schedule"),
 
                   #     Staff URL Path
     path('staff_home', StaffViews.staff_home, name="staff_home"),
@@ -105,6 +111,9 @@ urlpatterns = [
     path('fetch_result_student',StaffViews.fetch_result_student, name="fetch_result_student"),
     path('start_live_classroom',StaffViews.start_live_classroom, name="start_live_classroom"),
     path('start_live_classroom_process',StaffViews.start_live_classroom_process, name="start_live_classroom_process"),
+    path('manage_subject_description', StaffViews.manage_subject_description, name="manage_subject_description"),
+    path('upload_subject_description/<str:subject_id>', StaffViews.upload_subject_description, name="upload_subject_description"),
+    path('delete_subject_description/<str:subject_id>', StaffViews.delete_subject_description, name="delete_subject_description"),
 
 
     path('student_home', StudentViews.student_home, name="student_home"),
