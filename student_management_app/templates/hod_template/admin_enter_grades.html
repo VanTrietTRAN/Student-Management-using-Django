@@ -95,7 +95,8 @@ Nhập Điểm - {{ subject.subject_name }}
                     <div class="card-header">
                         <h3 class="card-title">Danh Sách Sinh Viên</h3>
                         <div class="card-tools">
-                            <button type="button" class="btn btn-success" id="saveBtn">
+                            <button type="button" class="btn btn-success" id="saveBtn" 
+                                    data-subject-id="{{ subject.id }}">
                                 <i class="fas fa-save"></i> Lưu Tất Cả Điểm
                             </button>
                             <a href="{% url 'admin_export_subject_grades' subject.id %}" 
@@ -181,6 +182,9 @@ Nhập Điểm - {{ subject.subject_name }}
 <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
 <script>
 $(document).ready(function() {
+    // Get subject ID from button data attribute
+    var saveGradesUrl = "{% url 'admin_save_grades' %}";
+
     // Initialize DataTables
     $('#gradesTable').DataTable({
         "pageLength": 50,
@@ -279,6 +283,7 @@ $(document).ready(function() {
 
     // Lưu điểm
     $('#saveBtn').click(function() {
+        var subjectId = $(this).data('subject-id');
         const grades = [];
         
         $('#gradesTable tbody tr').each(function() {
@@ -311,11 +316,11 @@ $(document).ready(function() {
 
         // Send AJAX
         $.ajax({
-            url: '{% url "admin_save_grades" %}',
+            url: saveGradesUrl,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                subject_id: {{ subject.id }},
+                subject_id: subjectId,
                 grades: grades
             }),
             success: function(response) {
