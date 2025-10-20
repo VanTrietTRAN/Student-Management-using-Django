@@ -1,54 +1,94 @@
 {% extends 'student_template/base_template.html' %}
 {% block page_title %}
-Result
+Kết quả học tập
 {% endblock page_title %}
 {% block main_content %}
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-                    <div class="row">
-              <div class="col-md-12">
-            <!-- general form elements -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line"></i> Kết quả học tập
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        {% if studentresult %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 50px;">STT</th>
+                                        <th>Môn học</th>
+                                        <th style="width: 100px;" class="text-center">Tín chỉ</th>
+                                        <th style="width: 120px;" class="text-center">Điểm bài tập</th>
+                                        <th style="width: 120px;" class="text-center">Điểm thi</th>
+                                        <th style="width: 120px;" class="text-center">Điểm trung bình</th>
+                                        <th style="width: 100px;" class="text-center">Xếp loại</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in studentresult %}
+                                    <tr>
+                                        <td class="text-center">{{ forloop.counter }}</td>
+                                        <td>
+                                            <strong>{{ row.subject_id.subject_name }}</strong>
+                                        </td>
+                                        <td class="text-center">{{ row.subject_id.credit_hours }}</td>
+                                        <td class="text-center">
+                                            <span class="badge badge-info">{{ row.subject_assignment_marks }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-primary">{{ row.subject_exam_marks }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            {% widthratio row.subject_assignment_marks 1 40|add:row.subject_exam_marks|floatformat:1 as avg %}
+                                            <strong style="font-size: 1.1em;">{{ avg|default:"0" }}/100</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if row.subject_exam_marks >= 40 %}
+                                                <span class="badge badge-success" style="font-size: 0.9em;">ĐẠT</span>
+                                            {% else %}
+                                                <span class="badge badge-danger" style="font-size: 0.9em;">CHƯA ĐẠT</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <strong>Tổng số môn: {{ studentresult.count }}</strong>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
 
-            <!-- /.card -->
-           <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">Result</h3>
-              </div>
+                        <div class="mt-3">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Ghi chú:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Điểm bài tập: Tối đa 40 điểm</li>
+                                    <li>Điểm thi: Tối đa 60 điểm</li>
+                                    <li>Điểm đạt: Điểm thi ≥ 40 điểm</li>
+                                </ul>
+                            </div>
+                        </div>
 
-               <div class="table">
-               <table class="table">
-                   <tr>
-                       <th>ID</th>
-                       <th>Subject</th>
-                       <th>Assignment Marks</th>
-                       <th>Exam Marks</th>
-                       <th>Status</th>
-                   </tr>
-                   {% for row in studentresult %}
-                        <tr>
-                            <td>{{ row.id }}</td>
-                            <td>{{ row.subject_id.subject_name }}</td>
-                            <td>{{ row.subject_assignment_marks }}</td>
-                            <td>{{ row.subject_exam_marks }}</td>
-                            <td>
-                                {% if row.subject_exam_marks >= 40 %}
-                                <span class="alert alert-success">PASS</span>
-                                {% else %}
-                                 <span class="alert alert-danger">FAIL</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                   {% endfor %}
-               </table>
-               </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Chưa có kết quả học tập</strong><br>
+                            Giảng viên chưa nhập điểm cho các môn học của bạn.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-
-
-
-          </div>
-          </div>
-      </div>
-    </section>
-    <!-- /.content -->
+        </div>
+    </div>
+</section>
 {% endblock main_content %}

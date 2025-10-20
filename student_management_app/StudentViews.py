@@ -23,9 +23,9 @@ def student_home(request):
     # Lấy lịch học của các môn đã đăng ký
     subject_ids = [enrollment.subject_id for enrollment in enrolled_subjects]
     schedule = Schedule.objects.filter(
-        subject__in=subject_ids,
-        is_active=True
-    ).select_related('subject', 'started_by').order_by('day_of_week', 'start_time')
+        subject_id__in=subject_ids,
+        session_year_id=student_obj.session_year_id
+    ).select_related('subject_id').order_by('weekday', 'start_time')
     
     # Lấy notifications
     notifications = NotificationStudent.objects.filter(
@@ -358,33 +358,34 @@ def student_view_fees(request):
 
 
 def student_view_schedule(request):
-    """Xem thời khóa biểu"""
+    """Xem thời khóa biểu - Lịch học các môn đã đăng ký"""
     student = Students.objects.get(admin=request.user.id)
     session_year = student.session_year_id
     
     # Lấy các môn đã đăng ký
     enrolled_subjects = StudentEnrollment.objects.filter(
         student_id=student,
-        session_year_id=session_year,
         is_active=True
-    ).values_list('subject_id', flat=True)
+    ).select_related('subject_id')
     
     # Lấy lịch học của các môn đã đăng ký
+    subject_ids = [enrollment.subject_id for enrollment in enrolled_subjects]
     schedules = Schedule.objects.filter(
-        subject_id__in=enrolled_subjects,
+        subject_id__in=subject_ids,
         session_year_id=session_year
-    ).order_by('weekday', 'start_time')
+    ).select_related('subject_id').order_by('weekday', 'start_time')
     
     # Sắp xếp theo thứ trong tuần
-    schedule_by_day = {}
+    days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    schedule_by_day = {day: [] for day in days_order}
+    
     for schedule in schedules:
         day = schedule.get_weekday_display()
-        if day not in schedule_by_day:
-            schedule_by_day[day] = []
         schedule_by_day[day].append(schedule)
     
     return render(request, "student_template/view_schedule.html", {
         "schedule_by_day": schedule_by_day,
+        "enrolled_subjects": enrolled_subjects,
         "student": student
     })
 

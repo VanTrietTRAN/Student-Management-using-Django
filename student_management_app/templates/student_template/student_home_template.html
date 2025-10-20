@@ -95,24 +95,24 @@ Home
                                       <th>Thứ</th>
                                       <th>Môn học</th>
                                       <th>Giờ học</th>
-                                      <th>Giảng viên</th>
+                                      <th>Phòng học</th>
                                   </tr>
                               </thead>
                               <tbody>
                                   {% for class in schedule %}
                                   <tr>
                                       <td>
-                                          {% if class.day_of_week == 'Monday' %}Thứ 2
-                                          {% elif class.day_of_week == 'Tuesday' %}Thứ 3
-                                          {% elif class.day_of_week == 'Wednesday' %}Thứ 4
-                                          {% elif class.day_of_week == 'Thursday' %}Thứ 5
-                                          {% elif class.day_of_week == 'Friday' %}Thứ 6
-                                          {% elif class.day_of_week == 'Saturday' %}Thứ 7
+                                          {% if class.weekday == 0 %}Thứ 2
+                                          {% elif class.weekday == 1 %}Thứ 3
+                                          {% elif class.weekday == 2 %}Thứ 4
+                                          {% elif class.weekday == 3 %}Thứ 5
+                                          {% elif class.weekday == 4 %}Thứ 6
+                                          {% elif class.weekday == 5 %}Thứ 7
                                           {% else %}Chủ nhật{% endif %}
                                       </td>
-                                      <td>{{ class.subject.subject_name }}</td>
+                                      <td>{{ class.subject_id.subject_name }}</td>
                                       <td>{{ class.start_time|time:"H:i" }} - {{ class.end_time|time:"H:i" }}</td>
-                                      <td>{{ class.started_by.admin.first_name }} {{ class.started_by.admin.last_name }}</td>
+                                      <td>{{ class.room|default:"TBA" }}</td>
                                   </tr>
                                   {% endfor %}
                               </tbody>
