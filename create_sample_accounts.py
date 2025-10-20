@@ -17,22 +17,27 @@ def create_sample_accounts():
     
     # 1. Tạo Session Year
     print("📅 Tạo Session Year...")
-    session_year, created = SessionYearModel.objects.get_or_create(
-        session_start_year="2024-01-01",
-        session_end_year="2024-12-31",
-        defaults={"id": 1}
-    )
+    try:
+        session_year = SessionYearModel.object.get(session_start_year="2024-01-01")
+        print(f"   ⚠ Session Year đã tồn tại")
+    except SessionYearModel.DoesNotExist:
+        session_year = SessionYearModel(
+            session_start_year="2024-01-01",
+            session_end_year="2024-12-31"
+        )
+        session_year.save()
+        print(f"   ✓ Session Year được tạo")
     print(f"   ✓ Session Year: {session_year.session_start_year} - {session_year.session_end_year}")
     
     # 2. Tạo Course
     print("\n📚 Tạo Course...")
-    course, created = Courses.objects.get_or_create(
-        course_name="Computer Science",
-        defaults={
-            "created_at": "2024-01-01",
-            "updated_at": "2024-01-01"
-        }
-    )
+    try:
+        course = Courses.objects.get(course_name="Computer Science")
+        print(f"   ⚠ Course đã tồn tại")
+    except Courses.DoesNotExist:
+        course = Courses(course_name="Computer Science")
+        course.save()
+        print(f"   ✓ Course được tạo")
     print(f"   ✓ Course: {course.course_name}")
     
     # 3. Tạo Admin Account
