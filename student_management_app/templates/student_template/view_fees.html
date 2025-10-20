@@ -1,0 +1,83 @@
+{% extends 'student_template/base_template.html' %}
+{% block page_title %}
+My Tuition Fees
+{% endblock page_title %}
+{% block main_content %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <h3 class="card-title">My Tuition Fees</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="info-box bg-light">
+                                    <span class="info-box-icon"><i class="fas fa-book"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Total Credit Hours</span>
+                                        <span class="info-box-number">{{ total_credits }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="info-box bg-success">
+                                    <span class="info-box-icon"><i class="fas fa-dollar-sign"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Total Tuition Fee</span>
+                                        <span class="info-box-number">${{ total_fee }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-4 mb-3">Fee Breakdown by Subject</h5>
+                        <table class="table table-bordered table-striped">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Subject Name</th>
+                                    <th>Lecturer</th>
+                                    <th>Credit Hours</th>
+                                    <th>Fee Per Credit</th>
+                                    <th>Total Fee</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in fee_details %}
+                                <tr>
+                                    <td>{{ detail.subject.subject_name }}</td>
+                                    <td>{{ detail.subject.staff_id.first_name }} {{ detail.subject.staff_id.last_name }}</td>
+                                    <td>{{ detail.credit_hours }}</td>
+                                    <td>${{ detail.fee_per_credit }}</td>
+                                    <td><strong>${{ detail.total_fee }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <th colspan="2">TOTAL</th>
+                                    <th>{{ total_credits }}</th>
+                                    <th>-</th>
+                                    <th><strong class="text-success">${{ total_fee }}</strong></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <div class="alert alert-info mt-4">
+                            <i class="icon fas fa-info"></i>
+                            <strong>Note:</strong> Tuition fee is calculated as: Credit Hours × Fee Per Credit
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock main_content %}

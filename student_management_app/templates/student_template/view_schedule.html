@@ -1,0 +1,67 @@
+{% extends 'student_template/base_template.html' %}
+{% block page_title %}
+My Schedule
+{% endblock page_title %}
+{% block main_content %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title">My Weekly Schedule</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        {% if schedule_by_day %}
+                        <div class="row">
+                            {% for day, schedules in schedule_by_day.items %}
+                            <div class="col-md-12 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0"><i class="fas fa-calendar-day"></i> {{ day }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Time</th>
+                                                    <th>Subject</th>
+                                                    <th>Room</th>
+                                                    <th>Lecturer</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for schedule in schedules %}
+                                                <tr>
+                                                    <td><strong>{{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</strong></td>
+                                                    <td>{{ schedule.subject_id.subject_name }}</td>
+                                                    <td>{{ schedule.room|default:"TBA" }}</td>
+                                                    <td>{{ schedule.subject_id.staff_id.first_name }} {{ schedule.subject_id.staff_id.last_name }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="icon fas fa-exclamation-triangle"></i>
+                            <strong>No Schedule Available</strong><br>
+                            You haven't enrolled in any subjects yet, or the schedule hasn't been set up for your enrolled subjects.
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock main_content %}

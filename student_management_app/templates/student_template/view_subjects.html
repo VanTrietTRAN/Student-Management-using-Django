@@ -1,0 +1,107 @@
+{% extends 'student_template/base_template.html' %}
+{% block page_title %}
+Available Subjects
+{% endblock page_title %}
+{% block main_content %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Available Subjects - Course Enrollment</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% if message.tags == 'success' %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% if message.tags == 'warning' %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject Name</th>
+                                    <th>Lecturer</th>
+                                    <th>Credit Hours</th>
+                                    <th>Fee Per Credit</th>
+                                    <th>Total Fee</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subjects %}
+                                <tr>
+                                    <td>{{ subject.subject_name }}</td>
+                                    <td>{{ subject.staff_id.first_name }} {{ subject.staff_id.last_name }}</td>
+                                    <td>{{ subject.credit_hours }}</td>
+                                    <td>${{ subject.fee_per_credit }}</td>
+                                    <td><strong>${{ subject.get_total_fee }}</strong></td>
+                                    <td>
+                                        {% if subject.subject_description_file %}
+                                        <a href="{% url 'student_view_subject_description' subject.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-file-pdf"></i> View
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if subject.id in enrolled_subjects %}
+                                        <span class="badge badge-success">Enrolled</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Not Enrolled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if subject.id in enrolled_subjects %}
+                                        <a href="{% url 'student_drop_subject' subject.id %}" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to drop this subject?')">
+                                            <i class="fas fa-times"></i> Drop
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'student_enroll_subject' subject.id %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus"></i> Enroll
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock main_content %}
