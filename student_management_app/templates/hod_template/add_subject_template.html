@@ -38,6 +38,15 @@ Add Subject
                         {% endfor %}
                     </select>
                   </div>
+                  <div class="form-group">
+                    <label>Credit Hours (Số tín chỉ)</label>
+                    <input type="number" class="form-control" name="credit_hours" placeholder="Nhập số tín chỉ" value="3" min="1" max="10" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Fee Per Credit (Học phí mỗi tín chỉ)</label>
+                    <input type="number" class="form-control" name="fee_per_credit" placeholder="Nhập học phí mỗi tín chỉ" value="0" min="0" step="0.01" required>
+                    <small class="form-text text-muted">Tổng học phí = Số tín chỉ × Học phí mỗi tín chỉ</small>
+                  </div>
                    <div class="form-group">
                       {% if messages %}
                         {% for message in messages %}
