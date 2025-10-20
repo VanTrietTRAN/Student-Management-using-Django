@@ -126,10 +126,18 @@ All accounts have password: **admin123**
 
 ## 📚 Documentation
 
-- **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)** - Detailed feature documentation
-- **[QUICK_SETUP.md](QUICK_SETUP.md)** - Quick setup guide
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-- **[STUDENT_REGISTRATION_GUIDE.md](STUDENT_REGISTRATION_GUIDE.md)** - Student registration process
+### 📖 **[DOCUMENTATION.md](DOCUMENTATION.md)** - Complete Documentation
+
+File tài liệu duy nhất chứa mọi thông tin bạn cần:
+- ✅ Hướng dẫn cài đặt chi tiết
+- ✅ Tất cả tính năng của hệ thống
+- ✅ Hướng dẫn sử dụng cho Admin, Lecturer, Student
+- ✅ Cấu trúc database và code
+- ✅ Troubleshooting
+- ✅ Testing checklist
+- ✅ Ví dụ thực tế
+
+**Đọc file này để hiểu đầy đủ về hệ thống!** 📘
 
 ---
 
