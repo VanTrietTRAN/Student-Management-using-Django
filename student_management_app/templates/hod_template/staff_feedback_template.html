@@ -1,6 +1,6 @@
 {% extends 'hod_template/base_template.html' %}
 {% block page_title %}
-Staff Feedback
+Phản Hồi Giảng Viên
 {% endblock page_title %}
 {% block main_content %}
     <!-- Main content -->
@@ -11,7 +11,7 @@ Staff Feedback
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">Staff Feedback</h3>
+                <h3 class="card-title">Phản Hồi Từ Giảng Viên</h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
@@ -19,11 +19,11 @@ Staff Feedback
                     <table class="table">
                         <tr>
                             <th>ID</th>
-                            <th>Staff ID</th>
-                            <th>Staff Name</th>
-                            <th>Message</th>
-                            <th>Sended On</th>
-                            <th>Reply</th>
+                            <th>ID Giảng Viên</th>
+                            <th>Tên Giảng Viên</th>
+                            <th>Nội Dung</th>
+                            <th>Gửi Lúc</th>
+                            <th>Trả Lời</th>
                         </tr>
                         {% for feedback in feedbacks %}
                         <tr>
@@ -34,7 +34,7 @@ Staff Feedback
                             <td>{{ feedback.created_at }}</td>
                             <td>
                                 {% if feedback.feedback_reply == "" %}
-                                <button class="btn btn-success reply_open_modal" data-toggle="modal" data-target="#reply_modal">Reply</button>
+                                <button class="btn btn-success reply_open_modal" data-toggle="modal" data-target="#reply_modal">Trả Lời</button>
                                 {% else %}
                                 {{ feedback.feedback_reply }}
                                 {% endif %}
@@ -61,18 +61,18 @@ Staff Feedback
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Reply</h4>
+          <h4 class="modal-title">Trả Lời</h4>
                       <button type="button" class="close" data-dismiss="modal">&times;</button>
 
         </div>
         <div class="modal-body">
-          <p>Reply To : <span id="reply_name"></span></p>
+          <p>Trả lời cho : <span id="reply_name"></span></p>
             <input type="hidden" id="reply_id" name="reply_id">
             <textarea class="form-control" rows="5" id="reply_message"></textarea>
-            <button id="reply_btn" class="btn btn-info btn-block">Reply</button>
+            <button id="reply_btn" class="btn btn-info btn-block">Gửi Trả Lời</button>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 {% extends 'hod_template/base_template.html' %}
 {% block page_title %}
-Add Session Year
+Thêm Niên Khóa
 {% endblock page_title %}
 {% block main_content %}
     <!-- Main content -->
@@ -11,7 +11,7 @@ Add Session Year
             <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">Add Session Year</h3>
+                <h3 class="card-title">Thêm Niên Khóa</h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
@@ -19,13 +19,13 @@ Add Session Year
                   {% csrf_token %}
                 <div class="card-body">
                   <div class="form-group">
-                    <label>Session Start Year </label>
-                    <input type="date" class="form-control" name="session_start" placeholder="Enter Session Start Year">
+                    <label>Năm Bắt Đầu</label>
+                    <input type="date" class="form-control" name="session_start" placeholder="Chọn năm bắt đầu">
                   </div>
 
                  <div class="form-group">
-                    <label>Session End Year </label>
-                    <input type="date" class="form-control" name="session_end" placeholder="Enter Session End Year">
+                    <label>Năm Kết Thúc</label>
+                    <input type="date" class="form-control" name="session_end" placeholder="Chọn năm kết thúc">
                   </div>
 
 
@@ -46,7 +46,7 @@ Add Session Year
                 <!-- /.card-body -->
 
                 <div class="card-footer">
-                  <button type="submit" class="btn btn-primary btn-block">Add Session Year</button>
+                  <button type="submit" class="btn btn-primary btn-block">Thêm Niên Khóa</button>
                 </div>
               </form>
             </div>
