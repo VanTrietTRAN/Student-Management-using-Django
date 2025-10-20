@@ -66,20 +66,20 @@ Gửi Thông Báo Sinh Viên
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Send Notification to <span id="name_span"></span></h4>
+          <h4 class="modal-title">Gửi Thông Báo cho <span id="name_span"></span></h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <input type="text" name="message" class="form-control" id="message_not">
+            <input type="text" name="message" class="form-control" id="message_not" placeholder="Nhập nội dung thông báo">
              <input type="hidden" name="student_id" class="form-control" id="student_id">
           </div>
           <div class="form-group">
-            <button class="btn btn-info btn-block send_notification_btn" type="button">Send Notification</button>
+            <button class="btn btn-info btn-block send_notification_btn" type="button">Gửi Thông Báo</button>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
         </div>
       </div>
 
@@ -112,10 +112,10 @@ Gửi Thông Báo Sinh Viên
         })
         .done(function(response){
             if(response=="True"){
-                alert("Message Sent");
+                alert("Đã gửi thông báo thành công!");
             }
             else{
-                alert("Failed to Send Message");
+                alert("Gửi thông báo thất bại!");
             }
         });
   }
