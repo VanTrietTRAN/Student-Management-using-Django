@@ -1,0 +1,97 @@
+{% extends 'hod_template/base_template.html' %}
+{% block page_title %}
+Edit Schedule | Schedule ID : {{ schedule.id }}
+{% endblock page_title %}
+{% block main_content %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Schedule</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" action="/edit_schedule_save" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select class="form-control" name="subject" required>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.id }}" {% if subject.id == schedule.subject_id.id %} selected {% endif %}>
+                                        {{ subject.subject_name }} ({{ subject.course_id.course_name }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Session Year</label>
+                                <select class="form-control" name="session_year" required>
+                                    {% for session in session_years %}
+                                    <option value="{{ session.id }}" {% if session.id == schedule.session_year_id.id %} selected {% endif %}>
+                                        {{ session.session_start_year|date:"Y" }} - {{ session.session_end_year|date:"Y" }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Weekday</label>
+                                <select class="form-control" name="weekday" required>
+                                    <option value="0" {% if schedule.weekday == 0 %} selected {% endif %}>Monday</option>
+                                    <option value="1" {% if schedule.weekday == 1 %} selected {% endif %}>Tuesday</option>
+                                    <option value="2" {% if schedule.weekday == 2 %} selected {% endif %}>Wednesday</option>
+                                    <option value="3" {% if schedule.weekday == 3 %} selected {% endif %}>Thursday</option>
+                                    <option value="4" {% if schedule.weekday == 4 %} selected {% endif %}>Friday</option>
+                                    <option value="5" {% if schedule.weekday == 5 %} selected {% endif %}>Saturday</option>
+                                    <option value="6" {% if schedule.weekday == 6 %} selected {% endif %}>Sunday</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Start Time</label>
+                                        <input type="time" class="form-control" name="start_time" value="{{ schedule.start_time|time:'H:i' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>End Time</label>
+                                        <input type="time" class="form-control" name="end_time" value="{{ schedule.end_time|time:'H:i' }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Room</label>
+                                <input type="text" class="form-control" name="room" placeholder="Enter room number/name" value="{{ schedule.room }}">
+                            </div>
+                            <div class="form-group">
+                                {% if messages %}
+                                {% for message in messages %}
+                                {% if message.tags == 'error' %}
+                                <div class="alert alert-danger" style="margin-top:10px">{{ message }}</div>
+                                {% endif %}
+                                {% if message.tags == 'success' %}
+                                <div class="alert alert-success" style="margin-top:10px">{{ message }}</div>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="{% url 'manage_schedule' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock main_content %}
