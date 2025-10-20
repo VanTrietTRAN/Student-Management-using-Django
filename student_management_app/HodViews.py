@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from student_management_app.forms import AddStudentForm, EditStudentForm
 from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, \
     FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, \
-    NotificationStudent, NotificationStaffs
+    NotificationStudent, NotificationStaffs, Schedule, StudentEnrollment
 
 
 def admin_home(request):
@@ -578,4 +578,112 @@ def send_staff_notification(request):
     notification.save()
     print(data.text)
     return HttpResponse("True")
+
+
+# ============= SCHEDULE MANAGEMENT =============
+def manage_schedule(request):
+    """Quản lý thời khóa biểu - Hiển thị danh sách lịch học"""
+    schedules = Schedule.objects.all().order_by('weekday', 'start_time')
+    session_years = SessionYearModel.object.all()
+    return render(request, "hod_template/manage_schedule_template.html", {
+        "schedules": schedules,
+        "session_years": session_years
+    })
+
+
+def add_schedule(request):
+    """Thêm lịch học mới"""
+    subjects = Subjects.objects.all()
+    session_years = SessionYearModel.object.all()
+    return render(request, "hod_template/add_schedule_template.html", {
+        "subjects": subjects,
+        "session_years": session_years
+    })
+
+
+def add_schedule_save(request):
+    """Lưu lịch học mới"""
+    if request.method != "POST":
+        return HttpResponse("<h2>Method Not Allowed</h2>")
+    else:
+        subject_id = request.POST.get("subject")
+        session_year_id = request.POST.get("session_year")
+        weekday = request.POST.get("weekday")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        room = request.POST.get("room", "")
+
+        try:
+            subject = Subjects.objects.get(id=subject_id)
+            session_year = SessionYearModel.object.get(id=session_year_id)
+            
+            schedule = Schedule(
+                subject_id=subject,
+                session_year_id=session_year,
+                weekday=weekday,
+                start_time=start_time,
+                end_time=end_time,
+                room=room
+            )
+            schedule.save()
+            messages.success(request, "Successfully Added Schedule")
+            return HttpResponseRedirect(reverse("add_schedule"))
+        except:
+            messages.error(request, "Failed to Add Schedule")
+            return HttpResponseRedirect(reverse("add_schedule"))
+
+
+def edit_schedule(request, schedule_id):
+    """Chỉnh sửa lịch học"""
+    schedule = Schedule.objects.get(id=schedule_id)
+    subjects = Subjects.objects.all()
+    session_years = SessionYearModel.object.all()
+    return render(request, "hod_template/edit_schedule_template.html", {
+        "schedule": schedule,
+        "subjects": subjects,
+        "session_years": session_years,
+        "id": schedule_id
+    })
+
+
+def edit_schedule_save(request):
+    """Lưu chỉnh sửa lịch học"""
+    if request.method != "POST":
+        return HttpResponse("<h2>Method Not Allowed</h2>")
+    else:
+        schedule_id = request.POST.get("schedule_id")
+        subject_id = request.POST.get("subject")
+        session_year_id = request.POST.get("session_year")
+        weekday = request.POST.get("weekday")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        room = request.POST.get("room", "")
+
+        try:
+            schedule = Schedule.objects.get(id=schedule_id)
+            schedule.subject_id = Subjects.objects.get(id=subject_id)
+            schedule.session_year_id = SessionYearModel.object.get(id=session_year_id)
+            schedule.weekday = weekday
+            schedule.start_time = start_time
+            schedule.end_time = end_time
+            schedule.room = room
+            schedule.save()
+            
+            messages.success(request, "Successfully Edited Schedule")
+            return HttpResponseRedirect(reverse("edit_schedule", kwargs={"schedule_id": schedule_id}))
+        except:
+            messages.error(request, "Failed to Edit Schedule")
+            return HttpResponseRedirect(reverse("edit_schedule", kwargs={"schedule_id": schedule_id}))
+
+
+def delete_schedule(request, schedule_id):
+    """Xóa lịch học"""
+    try:
+        schedule = Schedule.objects.get(id=schedule_id)
+        schedule.delete()
+        messages.success(request, "Successfully Deleted Schedule")
+    except:
+        messages.error(request, "Failed to Delete Schedule")
+    return HttpResponseRedirect(reverse("manage_schedule"))
+
 

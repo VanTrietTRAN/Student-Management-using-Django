@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from student_management_app.models import Subjects, SessionYearModel, Students, Attendance, AttendanceReport, \
     LeaveReportStaff, Staffs, FeedBackStaffs, CustomUser, Courses, NotificationStaffs, StudentResult, OnlineClassRoom
+from django.core.files.storage import FileSystemStorage
 
 
 def staff_home(request):
@@ -321,3 +322,50 @@ def start_live_classroom_process(request):
 
 def returnHtmlWidget(request):
     return render(request,"widget.html")
+
+
+# ============= SUBJECT DESCRIPTION MANAGEMENT =============
+def manage_subject_description(request):
+    """Quản lý file mô tả môn học của giảng viên"""
+    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    return render(request, "staff_template/manage_subject_description.html", {"subjects": subjects})
+
+
+def upload_subject_description(request, subject_id):
+    """Upload PDF mô tả môn học"""
+    if request.method == "POST":
+        try:
+            subject = Subjects.objects.get(id=subject_id, staff_id=request.user.id)
+            
+            if "subject_description_file" in request.FILES:
+                description_file = request.FILES['subject_description_file']
+                fs = FileSystemStorage()
+                filename = fs.save(description_file.name, description_file)
+                file_url = fs.url(filename)
+                
+                subject.subject_description_file = filename
+                subject.save()
+                
+                messages.success(request, "Successfully Uploaded Subject Description")
+            else:
+                messages.error(request, "No file selected")
+                
+            return HttpResponseRedirect(reverse("manage_subject_description"))
+        except:
+            messages.error(request, "Failed to Upload Subject Description")
+            return HttpResponseRedirect(reverse("manage_subject_description"))
+    else:
+        return HttpResponse("<h2>Method Not Allowed</h2>")
+
+
+def delete_subject_description(request, subject_id):
+    """Xóa file mô tả môn học"""
+    try:
+        subject = Subjects.objects.get(id=subject_id, staff_id=request.user.id)
+        subject.subject_description_file = None
+        subject.save()
+        messages.success(request, "Successfully Deleted Subject Description")
+    except:
+        messages.error(request, "Failed to Delete Subject Description")
+    
+    return HttpResponseRedirect(reverse("manage_subject_description"))
