@@ -87,6 +87,21 @@ urlpatterns = [
     path('edit_schedule/<str:schedule_id>', HodViews.edit_schedule,name="edit_schedule"),
     path('edit_schedule_save', HodViews.edit_schedule_save,name="edit_schedule_save"),
     path('delete_schedule/<str:schedule_id>', HodViews.delete_schedule,name="delete_schedule"),
+    
+    # Admin Grade Management
+    path('admin_grade_subjects', HodViews.admin_grade_subjects, name="admin_grade_subjects"),
+    path('admin_enter_grades/<str:subject_id>', HodViews.admin_enter_grades, name="admin_enter_grades"),
+    path('admin_save_grades', HodViews.admin_save_grades, name="admin_save_grades"),
+    path('admin_export_subject_grades/<str:subject_id>', HodViews.admin_export_subject_grades, name="admin_export_subject_grades"),
+    
+    # Admin Reports
+    path('admin_reports', HodViews.admin_reports, name="admin_reports"),
+    path('admin_export_students', HodViews.admin_export_students, name="admin_export_students"),
+    path('admin_export_grades', HodViews.admin_export_grades, name="admin_export_grades"),
+    
+    # User Management
+    path('toggle_user_status/<str:user_id>', HodViews.toggle_user_status, name="toggle_user_status"),
+    path('reset_user_password/<str:user_id>', HodViews.reset_user_password, name="reset_user_password"),
 
                   #     Staff URL Path
     path('staff_home', StaffViews.staff_home, name="staff_home"),

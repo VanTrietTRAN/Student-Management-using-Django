@@ -950,10 +950,16 @@ def admin_reports(request):
     subjects = Subjects.objects.all()
     session_years = SessionYearModel.objects.all()
     
+    # Thống kê
+    students_count = Students.objects.all().count()
+    staffs_count = Staffs.objects.all().count()
+    
     return render(request, "hod_template/admin_reports.html", {
         "courses": courses,
         "subjects": subjects,
-        "session_years": session_years
+        "session_years": session_years,
+        "students_count": students_count,
+        "staffs_count": staffs_count
     })
 
 

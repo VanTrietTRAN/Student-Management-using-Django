@@ -1,0 +1,201 @@
+{% extends 'hod_template/base_template.html' %}
+{% block page_title %}
+Báo Cáo & Xuất Dữ Liệu
+{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+.report-card {
+    transition: all 0.3s ease;
+    border-top: 4px solid;
+}
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.report-card-students { border-top-color: #007bff; }
+.report-card-grades { border-top-color: #28a745; }
+.export-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+</style>
+{% endblock custom_css %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body bg-gradient-primary text-white">
+                        <h3><i class="fas fa-chart-bar"></i> Báo Cáo & Xuất Dữ Liệu</h3>
+                        <p class="mb-0">Xuất danh sách sinh viên và điểm ra file Excel/CSV</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Cards -->
+        <div class="row">
+            
+            <!-- Export Students -->
+            <div class="col-md-6 mb-4">
+                <div class="card report-card report-card-students h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users"></i> Xuất Danh Sách Sinh Viên
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{% url 'admin_export_students' %}" method="GET">
+                            <div class="form-group">
+                                <label><i class="fas fa-graduation-cap"></i> Chọn Khóa Học:</label>
+                                <select name="course_id" class="form-control">
+                                    <option value="">-- Tất cả khóa học --</option>
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Chọn Năm Học:</label>
+                                <select name="session_id" class="form-control">
+                                    <option value="">-- Tất cả năm học --</option>
+                                    {% for session in session_years %}
+                                        <option value="{{ session.id }}">
+                                            {{ session.session_start_year }} - {{ session.session_end_year }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <small>
+                                    <i class="fas fa-info-circle"></i>
+                                    File CSV sẽ bao gồm: Mã SV, Họ tên, Email, Địa chỉ, Khóa học, Năm học, Ngày tham gia
+                                </small>
+                            </div>
+
+                            <button type="submit" class="btn export-btn btn-block">
+                                <i class="fas fa-file-download"></i> Xuất Danh Sách Sinh Viên (CSV)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Grades -->
+            <div class="col-md-6 mb-4">
+                <div class="card report-card report-card-grades h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clipboard-list"></i> Xuất Bảng Điểm Theo Môn
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{% url 'admin_export_grades' %}" method="GET">
+                            <div class="form-group">
+                                <label><i class="fas fa-book"></i> Chọn Môn Học: *</label>
+                                <select name="subject_id" class="form-control" required>
+                                    <option value="">-- Chọn môn học --</option>
+                                    {% for subject in subjects %}
+                                        <option value="{{ subject.id }}">
+                                            {{ subject.subject_code|default:subject.id }} - {{ subject.subject_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <small>
+                                    <i class="fas fa-info-circle"></i>
+                                    File CSV sẽ bao gồm: Mã SV, Họ tên, Email, Môn học, Giảng viên, Điểm BT, Điểm thi, Tổng điểm, Điểm chữ
+                                </small>
+                            </div>
+
+                            <button type="submit" class="btn export-btn btn-block">
+                                <i class="fas fa-file-download"></i> Xuất Bảng Điểm (CSV)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-pie"></i> Thống Kê Nhanh</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="info-box bg-info">
+                                    <span class="info-box-icon"><i class="fas fa-users"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Tổng Sinh Viên</span>
+                                        <span class="info-box-number">{{ students_count|default:0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-box bg-success">
+                                    <span class="info-box-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Tổng Giảng Viên</span>
+                                        <span class="info-box-number">{{ staffs_count|default:0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-box bg-warning">
+                                    <span class="info-box-icon"><i class="fas fa-book"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Tổng Môn Học</span>
+                                        <span class="info-box-number">{{ subjects.count }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-box bg-danger">
+                                    <span class="info-box-icon"><i class="fas fa-graduation-cap"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Tổng Khóa Học</span>
+                                        <span class="info-box-number">{{ courses.count }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-lightbulb"></i> Mẹo:</h5>
+                    <ul class="mb-0">
+                        <li>File CSV có thể mở bằng Excel hoặc Google Sheets</li>
+                        <li>Sử dụng bộ lọc để xuất dữ liệu theo nhu cầu cụ thể</li>
+                        <li>File sẽ được tải xuống tự động sau khi click nút "Xuất"</li>
+                        <li>Để xuất tất cả dữ liệu, không chọn bộ lọc nào</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock main_content %}

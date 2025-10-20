@@ -1,0 +1,338 @@
+{% extends 'hod_template/base_template.html' %}
+{% block page_title %}
+Nhập Điểm - {{ subject.subject_name }}
+{% endblock page_title %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+<style>
+.grade-input {
+    width: 80px;
+    text-align: center;
+    font-weight: bold;
+}
+.grade-badge {
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    min-width: 45px;
+    display: inline-block;
+}
+.badge-A { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.badge-Bplus { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+.badge-B { background: #28a745; color: white; }
+.badge-Cplus { background: #17a2b8; color: white; }
+.badge-C { background: #ffc107; color: #333; }
+.badge-Dplus { background: #fd7e14; color: white; }
+.badge-D { background: #dc3545; color: white; }
+.badge-F { background: #6c757d; color: white; }
+.weighted-score {
+    font-size: 0.9em;
+    color: #666;
+}
+#saveBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 10px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+</style>
+{% endblock custom_css %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <!-- Header -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body bg-gradient-info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="mb-1">
+                                    <i class="fas fa-edit"></i> Nhập Điểm - {{ subject.subject_name }}
+                                </h4>
+                                <p class="mb-0">
+                                    <small>
+                                        Mã môn: <strong>{{ subject.subject_code|default:subject.id }}</strong> | 
+                                        Giảng viên: <strong>{{ subject.staff_id.first_name }} {{ subject.staff_id.last_name }}</strong> |
+                                        Số SV: <strong>{{ students_data|length }}</strong>
+                                    </small>
+                                </p>
+                            </div>
+                            <div>
+                                <a href="{% url 'admin_grade_subjects' %}" class="btn btn-light">
+                                    <i class="fas fa-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle"></i> Hướng dẫn:</h5>
+                    <ul class="mb-0">
+                        <li>Nhập điểm từ <strong>0-100</strong> cho cả Bài tập và Thi</li>
+                        <li>Hệ thống tự động tính: <strong>Điểm BT × 40%</strong> + <strong>Điểm thi × 60%</strong></li>
+                        <li>Điểm chữ: A (≥85), B+ (80-84), B (70-79), C+ (65-69), C (50-64), D+ (45-49), D (40-44), F (<40)</li>
+                        <li>Click <strong>Lưu Tất Cả Điểm</strong> sau khi hoàn tất</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grades Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh Sách Sinh Viên</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-success" id="saveBtn">
+                                <i class="fas fa-save"></i> Lưu Tất Cả Điểm
+                            </button>
+                            <a href="{% url 'admin_export_subject_grades' subject.id %}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-file-excel"></i> Xuất Excel
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="gradesTable" class="table table-bordered table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th width="50">STT</th>
+                                        <th>Mã SV</th>
+                                        <th>Họ và tên</th>
+                                        <th width="120">Điểm BT<br><small>(0-100)</small></th>
+                                        <th width="120">Điểm Thi<br><small>(0-100)</small></th>
+                                        <th width="100">BT×40%</th>
+                                        <th width="100">Thi×60%</th>
+                                        <th width="100">Tổng</th>
+                                        <th width="80">Điểm chữ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in students_data %}
+                                    <tr>
+                                        <td class="text-center">{{ forloop.counter }}</td>
+                                        <td>{{ data.student.admin.username }}</td>
+                                        <td>
+                                            <strong>{{ data.student.admin.first_name }} {{ data.student.admin.last_name }}</strong>
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   class="form-control grade-input assignment-input" 
+                                                   min="0" max="100" 
+                                                   value="{{ data.assignment_marks }}"
+                                                   data-student-id="{{ data.student.id }}"
+                                                   placeholder="0-100">
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   class="form-control grade-input exam-input" 
+                                                   min="0" max="100" 
+                                                   value="{{ data.exam_marks }}"
+                                                   data-student-id="{{ data.student.id }}"
+                                                   placeholder="0-100">
+                                        </td>
+                                        <td class="text-center weighted-assignment weighted-score">
+                                            {{ data.assignment_marks|floatformat:1 }}
+                                        </td>
+                                        <td class="text-center weighted-exam weighted-score">
+                                            {{ data.exam_marks|floatformat:1 }}
+                                        </td>
+                                        <td class="text-center total-score">
+                                            <strong>-</strong>
+                                        </td>
+                                        <td class="text-center letter-grade">
+                                            <span class="grade-badge">-</span>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="9" class="text-center">
+                                            <em>Chưa có sinh viên đăng ký môn này</em>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock main_content %}
+
+{% block custom_js %}
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize DataTables
+    $('#gradesTable').DataTable({
+        "pageLength": 50,
+        "ordering": true,
+        "searching": true,
+        "info": true,
+        "lengthChange": true,
+        "language": {
+            "lengthMenu": "Hiển thị _MENU_ sinh viên/trang",
+            "zeroRecords": "Không tìm thấy sinh viên nào",
+            "info": "Trang _PAGE_ / _PAGES_",
+            "infoEmpty": "Không có dữ liệu",
+            "infoFiltered": "(lọc từ _MAX_ sinh viên)",
+            "search": "Tìm kiếm:",
+            "paginate": {
+                "first": "Đầu",
+                "last": "Cuối",
+                "next": "Sau",
+                "previous": "Trước"
+            }
+        }
+    });
+
+    // Tính toán điểm tự động
+    function calculateGrade(row) {
+        const assignmentInput = row.find('.assignment-input');
+        const examInput = row.find('.exam-input');
+        
+        const assignment = parseFloat(assignmentInput.val()) || 0;
+        const exam = parseFloat(examInput.val()) || 0;
+        
+        // Validate
+        if (assignment < 0 || assignment > 100) {
+            assignmentInput.val(0);
+            return;
+        }
+        if (exam < 0 || exam > 100) {
+            examInput.val(0);
+            return;
+        }
+        
+        // Calculate weighted scores
+        const weightedAssignment = assignment * 0.4;
+        const weightedExam = exam * 0.6;
+        const total = weightedAssignment + weightedExam;
+        
+        // Update display
+        row.find('.weighted-assignment').text(weightedAssignment.toFixed(1));
+        row.find('.weighted-exam').text(weightedExam.toFixed(1));
+        row.find('.total-score strong').text(total.toFixed(1));
+        
+        // Calculate letter grade
+        let letter, badgeClass;
+        if (total >= 85) {
+            letter = 'A';
+            badgeClass = 'badge-A';
+        } else if (total >= 80) {
+            letter = 'B+';
+            badgeClass = 'badge-Bplus';
+        } else if (total >= 70) {
+            letter = 'B';
+            badgeClass = 'badge-B';
+        } else if (total >= 65) {
+            letter = 'C+';
+            badgeClass = 'badge-Cplus';
+        } else if (total >= 50) {
+            letter = 'C';
+            badgeClass = 'badge-C';
+        } else if (total >= 45) {
+            letter = 'D+';
+            badgeClass = 'badge-Dplus';
+        } else if (total >= 40) {
+            letter = 'D';
+            badgeClass = 'badge-D';
+        } else {
+            letter = 'F';
+            badgeClass = 'badge-F';
+        }
+        
+        row.find('.letter-grade .grade-badge')
+            .text(letter)
+            .removeClass()
+            .addClass('grade-badge ' + badgeClass);
+    }
+
+    // Event listeners cho inputs
+    $('.assignment-input, .exam-input').on('input', function() {
+        const row = $(this).closest('tr');
+        calculateGrade(row);
+    });
+
+    // Tính toán ban đầu cho các điểm đã có
+    $('#gradesTable tbody tr').each(function() {
+        calculateGrade($(this));
+    });
+
+    // Lưu điểm
+    $('#saveBtn').click(function() {
+        const grades = [];
+        
+        $('#gradesTable tbody tr').each(function() {
+            const row = $(this);
+            const studentId = row.find('.assignment-input').data('student-id');
+            const assignment = parseFloat(row.find('.assignment-input').val()) || 0;
+            const exam = parseFloat(row.find('.exam-input').val()) || 0;
+            
+            if (studentId) {
+                grades.push({
+                    student_id: studentId,
+                    assignment_marks: assignment,
+                    exam_marks: exam
+                });
+            }
+        });
+
+        if (grades.length === 0) {
+            alert('Không có điểm nào để lưu!');
+            return;
+        }
+
+        // Confirm
+        if (!confirm(`Bạn có chắc muốn lưu điểm cho ${grades.length} sinh viên?`)) {
+            return;
+        }
+
+        // Show loading
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang lưu...');
+
+        // Send AJAX
+        $.ajax({
+            url: '{% url "admin_save_grades" %}',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                subject_id: {{ subject.id }},
+                grades: grades
+            }),
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + response.message);
+                    $('#saveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Lưu Tất Cả Điểm');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Lỗi kết nối: ' + error);
+                $('#saveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Lưu Tất Cả Điểm');
+            }
+        });
+    });
+});
+</script>
+{% endblock custom_js %}

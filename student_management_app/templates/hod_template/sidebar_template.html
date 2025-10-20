@@ -143,6 +143,36 @@
             </ul>
           </li>
 
+          <!-- Grade Management (NEW) -->
+          {% url 'admin_grade_subjects' as admin_grade_subjects %}
+          {% url 'admin_enter_grades' subject_id=1 as admin_enter_grades_sample %}
+          <li class="nav-item {% if 'admin_grade' in request.path or 'admin_enter_grades' in request.path %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if 'admin_grade' in request.path or 'admin_enter_grades' in request.path %}active{% endif %}">
+              <i class="nav-icon fas fa-clipboard-list"></i>
+              <p>
+                Quản Lý Điểm
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ admin_grade_subjects }}" class="nav-link {% if request.path == admin_grade_subjects %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Nhập Điểm Theo Môn</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Reports (NEW) -->
+          {% url 'admin_reports' as admin_reports %}
+          <li class="nav-item">
+            <a href="{{ admin_reports }}" class="nav-link {% if request.path == admin_reports %}active{% endif %}">
+              <i class="nav-icon fas fa-chart-bar"></i>
+              <p>Báo Cáo & Xuất Dữ Liệu</p>
+            </a>
+          </li>
+
           <!-- Schedule Management -->
           {% url 'manage_schedule' as manage_schedule %}
           {% url 'add_schedule' as add_schedule %}
