@@ -281,8 +281,8 @@ def staff_view_class_students(request, subject_id):
         # Lấy điểm của sinh viên (nếu có)
         try:
             result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
-            assignment_marks = result.assignment_marks
-            exam_marks = result.exam_marks
+            assignment_marks = result.subject_assignment_marks
+            exam_marks = result.subject_exam_marks
             total_marks = assignment_marks + exam_marks if assignment_marks and exam_marks else None
         except StudentResult.DoesNotExist:
             assignment_marks = None
@@ -319,17 +319,25 @@ def staff_enter_grades(request, subject_id):
         # Lấy điểm của sinh viên (nếu có)
         try:
             result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
-            assignment_marks = result.assignment_marks
-            exam_marks = result.exam_marks
+            # Điểm đã lưu trong DB là điểm sau khi nhân hệ số (0-40, 0-60)
+            # Cần chuyển ngược về điểm gốc (0-100) để hiển thị
+            assignment_marks = result.subject_assignment_marks  # Điểm sau hệ số (0-40)
+            exam_marks = result.subject_exam_marks  # Điểm sau hệ số (0-60)
+            assignment_marks_raw = assignment_marks / 0.4 if assignment_marks else None  # Chuyển về 0-100
+            exam_marks_raw = exam_marks / 0.6 if exam_marks else None  # Chuyển về 0-100
         except StudentResult.DoesNotExist:
             assignment_marks = None
             exam_marks = None
+            assignment_marks_raw = None
+            exam_marks_raw = None
         
         students_data.append({
             'id': student.id,
             'admin': student.admin,
-            'assignment_marks': assignment_marks,
-            'exam_marks': exam_marks
+            'assignment_marks': assignment_marks,  # Điểm sau hệ số để tính tổng
+            'exam_marks': exam_marks,
+            'assignment_marks_raw': assignment_marks_raw,  # Điểm gốc để hiển thị
+            'exam_marks_raw': exam_marks_raw
         })
     
     return render(request, "staff_template/staff_enter_grades.html", {
@@ -355,30 +363,34 @@ def staff_save_grades(request):
             assignment_marks_key = f"assignment_marks_{student.id}"
             exam_marks_key = f"exam_marks_{student.id}"
             
-            assignment_marks = request.POST.get(assignment_marks_key)
-            exam_marks = request.POST.get(exam_marks_key)
+            assignment_marks_raw = request.POST.get(assignment_marks_key)
+            exam_marks_raw = request.POST.get(exam_marks_key)
             
             # Chỉ lưu nếu có ít nhất một trong hai điểm
-            if assignment_marks or exam_marks:
-                assignment_marks = float(assignment_marks) if assignment_marks else 0
-                exam_marks = float(exam_marks) if exam_marks else 0
+            if assignment_marks_raw or exam_marks_raw:
+                assignment_marks_raw = float(assignment_marks_raw) if assignment_marks_raw else 0
+                exam_marks_raw = float(exam_marks_raw) if exam_marks_raw else 0
                 
-                # Kiểm tra điểm hợp lệ
-                if assignment_marks < 0 or assignment_marks > 40:
-                    messages.error(request, f"Điểm bài tập phải từ 0-40 cho sinh viên {student.admin.username}")
+                # Kiểm tra điểm hợp lệ (0-100)
+                if assignment_marks_raw < 0 or assignment_marks_raw > 100:
+                    messages.error(request, f"Điểm bài tập phải từ 0-100 cho sinh viên {student.admin.username}")
                     return HttpResponseRedirect(reverse("staff_enter_grades", kwargs={"subject_id": subject_id}))
                 
-                if exam_marks < 0 or exam_marks > 60:
-                    messages.error(request, f"Điểm thi phải từ 0-60 cho sinh viên {student.admin.username}")
+                if exam_marks_raw < 0 or exam_marks_raw > 100:
+                    messages.error(request, f"Điểm thi phải từ 0-100 cho sinh viên {student.admin.username}")
                     return HttpResponseRedirect(reverse("staff_enter_grades", kwargs={"subject_id": subject_id}))
+                
+                # Tính điểm sau khi nhân hệ số để lưu vào DB
+                assignment_marks = assignment_marks_raw * 0.4  # Nhân 40%
+                exam_marks = exam_marks_raw * 0.6  # Nhân 60%
                 
                 # Tạo hoặc cập nhật điểm
                 result, created = StudentResult.objects.get_or_create(
                     student_id=student,
                     subject_id=subject
                 )
-                result.assignment_marks = assignment_marks
-                result.exam_marks = exam_marks
+                result.subject_assignment_marks = assignment_marks  # Lưu điểm đã nhân hệ số (0-40)
+                result.subject_exam_marks = exam_marks  # Lưu điểm đã nhân hệ số (0-60)
                 result.save()
         
         messages.success(request, "Lưu điểm thành công!")
@@ -498,7 +510,7 @@ def export_subject_grades(request, subject_id):
     response.write('\ufeff')
     
     writer = csv.writer(response)
-    writer.writerow(['STT', 'Mã SV', 'Họ và tên', 'Email', 'Điểm BT', 'Điểm thi', 'Tổng điểm', 'Điểm chữ'])
+    writer.writerow(['STT', 'Mã SV', 'Họ và tên', 'Email', 'Điểm BT (0-100)', 'Điểm thi (0-100)', 'BT×40%', 'Thi×60%', 'Tổng điểm', 'Điểm chữ'])
     
     for idx, enrollment in enumerate(enrollments, 1):
         student = enrollment.student_id
@@ -506,9 +518,16 @@ def export_subject_grades(request, subject_id):
         # Lấy điểm
         try:
             result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
-            assignment_marks = result.assignment_marks if result.assignment_marks else 0
-            exam_marks = result.exam_marks if result.exam_marks else 0
-            total = assignment_marks + exam_marks
+            # Điểm trong DB là sau khi nhân hệ số (0-40, 0-60)
+            assignment_marks_weighted = result.subject_assignment_marks if result.subject_assignment_marks else 0
+            exam_marks_weighted = result.subject_exam_marks if result.subject_exam_marks else 0
+            
+            # Chuyển về điểm gốc (0-100)
+            assignment_marks_raw = round(assignment_marks_weighted / 0.4, 1) if assignment_marks_weighted else ''
+            exam_marks_raw = round(exam_marks_weighted / 0.6, 1) if exam_marks_weighted else ''
+            
+            # Tổng điểm
+            total = assignment_marks_weighted + exam_marks_weighted
             
             # Tính điểm chữ
             if total >= 95:
@@ -524,8 +543,10 @@ def export_subject_grades(request, subject_id):
             else:
                 grade = 'F'
         except StudentResult.DoesNotExist:
-            assignment_marks = ''
-            exam_marks = ''
+            assignment_marks_raw = ''
+            exam_marks_raw = ''
+            assignment_marks_weighted = ''
+            exam_marks_weighted = ''
             total = ''
             grade = ''
         
@@ -534,8 +555,10 @@ def export_subject_grades(request, subject_id):
             student.admin.username,
             f"{student.admin.first_name} {student.admin.last_name}",
             student.admin.email,
-            assignment_marks,
-            exam_marks,
+            assignment_marks_raw,
+            exam_marks_raw,
+            f"{assignment_marks_weighted}" if assignment_marks_weighted else '',
+            f"{exam_marks_weighted}" if exam_marks_weighted else '',
             total,
             grade
         ])

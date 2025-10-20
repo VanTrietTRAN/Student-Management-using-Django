@@ -62,9 +62,9 @@ Nhập điểm - {{ subject.subject_name }}
                                       <div class="callout callout-warning">
                                           <h5><i class="fas fa-info-circle"></i> Hướng dẫn chấm điểm:</h5>
                                           <ul class="mb-0">
-                                              <li><strong>Điểm bài tập:</strong> Nhập điểm từ 0-40</li>
-                                              <li><strong>Điểm thi:</strong> Nhập điểm từ 0-60</li>
-                                              <li><strong>Tổng điểm:</strong> Được tính tự động (Điểm BT + Điểm thi)</li>
+                                              <li><strong>Điểm bài tập:</strong> Nhập điểm từ 0-100 (hệ thống sẽ tự động nhân 40%)</li>
+                                              <li><strong>Điểm thi:</strong> Nhập điểm từ 0-100 (hệ thống sẽ tự động nhân 60%)</li>
+                                              <li><strong>Tổng điểm:</strong> = (Điểm BT × 0.4) + (Điểm thi × 0.6)</li>
                                               <li><strong>Điểm chữ:</strong> A+ (≥95), A (85-94), B (70-84), C (55-69), D (40-54), F (<40)</li>
                                           </ul>
                                       </div>
@@ -78,11 +78,13 @@ Nhập điểm - {{ subject.subject_name }}
                                           <tr>
                                               <th style="width: 5%">STT</th>
                                               <th style="width: 15%">Mã SV</th>
-                                              <th style="width: 30%">Họ và tên</th>
-                                              <th style="width: 15%">Điểm BT (0-40)</th>
-                                              <th style="width: 15%">Điểm thi (0-60)</th>
-                                              <th style="width: 10%">Tổng điểm</th>
-                                              <th style="width: 10%">Điểm chữ</th>
+                                              <th style="width: 25%">Họ và tên</th>
+                                              <th style="width: 12%">Điểm BT (0-100)</th>
+                                              <th style="width: 12%">Điểm thi (0-100)</th>
+                                              <th style="width: 8%">BT×40%</th>
+                                              <th style="width: 8%">Thi×60%</th>
+                                              <th style="width: 8%">Tổng</th>
+                                              <th style="width: 7%">Điểm chữ</th>
                                           </tr>
                                       </thead>
                                       <tbody>
@@ -98,28 +100,46 @@ Nhập điểm - {{ subject.subject_name }}
                                                   <input type="number" 
                                                          class="form-control assignment-marks" 
                                                          name="assignment_marks_{{ student.id }}" 
-                                                         value="{{ student.assignment_marks|default:'' }}"
+                                                         value="{{ student.assignment_marks_raw|default:'' }}"
                                                          min="0" 
-                                                         max="40" 
+                                                         max="100" 
                                                          step="0.1"
                                                          data-student="{{ student.id }}"
-                                                         placeholder="0-40">
+                                                         placeholder="0-100">
                                               </td>
                                               <td>
                                                   <input type="number" 
                                                          class="form-control exam-marks" 
                                                          name="exam_marks_{{ student.id }}" 
-                                                         value="{{ student.exam_marks|default:'' }}"
+                                                         value="{{ student.exam_marks_raw|default:'' }}"
                                                          min="0" 
-                                                         max="60" 
+                                                         max="100" 
                                                          step="0.1"
                                                          data-student="{{ student.id }}"
-                                                         placeholder="0-60">
+                                                         placeholder="0-100">
+                                              </td>
+                                              <td class="text-center">
+                                                  <small class="assignment-weighted" data-student="{{ student.id }}">
+                                                      {% if student.assignment_marks_raw %}
+                                                      {{ student.assignment_marks_raw|floatformat:1 }}×0.4
+                                                      {% else %}
+                                                      -
+                                                      {% endif %}
+                                                  </small>
+                                              </td>
+                                              <td class="text-center">
+                                                  <small class="exam-weighted" data-student="{{ student.id }}">
+                                                      {% if student.exam_marks_raw %}
+                                                      {{ student.exam_marks_raw|floatformat:1 }}×0.6
+                                                      {% else %}
+                                                      -
+                                                      {% endif %}
+                                                  </small>
                                               </td>
                                               <td class="text-center">
                                                   <strong class="total-marks" data-student="{{ student.id }}">
                                                       {% if student.assignment_marks and student.exam_marks %}
-                                                      {{ student.assignment_marks|add:student.exam_marks }}
+                                                      {{ student.assignment_marks|add:student.exam_marks|floatformat:1 }}
                                                       {% else %}
                                                       -
                                                       {% endif %}
@@ -190,9 +210,17 @@ Nhập điểm - {{ subject.subject_name }}
         // Calculate total and grade when marks change
         $('.assignment-marks, .exam-marks').on('input', function() {
             var studentId = $(this).data('student');
-            var assignmentMarks = parseFloat($('input[name="assignment_marks_' + studentId + '"]').val()) || 0;
-            var examMarks = parseFloat($('input[name="exam_marks_' + studentId + '"]').val()) || 0;
-            var total = assignmentMarks + examMarks;
+            var assignmentMarksRaw = parseFloat($('input[name="assignment_marks_' + studentId + '"]').val()) || 0;
+            var examMarksRaw = parseFloat($('input[name="exam_marks_' + studentId + '"]').val()) || 0;
+            
+            // Tính điểm sau khi nhân hệ số
+            var assignmentWeighted = assignmentMarksRaw * 0.4;
+            var examWeighted = examMarksRaw * 0.6;
+            var total = assignmentWeighted + examWeighted;
+            
+            // Update weighted scores
+            $('.assignment-weighted[data-student="' + studentId + '"]').text(assignmentMarksRaw.toFixed(1) + '×0.4');
+            $('.exam-weighted[data-student="' + studentId + '"]').text(examMarksRaw.toFixed(1) + '×0.6');
             
             // Update total
             $('.total-marks[data-student="' + studentId + '"]').text(total.toFixed(1));
@@ -220,16 +248,16 @@ Nhập điểm - {{ subject.subject_name }}
             var valid = true;
             $('.assignment-marks').each(function() {
                 var val = parseFloat($(this).val());
-                if ($(this).val() !== '' && (val < 0 || val > 40)) {
-                    alert('Điểm bài tập phải từ 0 đến 40');
+                if ($(this).val() !== '' && (val < 0 || val > 100)) {
+                    alert('Điểm bài tập phải từ 0 đến 100');
                     valid = false;
                     return false;
                 }
             });
             $('.exam-marks').each(function() {
                 var val = parseFloat($(this).val());
-                if ($(this).val() !== '' && (val < 0 || val > 60)) {
-                    alert('Điểm thi phải từ 0 đến 60');
+                if ($(this).val() !== '' && (val < 0 || val > 100)) {
+                    alert('Điểm thi phải từ 0 đến 100');
                     valid = false;
                     return false;
                 }
