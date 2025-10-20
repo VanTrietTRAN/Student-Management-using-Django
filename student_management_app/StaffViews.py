@@ -236,6 +236,312 @@ def staff_profile_save(request):
             messages.error(request, "Cập nhật thông tin thất bại!")
             return HttpResponseRedirect(reverse("staff_profile"))
 
+def staff_my_subjects(request):
+    """View để hiển thị danh sách môn học mà giảng viên đang giảng dạy"""
+    from student_management_app.models import Schedule, StudentEnrollment
+    
+    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    
+    # Lấy thêm thông tin số sinh viên và lịch học cho mỗi môn
+    subjects_data = []
+    for subject in subjects:
+        # Đếm số sinh viên đăng ký môn này
+        student_count = StudentEnrollment.objects.filter(subject_id=subject.id).count()
+        
+        # Lấy lịch học (nếu có)
+        try:
+            schedule = Schedule.objects.get(subject_id=subject.id)
+        except Schedule.DoesNotExist:
+            schedule = None
+        
+        subjects_data.append({
+            'id': subject.id,
+            'subject_code': subject.subject_code,
+            'subject_name': subject.subject_name,
+            'credit_hours': subject.credit_hours,
+            'student_count': student_count,
+            'schedule': schedule
+        })
+    
+    return render(request, "staff_template/staff_my_subjects.html", {"subjects": subjects_data})
+
+def staff_view_class_students(request, subject_id):
+    """View để hiển thị danh sách sinh viên đăng ký môn học"""
+    from student_management_app.models import StudentEnrollment, StudentResult
+    
+    subject = Subjects.objects.get(id=subject_id)
+    
+    # Lấy danh sách sinh viên đăng ký môn này
+    enrollments = StudentEnrollment.objects.filter(subject_id=subject_id)
+    
+    students_data = []
+    for enrollment in enrollments:
+        student = enrollment.student_id
+        
+        # Lấy điểm của sinh viên (nếu có)
+        try:
+            result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
+            assignment_marks = result.assignment_marks
+            exam_marks = result.exam_marks
+            total_marks = assignment_marks + exam_marks if assignment_marks and exam_marks else None
+        except StudentResult.DoesNotExist:
+            assignment_marks = None
+            exam_marks = None
+            total_marks = None
+        
+        students_data.append({
+            'id': student.id,
+            'admin': student.admin,
+            'gender': student.gender,
+            'assignment_marks': assignment_marks,
+            'exam_marks': exam_marks,
+            'total_marks': total_marks
+        })
+    
+    return render(request, "staff_template/staff_view_class_students.html", {
+        "subject": subject,
+        "students": students_data
+    })
+
+def staff_enter_grades(request, subject_id):
+    """View để nhập điểm cho sinh viên"""
+    from student_management_app.models import StudentEnrollment, StudentResult
+    
+    subject = Subjects.objects.get(id=subject_id)
+    
+    # Lấy danh sách sinh viên đăng ký môn này
+    enrollments = StudentEnrollment.objects.filter(subject_id=subject_id)
+    
+    students_data = []
+    for enrollment in enrollments:
+        student = enrollment.student_id
+        
+        # Lấy điểm của sinh viên (nếu có)
+        try:
+            result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
+            assignment_marks = result.assignment_marks
+            exam_marks = result.exam_marks
+        except StudentResult.DoesNotExist:
+            assignment_marks = None
+            exam_marks = None
+        
+        students_data.append({
+            'id': student.id,
+            'admin': student.admin,
+            'assignment_marks': assignment_marks,
+            'exam_marks': exam_marks
+        })
+    
+    return render(request, "staff_template/staff_enter_grades.html", {
+        "subject": subject,
+        "students": students_data
+    })
+
+def staff_save_grades(request):
+    """View để lưu điểm cho sinh viên"""
+    if request.method != "POST":
+        return HttpResponseRedirect(reverse("staff_my_subjects"))
+    
+    from student_management_app.models import StudentEnrollment, StudentResult
+    
+    subject_id = request.POST.get("subject_id")
+    
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+        enrollments = StudentEnrollment.objects.filter(subject_id=subject_id)
+        
+        for enrollment in enrollments:
+            student = enrollment.student_id
+            assignment_marks_key = f"assignment_marks_{student.id}"
+            exam_marks_key = f"exam_marks_{student.id}"
+            
+            assignment_marks = request.POST.get(assignment_marks_key)
+            exam_marks = request.POST.get(exam_marks_key)
+            
+            # Chỉ lưu nếu có ít nhất một trong hai điểm
+            if assignment_marks or exam_marks:
+                assignment_marks = float(assignment_marks) if assignment_marks else 0
+                exam_marks = float(exam_marks) if exam_marks else 0
+                
+                # Kiểm tra điểm hợp lệ
+                if assignment_marks < 0 or assignment_marks > 40:
+                    messages.error(request, f"Điểm bài tập phải từ 0-40 cho sinh viên {student.admin.username}")
+                    return HttpResponseRedirect(reverse("staff_enter_grades", kwargs={"subject_id": subject_id}))
+                
+                if exam_marks < 0 or exam_marks > 60:
+                    messages.error(request, f"Điểm thi phải từ 0-60 cho sinh viên {student.admin.username}")
+                    return HttpResponseRedirect(reverse("staff_enter_grades", kwargs={"subject_id": subject_id}))
+                
+                # Tạo hoặc cập nhật điểm
+                result, created = StudentResult.objects.get_or_create(
+                    student_id=student,
+                    subject_id=subject
+                )
+                result.assignment_marks = assignment_marks
+                result.exam_marks = exam_marks
+                result.save()
+        
+        messages.success(request, "Lưu điểm thành công!")
+        return HttpResponseRedirect(reverse("staff_view_class_students", kwargs={"subject_id": subject_id}))
+    
+    except Exception as e:
+        messages.error(request, f"Lỗi khi lưu điểm: {str(e)}")
+        return HttpResponseRedirect(reverse("staff_enter_grades", kwargs={"subject_id": subject_id}))
+
+def staff_manage_description_new(request, subject_id):
+    """View để quản lý mô tả học phần"""
+    subject = Subjects.objects.get(id=subject_id)
+    return render(request, "staff_template/staff_manage_description.html", {"subject": subject})
+
+def staff_save_description(request):
+    """View để lưu mô tả học phần"""
+    if request.method != "POST":
+        return HttpResponseRedirect(reverse("staff_my_subjects"))
+    
+    subject_id = request.POST.get("subject_id")
+    description = request.POST.get("description")
+    
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+        subject.description = description
+        
+        # Xử lý file upload
+        if request.FILES.get('description_file'):
+            subject.description_file = request.FILES['description_file']
+        
+        subject.save()
+        messages.success(request, "Lưu mô tả học phần thành công!")
+        return HttpResponseRedirect(reverse("staff_manage_description", kwargs={"subject_id": subject_id}))
+    
+    except Exception as e:
+        messages.error(request, f"Lỗi khi lưu mô tả: {str(e)}")
+        return HttpResponseRedirect(reverse("staff_manage_description", kwargs={"subject_id": subject_id}))
+
+def staff_send_notification(request):
+    """View để hiển thị form gửi thông báo"""
+    from student_management_app.models import StudentEnrollment
+    
+    # Lấy danh sách môn học của giảng viên với số sinh viên
+    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    subjects_data = []
+    
+    for subject in subjects:
+        student_count = StudentEnrollment.objects.filter(subject_id=subject.id).count()
+        subjects_data.append({
+            'id': subject.id,
+            'subject_code': subject.subject_code,
+            'subject_name': subject.subject_name,
+            'student_count': student_count
+        })
+    
+    # Lấy lịch sử thông báo đã gửi
+    notifications = NotificationStaffs.objects.filter(staff_id=request.user.id).order_by('-created_at')[:10]
+    
+    return render(request, "staff_template/staff_send_notification.html", {
+        "subjects": subjects_data,
+        "notifications": notifications
+    })
+
+def staff_send_notification_save(request):
+    """View để lưu và gửi thông báo"""
+    if request.method != "POST":
+        return HttpResponseRedirect(reverse("staff_send_notification"))
+    
+    from student_management_app.models import StudentEnrollment, NotificationStudent
+    
+    subject_id = request.POST.get("subject_id")
+    message = request.POST.get("message")
+    
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+        staff = Staffs.objects.get(admin=request.user.id)
+        
+        # Tạo notification cho staff
+        notification_staff = NotificationStaffs(
+            staff_id=staff,
+            message=f"Đã gửi thông báo đến môn {subject.subject_name}: {message}"
+        )
+        notification_staff.save()
+        
+        # Gửi thông báo đến tất cả sinh viên đăng ký môn này
+        enrollments = StudentEnrollment.objects.filter(subject_id=subject_id)
+        
+        for enrollment in enrollments:
+            student = enrollment.student_id
+            notification_student = NotificationStudent(
+                student_id=student,
+                message=f"[{subject.subject_name}] {message}"
+            )
+            notification_student.save()
+        
+        messages.success(request, f"Đã gửi thông báo đến {enrollments.count()} sinh viên!")
+        return HttpResponseRedirect(reverse("staff_send_notification"))
+    
+    except Exception as e:
+        messages.error(request, f"Lỗi khi gửi thông báo: {str(e)}")
+        return HttpResponseRedirect(reverse("staff_send_notification"))
+
+def export_subject_grades(request, subject_id):
+    """View để xuất điểm ra Excel"""
+    import csv
+    from django.http import HttpResponse
+    from student_management_app.models import StudentEnrollment, StudentResult
+    
+    subject = Subjects.objects.get(id=subject_id)
+    enrollments = StudentEnrollment.objects.filter(subject_id=subject_id)
+    
+    # Tạo HTTP response với content type CSV
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="diem_{subject.subject_code}.csv"'
+    
+    # Thêm BOM để Excel hiển thị đúng tiếng Việt
+    response.write('\ufeff')
+    
+    writer = csv.writer(response)
+    writer.writerow(['STT', 'Mã SV', 'Họ và tên', 'Email', 'Điểm BT', 'Điểm thi', 'Tổng điểm', 'Điểm chữ'])
+    
+    for idx, enrollment in enumerate(enrollments, 1):
+        student = enrollment.student_id
+        
+        # Lấy điểm
+        try:
+            result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
+            assignment_marks = result.assignment_marks if result.assignment_marks else 0
+            exam_marks = result.exam_marks if result.exam_marks else 0
+            total = assignment_marks + exam_marks
+            
+            # Tính điểm chữ
+            if total >= 95:
+                grade = 'A+'
+            elif total >= 85:
+                grade = 'A'
+            elif total >= 70:
+                grade = 'B'
+            elif total >= 55:
+                grade = 'C'
+            elif total >= 40:
+                grade = 'D'
+            else:
+                grade = 'F'
+        except StudentResult.DoesNotExist:
+            assignment_marks = ''
+            exam_marks = ''
+            total = ''
+            grade = ''
+        
+        writer.writerow([
+            idx,
+            student.admin.username,
+            f"{student.admin.first_name} {student.admin.last_name}",
+            student.admin.email,
+            assignment_marks,
+            exam_marks,
+            total,
+            grade
+        ])
+    
+    return response
+
 @csrf_exempt
 def staff_fcmtoken_save(request):
     token=request.POST.get("token")

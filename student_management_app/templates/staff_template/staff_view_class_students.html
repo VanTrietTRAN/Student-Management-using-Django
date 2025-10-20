@@ -1,0 +1,180 @@
+{% extends 'staff_template/base_template.html' %}
+{% load static %}
+{% block page_title %}
+Danh sách sinh viên - {{ subject.subject_name }}
+{% endblock page_title %}
+{% block main_content %}
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+          <div class="row">
+              <div class="col-12">
+                  <div class="card">
+                      <div class="card-header">
+                          <h3 class="card-title">
+                              <i class="fas fa-users"></i> Danh sách sinh viên môn học
+                          </h3>
+                          <div class="card-tools">
+                              <a href="{% url 'export_subject_grades' subject.id %}" class="btn btn-success btn-sm">
+                                  <i class="fas fa-file-excel"></i> Xuất Excel
+                              </a>
+                              <a href="{% url 'staff_my_subjects' %}" class="btn btn-secondary btn-sm">
+                                  <i class="fas fa-arrow-left"></i> Quay lại
+                              </a>
+                          </div>
+                      </div>
+                      
+                      <div class="card-body">
+                          <!-- Subject Info -->
+                          <div class="row mb-3">
+                              <div class="col-md-6">
+                                  <div class="info-box bg-info">
+                                      <span class="info-box-icon"><i class="fas fa-book"></i></span>
+                                      <div class="info-box-content">
+                                          <span class="info-box-text">Môn học</span>
+                                          <span class="info-box-number">{{ subject.subject_name }}</span>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col-md-3">
+                                  <div class="info-box bg-success">
+                                      <span class="info-box-icon"><i class="fas fa-users"></i></span>
+                                      <div class="info-box-content">
+                                          <span class="info-box-text">Số sinh viên</span>
+                                          <span class="info-box-number">{{ students|length }}</span>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col-md-3">
+                                  <div class="info-box bg-warning">
+                                      <span class="info-box-icon"><i class="fas fa-credit-card"></i></span>
+                                      <div class="info-box-content">
+                                          <span class="info-box-text">Tín chỉ</span>
+                                          <span class="info-box-number">{{ subject.credit_hours }}</span>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+
+                          {% if messages %}
+                              {% for message in messages %}
+                              {% if message.tags == 'error' %}
+                              <div class="alert alert-danger alert-dismissible fade show">
+                                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                  {{ message }}
+                              </div>
+                              {% endif %}
+                              {% if message.tags == 'success' %}
+                              <div class="alert alert-success alert-dismissible fade show">
+                                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                  {{ message }}
+                              </div>
+                              {% endif %}
+                              {% endfor %}
+                          {% endif %}
+
+                          {% if students %}
+                          <div class="table-responsive">
+                              <table id="studentsTable" class="table table-bordered table-hover">
+                                  <thead class="thead-light">
+                                      <tr>
+                                          <th style="width: 5%">STT</th>
+                                          <th style="width: 15%">Mã SV</th>
+                                          <th style="width: 25%">Họ và tên</th>
+                                          <th style="width: 20%">Email</th>
+                                          <th style="width: 10%">Giới tính</th>
+                                          <th style="width: 10%">Điểm BT</th>
+                                          <th style="width: 10%">Điểm thi</th>
+                                          <th style="width: 5%">TB</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      {% for student in students %}
+                                      <tr>
+                                          <td>{{ forloop.counter }}</td>
+                                          <td><span class="badge badge-primary">{{ student.admin.username }}</span></td>
+                                          <td><strong>{{ student.admin.first_name }} {{ student.admin.last_name }}</strong></td>
+                                          <td>{{ student.admin.email }}</td>
+                                          <td>
+                                              {% if student.gender == 'Male' %}
+                                              <span class="badge badge-info"><i class="fas fa-male"></i> Nam</span>
+                                              {% else %}
+                                              <span class="badge badge-danger"><i class="fas fa-female"></i> Nữ</span>
+                                              {% endif %}
+                                          </td>
+                                          <td class="text-center">
+                                              {% if student.assignment_marks %}
+                                              {{ student.assignment_marks }}
+                                              {% else %}
+                                              <span class="text-muted">-</span>
+                                              {% endif %}
+                                          </td>
+                                          <td class="text-center">
+                                              {% if student.exam_marks %}
+                                              {{ student.exam_marks }}
+                                              {% else %}
+                                              <span class="text-muted">-</span>
+                                              {% endif %}
+                                          </td>
+                                          <td class="text-center">
+                                              {% if student.total_marks %}
+                                              <strong>{{ student.total_marks }}</strong>
+                                              {% else %}
+                                              <span class="text-muted">-</span>
+                                              {% endif %}
+                                          </td>
+                                      </tr>
+                                      {% endfor %}
+                                  </tbody>
+                              </table>
+                          </div>
+                          {% else %}
+                          <div class="alert alert-info">
+                              <i class="icon fas fa-info-circle"></i>
+                              Chưa có sinh viên nào đăng ký môn học này.
+                          </div>
+                          {% endif %}
+                      </div>
+                      
+                      <div class="card-footer">
+                          <a href="{% url 'staff_enter_grades' subject.id %}" class="btn btn-primary">
+                              <i class="fas fa-pen"></i> Nhập điểm cho sinh viên
+                          </a>
+                          <a href="{% url 'staff_my_subjects' %}" class="btn btn-secondary">
+                              <i class="fas fa-arrow-left"></i> Quay lại danh sách môn học
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section>
+    
+    <script>
+    $(document).ready(function() {
+        $('#studentsTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+            "language": {
+                "lengthMenu": "Hiển thị _MENU_ sinh viên mỗi trang",
+                "zeroRecords": "Không tìm thấy sinh viên nào",
+                "info": "Trang _PAGE_ / _PAGES_",
+                "infoEmpty": "Không có dữ liệu",
+                "infoFiltered": "(lọc từ _MAX_ sinh viên)",
+                "search": "Tìm kiếm:",
+                "paginate": {
+                    "first": "Đầu",
+                    "last": "Cuối",
+                    "next": "Sau",
+                    "previous": "Trước"
+                }
+            }
+        });
+    });
+    </script>
+{% endblock main_content %}
