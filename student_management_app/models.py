@@ -44,7 +44,7 @@ class Subjects(models.Model):
     course_id=models.ForeignKey(Courses,on_delete=models.CASCADE,default=1)
     staff_id=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     credit_hours=models.IntegerField(default=3)  # Số tín chỉ của môn học
-    fee_per_credit=models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Học phí mỗi tín chỉ
+    fee_per_credit=models.DecimalField(max_digits=10, decimal_places=2, default=500000)  # Học phí mỗi tín chỉ (VNĐ)
     subject_description_file=models.FileField(upload_to='subject_descriptions/', blank=True, null=True)  # File PDF mô tả môn học
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
