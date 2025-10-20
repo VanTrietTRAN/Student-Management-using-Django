@@ -13,16 +13,39 @@ Quản lý Điểm - Chọn Môn Học
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
+.subject-card .card-header {
+    padding: 12px 15px;
+}
+.subject-card .card-header h5 {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+.subject-code {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+.info-row {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+.info-row i {
+    width: 20px;
+    text-align: center;
+}
 .stats-badge {
-    font-size: 0.9em;
-    padding: 5px 10px;
-    border-radius: 12px;
+    font-size: 0.8em;
+    padding: 4px 8px;
+    border-radius: 10px;
+    margin-right: 3px;
 }
 .btn-enter-grade {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     color: white;
     font-weight: 500;
+    font-size: 0.875rem;
 }
 .btn-enter-grade:hover {
     background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
@@ -32,6 +55,7 @@ Quản lý Điểm - Chọn Môn Học
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     border: none;
     color: white;
+    font-size: 0.875rem;
 }
 </style>
 {% endblock custom_css %}
@@ -117,42 +141,44 @@ Quản lý Điểm - Chọn Môn Học
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card subject-card">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-book-open"></i>
-                            {{ data.subject.subject_code|default:data.subject.id }}
+                        <h5 class="mb-1">
+                            {{ data.subject.subject_name }}
                         </h5>
+                        <small class="subject-code">
+                            <i class="fas fa-hashtag"></i> {{ data.subject.subject_code|default:data.subject.id }}
+                        </small>
                     </div>
                     <div class="card-body">
-                        <h6 class="card-title font-weight-bold">{{ data.subject.subject_name }}</h6>
-                        
-                        <div class="mb-2">
-                            <small class="text-muted">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                {{ data.subject.staff_id.first_name }} {{ data.subject.staff_id.last_name }}
-                            </small>
+                        <!-- Course Info (First) -->
+                        <div class="info-row">
+                            <i class="fas fa-graduation-cap text-primary"></i>
+                            <span class="text-muted">Chương trình:</span>
+                            <strong>{{ data.subject.course_id.course_name }}</strong>
                         </div>
 
-                        <div class="mb-2">
-                            <small class="text-muted">
-                                <i class="fas fa-university"></i>
-                                {{ data.subject.course_id.course_name }}
-                            </small>
+                        <!-- Staff Info (Second) -->
+                        <div class="info-row mb-3">
+                            <i class="fas fa-chalkboard-teacher text-success"></i>
+                            <span class="text-muted">Giảng viên:</span>
+                            <strong>{{ data.subject.staff_id.first_name }} {{ data.subject.staff_id.last_name }}</strong>
                         </div>
 
+                        <!-- Statistics Badges -->
                         <div class="mb-3">
                             <span class="badge badge-info stats-badge">
-                                <i class="fas fa-users"></i> {{ data.enrolled_count }} SV đăng ký
+                                <i class="fas fa-users"></i> {{ data.enrolled_count }} SV
                             </span>
                             <span class="badge badge-success stats-badge">
-                                <i class="fas fa-check"></i> {{ data.graded_count }} đã có điểm
+                                <i class="fas fa-check"></i> {{ data.graded_count }} có điểm
                             </span>
                             {% if data.pending_count > 0 %}
                             <span class="badge badge-warning stats-badge">
-                                <i class="fas fa-clock"></i> {{ data.pending_count }} chờ điểm
+                                <i class="fas fa-clock"></i> {{ data.pending_count }} chờ
                             </span>
                             {% endif %}
                         </div>
 
+                        <!-- Action Buttons -->
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'admin_enter_grades' data.subject.id %}" 
                                class="btn btn-enter-grade btn-sm">
