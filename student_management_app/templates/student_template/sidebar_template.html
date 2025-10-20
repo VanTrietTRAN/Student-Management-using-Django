@@ -32,11 +32,10 @@
           </li>
 
           <!-- Enrollment & Courses -->
-          {% url 'view_subjects' as view_subjects %}
-          {% url 'enroll_subject' as enroll_subject %}
-          {% url 'view_schedule' as view_schedule %}
-          <li class="nav-item {% if request.path == view_subjects or request.path == enroll_subject or request.path == view_schedule %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == view_subjects or request.path == enroll_subject or request.path == view_schedule %}active{% endif %}">
+          {% url 'student_view_subjects' as view_subjects %}
+          {% url 'student_view_schedule' as view_schedule %}
+          <li class="nav-item {% if request.path == view_subjects or request.path == view_schedule %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == view_subjects or request.path == view_schedule %}active{% endif %}">
               <i class="nav-icon fas fa-book-reader"></i>
               <p>
                 My Courses
@@ -45,19 +44,13 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'view_subjects' %}" class="nav-link {% if request.path == view_subjects %}active{% endif %}">
+                <a href="{% url 'student_view_subjects' %}" class="nav-link {% if request.path == view_subjects %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Available Subjects</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'enroll_subject' %}" class="nav-link {% if request.path == enroll_subject %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Enroll in Subjects</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'view_schedule' %}" class="nav-link {% if request.path == view_schedule %}active{% endif %}">
+                <a href="{% url 'student_view_schedule' %}" class="nav-link {% if request.path == view_schedule %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Class Schedule</p>
                 </a>
@@ -66,9 +59,9 @@
           </li>
 
           <!-- Fees -->
-          {% url 'view_fees' as view_fees %}
+          {% url 'student_view_fees' as view_fees %}
           <li class="nav-item">
-            <a href="{% url 'view_fees' %}" class="nav-link {% if request.path == view_fees %}active{% endif %}">
+            <a href="{% url 'student_view_fees' %}" class="nav-link {% if request.path == view_fees %}active{% endif %}">
               <i class="nav-icon fas fa-dollar-sign"></i>
               <p>My Fees</p>
             </a>

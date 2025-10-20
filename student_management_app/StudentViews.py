@@ -139,6 +139,8 @@ def student_profile_save(request):
         last_name=request.POST.get("last_name")
         password=request.POST.get("password")
         address=request.POST.get("address")
+        gender=request.POST.get("gender")
+        
         try:
             customuser=CustomUser.objects.get(id=request.user.id)
             customuser.first_name=first_name
@@ -149,11 +151,18 @@ def student_profile_save(request):
 
             student=Students.objects.get(admin=customuser)
             student.address=address
+            if gender:
+                student.gender=gender
+            
+            # Xử lý upload ảnh đại diện
+            if request.FILES.get('profile_pic'):
+                student.profile_pic=request.FILES['profile_pic']
+            
             student.save()
-            messages.success(request, "Successfully Updated Profile")
+            messages.success(request, "Cập nhật thông tin thành công")
             return HttpResponseRedirect(reverse("student_profile"))
-        except:
-            messages.error(request, "Failed to Update Profile")
+        except Exception as e:
+            messages.error(request, f"Cập nhật thất bại: {str(e)}")
             return HttpResponseRedirect(reverse("student_profile"))
 
 @csrf_exempt
@@ -209,15 +218,19 @@ def student_enroll_subject(request, subject_id):
         subject = Subjects.objects.get(id=subject_id)
         session_year = student.session_year_id
         
-        # Kiểm tra đã đăng ký chưa
-        existing = StudentEnrollment.objects.filter(
-            student_id=student,
-            subject_id=subject,
-            session_year_id=session_year
-        ).exists()
+        # Kiểm tra số môn đã đăng ký (giới hạn 8 môn)
+        enrolled_count = StudentEnrollment.objects.filter(
+            student_id=student, 
+            is_active=True
+        ).count()
         
-        if existing:
-            messages.warning(request, "You have already enrolled in this subject")
+        if enrolled_count >= 8:
+            messages.error(request, "Bạn đã đăng ký tối đa 8 môn học. Vui lòng hủy đăng ký môn khác trước khi đăng ký môn mới.")
+            return HttpResponseRedirect(reverse("student_view_subjects"))
+        
+        # Kiểm tra đã đăng ký môn này chưa
+        if StudentEnrollment.objects.filter(student_id=student, subject_id=subject, is_active=True).exists():
+            messages.warning(request, "Bạn đã đăng ký môn học này rồi")
         else:
             enrollment = StudentEnrollment(
                 student_id=student,
@@ -226,9 +239,9 @@ def student_enroll_subject(request, subject_id):
                 is_active=True
             )
             enrollment.save()
-            messages.success(request, f"Successfully enrolled in {subject.subject_name}")
+            messages.success(request, f"Đăng ký thành công môn {subject.subject_name}")
     except Exception as e:
-        messages.error(request, f"Failed to enroll: {str(e)}")
+        messages.error(request, f"Đăng ký thất bại: {str(e)}")
     
     return HttpResponseRedirect(reverse("student_view_subjects"))
 
@@ -248,9 +261,9 @@ def student_drop_subject(request, subject_id):
         enrollment.is_active = False
         enrollment.save()
         
-        messages.success(request, f"Successfully dropped {subject.subject_name}")
+        messages.success(request, f"Đã hủy đăng ký môn {subject.subject_name}")
     except:
-        messages.error(request, "Failed to drop subject")
+        messages.error(request, "Hủy đăng ký thất bại")
     
     return HttpResponseRedirect(reverse("student_view_subjects"))
 

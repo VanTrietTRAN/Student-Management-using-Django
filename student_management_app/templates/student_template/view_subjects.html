@@ -49,8 +49,6 @@ Available Subjects
                                     <th>Subject Name</th>
                                     <th>Lecturer</th>
                                     <th>Credit Hours</th>
-                                    <th>Fee Per Credit</th>
-                                    <th>Total Fee</th>
                                     <th>Description</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -62,18 +60,6 @@ Available Subjects
                                     <td>{{ subject.subject_name }}</td>
                                     <td>{{ subject.staff_id.first_name }} {{ subject.staff_id.last_name }}</td>
                                     <td>{{ subject.credit_hours }}</td>
-                                    <td>{{ subject.fee_per_credit|floatformat:0 }} VNĐ</td>
-                                    <td>
-                                        <strong style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                                       color: white; 
-                                                       padding: 5px 15px; 
-                                                       border-radius: 20px; 
-                                                       display: inline-block;
-                                                       font-size: 1.1em;
-                                                       box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);">
-                                            💰 {{ subject.get_total_fee|floatformat:0 }} VNĐ
-                                        </strong>
-                                    </td>
                                     <td>
                                         {% if subject.subject_description_file %}
                                         <a href="{% url 'student_view_subject_description' subject.id %}" class="btn btn-info btn-sm">
@@ -92,7 +78,7 @@ Available Subjects
                                     </td>
                                     <td>
                                         {% if subject.id in enrolled_subjects %}
-                                        <a href="{% url 'student_drop_subject' subject.id %}" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to drop this subject?')">
+                                        <a href="{% url 'student_drop_subject' subject.id %}" class="btn btn-warning btn-sm" onclick="return confirm('Bạn có chắc muốn hủy đăng ký môn này?')">
                                             <i class="fas fa-times"></i> Drop
                                         </a>
                                         {% else %}
