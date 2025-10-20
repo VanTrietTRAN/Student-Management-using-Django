@@ -13,28 +13,75 @@ from student_management_app.models import Students, Courses, Subjects, CustomUse
 
 def student_home(request):
     student_obj=Students.objects.get(admin=request.user.id)
+    
+    # Lấy các môn đã đăng ký
+    enrolled_subjects = StudentEnrollment.objects.filter(
+        student_id=student_obj, 
+        is_active=True
+    ).select_related('subject_id')
+    
+    # Lấy lịch học của các môn đã đăng ký
+    subject_ids = [enrollment.subject_id for enrollment in enrolled_subjects]
+    schedule = Schedule.objects.filter(
+        subject__in=subject_ids,
+        is_active=True
+    ).select_related('subject', 'started_by').order_by('day_of_week', 'start_time')
+    
+    # Lấy notifications
+    notifications = NotificationStudent.objects.filter(
+        student_id=student_obj
+    ).order_by('-created_at')[:10]
+    
+    # Attendance statistics
     attendance_total=AttendanceReport.objects.filter(student_id=student_obj).count()
     attendance_present=AttendanceReport.objects.filter(student_id=student_obj,status=True).count()
     attendance_absent=AttendanceReport.objects.filter(student_id=student_obj,status=False).count()
-    course=Courses.objects.get(id=student_obj.course_id.id)
-    subjects=Subjects.objects.filter(course_id=course).count()
-    subjects_data=Subjects.objects.filter(course_id=course)
+    
+    # Subjects count
+    enrolled_count = enrolled_subjects.count()
+    
+    # Online classroom
     session_obj=SessionYearModel.object.get(id=student_obj.session_year_id.id)
-    class_room=OnlineClassRoom.objects.filter(subject__in=subjects_data,is_active=True,session_years=session_obj)
+    class_room=OnlineClassRoom.objects.filter(
+        subject__in=subject_ids,
+        is_active=True,
+        session_years=session_obj
+    )
 
+    # Chart data for attendance
     subject_name=[]
     data_present=[]
     data_absent=[]
-    subject_data=Subjects.objects.filter(course_id=student_obj.course_id)
-    for subject in subject_data:
+    for enrollment in enrolled_subjects:
+        subject = enrollment.subject_id
         attendance=Attendance.objects.filter(subject_id=subject.id)
-        attendance_present_count=AttendanceReport.objects.filter(attendance_id__in=attendance,status=True,student_id=student_obj.id).count()
-        attendance_absent_count=AttendanceReport.objects.filter(attendance_id__in=attendance,status=False,student_id=student_obj.id).count()
+        attendance_present_count=AttendanceReport.objects.filter(
+            attendance_id__in=attendance,
+            status=True,
+            student_id=student_obj.id
+        ).count()
+        attendance_absent_count=AttendanceReport.objects.filter(
+            attendance_id__in=attendance,
+            status=False,
+            student_id=student_obj.id
+        ).count()
         subject_name.append(subject.subject_name)
         data_present.append(attendance_present_count)
         data_absent.append(attendance_absent_count)
 
-    return render(request,"student_template/student_home_template.html",{"total_attendance":attendance_total,"attendance_absent":attendance_absent,"attendance_present":attendance_present,"subjects":subjects,"data_name":subject_name,"data1":data_present,"data2":data_absent,"class_room":class_room})
+    return render(request,"student_template/student_home_template.html",{
+        "total_attendance":attendance_total,
+        "attendance_absent":attendance_absent,
+        "attendance_present":attendance_present,
+        "subjects":enrolled_count,
+        "data_name":subject_name,
+        "data1":data_present,
+        "data2":data_absent,
+        "class_room":class_room,
+        "schedule":schedule,
+        "notifications":notifications,
+        "enrolled_subjects":enrolled_subjects
+    })
 
 def join_class_room(request,subject_id,session_year_id):
     session_year_obj=SessionYearModel.object.get(id=session_year_id)
@@ -182,9 +229,13 @@ def student_all_notification(request):
     return render(request,"student_template/all_notification.html",{"notifications":notifications})
 
 def student_view_result(request):
-    student=Students.objects.get(admin=request.user.id)
-    studentresult=StudentResult.objects.filter(student_id=student.id)
-    return render(request,"student_template/student_result.html",{"studentresult":studentresult})
+    try:
+        student=Students.objects.get(admin=request.user.id)
+        studentresult=StudentResult.objects.filter(student_id=student.id)
+        return render(request,"student_template/student_result.html",{"studentresult":studentresult})
+    except Exception as e:
+        messages.error(request, f"Chưa có bảng điểm. Vui lòng liên hệ giảng viên hoặc admin.")
+        return HttpResponseRedirect(reverse("student_home"))
 
 
 # ============= COURSE ENROLLMENT =============

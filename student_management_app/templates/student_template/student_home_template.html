@@ -78,6 +78,95 @@ Home
           </div>
           <!-- ./col -->
         </div>
+        
+          <!-- Schedule and Notifications Row -->
+          <div class="row">
+              <!-- Weekly Schedule -->
+              <div class="col-lg-6">
+                  <div class="card card-primary">
+                      <div class="card-header">
+                          <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Thời khóa biểu</h3>
+                      </div>
+                      <div class="card-body p-0">
+                          {% if schedule %}
+                          <table class="table table-hover">
+                              <thead>
+                                  <tr>
+                                      <th>Thứ</th>
+                                      <th>Môn học</th>
+                                      <th>Giờ học</th>
+                                      <th>Giảng viên</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for class in schedule %}
+                                  <tr>
+                                      <td>
+                                          {% if class.day_of_week == 'Monday' %}Thứ 2
+                                          {% elif class.day_of_week == 'Tuesday' %}Thứ 3
+                                          {% elif class.day_of_week == 'Wednesday' %}Thứ 4
+                                          {% elif class.day_of_week == 'Thursday' %}Thứ 5
+                                          {% elif class.day_of_week == 'Friday' %}Thứ 6
+                                          {% elif class.day_of_week == 'Saturday' %}Thứ 7
+                                          {% else %}Chủ nhật{% endif %}
+                                      </td>
+                                      <td>{{ class.subject.subject_name }}</td>
+                                      <td>{{ class.start_time|time:"H:i" }} - {{ class.end_time|time:"H:i" }}</td>
+                                      <td>{{ class.started_by.admin.first_name }} {{ class.started_by.admin.last_name }}</td>
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                          {% else %}
+                          <div class="p-3 text-center text-muted">
+                              <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                              <p>Chưa có lịch học nào</p>
+                          </div>
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+              
+              <!-- Notifications -->
+              <div class="col-lg-6">
+                  <div class="card card-warning">
+                      <div class="card-header">
+                          <h3 class="card-title"><i class="fas fa-bell"></i> Thông báo</h3>
+                          <div class="card-tools">
+                              <a href="{% url 'student_all_notification' %}" class="btn btn-tool btn-sm">
+                                  <i class="fas fa-eye"></i> Xem tất cả
+                              </a>
+                          </div>
+                      </div>
+                      <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                          {% if notifications %}
+                          <ul class="list-group list-group-flush">
+                              {% for notif in notifications %}
+                              <li class="list-group-item">
+                                  <div class="d-flex w-100 justify-content-between">
+                                      <h6 class="mb-1">
+                                          {% if notif.message|length > 50 %}
+                                              {{ notif.message|slice:":50" }}...
+                                          {% else %}
+                                              {{ notif.message }}
+                                          {% endif %}
+                                      </h6>
+                                      <small class="text-muted">{{ notif.created_at|timesince }} trước</small>
+                                  </div>
+                              </li>
+                              {% endfor %}
+                          </ul>
+                          {% else %}
+                          <div class="p-3 text-center text-muted">
+                              <i class="fas fa-bell-slash fa-3x mb-3"></i>
+                              <p>Chưa có thông báo nào</p>
+                          </div>
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+          </div>
+        
           <div class="row">
               <div class="col-lg-6">
                   <div class="card card-danger">
