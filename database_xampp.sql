@@ -1,43 +1,28 @@
--- ===================================================
--- SQL Import File for Student Management System
--- Tương thích với MySQL 5.7+ (XAMPP)
--- Cập nhật: 2025-10-20 18:58:58
--- ===================================================
---
--- ✅ TẤT CẢ USER ĐÃ CÓ PASSWORD: admin
--- ✅ SAU KHI IMPORT - LOGIN NGAY!
---
--- DANH SÁCH TÀI KHOẢN:
--- 👨‍💼 admin@gmail.com / admin
--- 👨‍🏫 staff1@gmail.com / admin
--- 👨‍🏫 staff2@gmail.com / admin
--- 👨‍🏫 staff3@gmail.com / admin
--- 👨‍🏫 staff4@gmail.com / admin
--- 👨‍🎓 student1@gmail.com / admin
--- 👨‍🎓 student2@gmail.com / admin
---
--- CÁC CẬP NHẬT MỚI:
--- ✅ Bảng student_management_app_subjects:
---    - Thêm cột subject_code VARCHAR(50) - Mã môn học
---    - Thêm cột description TEXT - Mô tả chi tiết môn học
---    - Thêm cột description_file VARCHAR(100) - File PDF mô tả
--- ✅ 19 môn học đã được cập nhật mã môn (MH_1 đến AN_NINH)
--- ✅ Hệ thống chấm điểm mới:
---    - Giảng viên nhập 0-100
---    - Tự động × 0.4 cho BT, × 0.6 cho Thi
---    - Lưu trong subject_assignment_marks và subject_exam_marks
---
--- ===================================================
+﻿-- =====================================================
+-- STUDENT MANAGEMENT SYSTEM - DATABASE EXPORT
+-- Export Date: 2025-10-20 19:29:29
+-- Database: student_management_system
+-- Encoding: UTF-8
+-- =====================================================
+
+-- IMPORTANT UPDATES IN THIS VERSION:
+-- ✅ Email format: admin01@uni.com, staff@uni.com, student@std.uni.com
+-- ✅ Staff names: Vietnamese names with academic titles (ThS, TS, PGS.TS)
+-- ✅ All passwords reset to: 'admin'
+-- ✅ Subject codes added
+-- ✅ Subject descriptions fields added
 
 SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
--- Bảng: auth_group
+-- =====================================================
+-- Table: auth_group
+-- =====================================================
+
 DROP TABLE IF EXISTS `auth_group`;
+
 CREATE TABLE `auth_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
@@ -46,8 +31,12 @@ CREATE TABLE `auth_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: auth_group_permissions
+-- =====================================================
+-- Table: auth_group_permissions
+-- =====================================================
+
 DROP TABLE IF EXISTS `auth_group_permissions`;
+
 CREATE TABLE `auth_group_permissions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` int(11) NOT NULL,
@@ -61,8 +50,12 @@ CREATE TABLE `auth_group_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: auth_permission
+-- =====================================================
+-- Table: auth_permission
+-- =====================================================
+
 DROP TABLE IF EXISTS `auth_permission`;
+
 CREATE TABLE `auth_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -74,8 +67,7 @@ CREATE TABLE `auth_permission` (
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `auth_permission`
-LOCK TABLES `auth_permission` WRITE;
+-- Data for table `auth_permission`
 INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALUES
 (1, 'Can add log entry', 1, 'add_logentry'),
 (2, 'Can change log entry', 1, 'change_logentry'),
@@ -173,11 +165,14 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 (94, 'Can change student enrollment', 24, 'change_studentenrollment'),
 (95, 'Can delete student enrollment', 24, 'delete_studentenrollment'),
 (96, 'Can view student enrollment', 24, 'view_studentenrollment');
-UNLOCK TABLES;
 
 
--- Bảng: django_admin_log
+-- =====================================================
+-- Table: django_admin_log
+-- =====================================================
+
 DROP TABLE IF EXISTS `django_admin_log`;
+
 CREATE TABLE `django_admin_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `action_time` datetime(6) NOT NULL,
@@ -195,8 +190,12 @@ CREATE TABLE `django_admin_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: django_content_type
+-- =====================================================
+-- Table: django_content_type
+-- =====================================================
+
 DROP TABLE IF EXISTS `django_content_type`;
+
 CREATE TABLE `django_content_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app_label` varchar(100) NOT NULL,
@@ -205,8 +204,7 @@ CREATE TABLE `django_content_type` (
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `django_content_type`
-LOCK TABLES `django_content_type` WRITE;
+-- Data for table `django_content_type`
 INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (1, 'admin', 'logentry'),
 (3, 'auth', 'group'),
@@ -232,11 +230,14 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (21, 'student_management_app', 'studentresult'),
 (11, 'student_management_app', 'students'),
 (10, 'student_management_app', 'subjects');
-UNLOCK TABLES;
 
 
--- Bảng: django_migrations
+-- =====================================================
+-- Table: django_migrations
+-- =====================================================
+
 DROP TABLE IF EXISTS `django_migrations`;
+
 CREATE TABLE `django_migrations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app` varchar(255) NOT NULL,
@@ -245,8 +246,7 @@ CREATE TABLE `django_migrations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `django_migrations`
-LOCK TABLES `django_migrations` WRITE;
+-- Data for table `django_migrations`
 INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 (1, 'contenttypes', '0001_initial', '2020-04-12 08:09:49.732772'),
 (2, 'contenttypes', '0002_remove_content_type_name', '2020-04-12 08:09:49.916310'),
@@ -276,11 +276,14 @@ INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 (26, 'student_management_app', '0004_subjects_credit_hours_subjects_fee_per_credit_and_more', '2025-10-20 09:18:46.246523'),
 (27, 'student_management_app', '0005_alter_subjects_fee_per_credit', '2025-10-20 09:49:48.987222'),
 (28, 'student_management_app', '0006_subjects_description_subjects_description_file_and_more', '2025-10-20 11:47:10.775149');
-UNLOCK TABLES;
 
 
--- Bảng: django_session
+-- =====================================================
+-- Table: django_session
+-- =====================================================
+
 DROP TABLE IF EXISTS `django_session`;
+
 CREATE TABLE `django_session` (
   `session_key` varchar(40) NOT NULL,
   `session_data` longtext NOT NULL,
@@ -289,17 +292,18 @@ CREATE TABLE `django_session` (
   KEY `django_session_expire_date_a5c62663` (`expire_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `django_session`
-LOCK TABLES `django_session` WRITE;
+-- Data for table `django_session`
 INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALUES
 ('4uafupyvuwgg8hsxkrbyvr6dr5flanz0', 'MTkxMzk4ODg5ZjE2ZmJmNzFiYzU4ZDYzYTZmNjU5NzE1ZTY1ZGFkODp7Il9hdXRoX3VzZXJfaWQiOiIyIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoic3R1ZGVudF9tYW5hZ2VtZW50X2FwcC5FbWFpbEJhY2tFbmQuRW1haWxCYWNrRW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiZWI2YTk5ZjEwMzM0MDdjYmE0NmZjZGZlZDEyZGM5NzhhOTM3Y2JmMyJ9', '2020-06-09 08:15:00.200912'),
-('m8eqtizu2bo12n6nayfu1vi7zh7tbfhz', '.eJxVjMEOgyAQRP-Fc9PgLiL02MTvIAu7VNNKTMFT03-v3uptZt7kfVSgrU1hq_IOM6ubAnX53yKlp5QD1LaxlBYWKvSQ5Yi0rtdxofl1319j4VM5eyaq0y7pEHyfGI1DcboDk7Ud0IrFrmeA5DGzyZh1dGQGspR8jjh4ABdJZ1bfH5dGOi4:1vAo0n:NGdyEpX4AuKyp6mepq-tFpP0js7-zndoqkAu789K8gM', '2025-11-03 11:25:13.866969'),
 ('z25qqlq023k6i2veud817qctrlxk63fn', 'MTkxMzk4ODg5ZjE2ZmJmNzFiYzU4ZDYzYTZmNjU5NzE1ZTY1ZGFkODp7Il9hdXRoX3VzZXJfaWQiOiIyIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoic3R1ZGVudF9tYW5hZ2VtZW50X2FwcC5FbWFpbEJhY2tFbmQuRW1haWxCYWNrRW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiZWI2YTk5ZjEwMzM0MDdjYmE0NmZjZGZlZDEyZGM5NzhhOTM3Y2JmMyJ9', '2020-05-24 14:09:45.204277');
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_adminhod
+-- =====================================================
+-- Table: student_management_app_adminhod
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_adminhod`;
+
 CREATE TABLE `student_management_app_adminhod` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) NOT NULL,
@@ -310,16 +314,18 @@ CREATE TABLE `student_management_app_adminhod` (
   CONSTRAINT `student_management_a_admin_id_2d75304f_fk_student_m` FOREIGN KEY (`admin_id`) REFERENCES `student_management_app_customuser` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_adminhod`
-LOCK TABLES `student_management_app_adminhod` WRITE;
+-- Data for table `student_management_app_adminhod`
 INSERT INTO `student_management_app_adminhod` (`id`, `created_at`, `updated_at`, `admin_id`) VALUES
 (1, '2020-04-12 08:16:07.103523', '2020-04-12 08:16:07.103523', 1),
 (2, '2025-10-20 09:22:58.742662', '2025-10-20 09:22:58.742685', 16);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_attendance
+-- =====================================================
+-- Table: student_management_app_attendance
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_attendance`;
+
 CREATE TABLE `student_management_app_attendance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `attendance_date` date NOT NULL,
@@ -334,8 +340,7 @@ CREATE TABLE `student_management_app_attendance` (
   CONSTRAINT `student_management_a_subject_id_id_9ae82fd0_fk_student_m` FOREIGN KEY (`subject_id_id`) REFERENCES `student_management_app_subjects` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_attendance`
-LOCK TABLES `student_management_app_attendance` WRITE;
+-- Data for table `student_management_app_attendance`
 INSERT INTO `student_management_app_attendance` (`id`, `attendance_date`, `created_at`, `updated_at`, `session_year_id_id`, `subject_id_id`) VALUES
 (4, '2020-04-12', '2020-04-12 11:49:25.282944', '2020-04-12 11:49:25.282944', 1, 1),
 (5, '2020-04-12', '2020-04-12 11:49:51.034169', '2020-04-12 11:49:51.034169', 1, 2),
@@ -350,11 +355,14 @@ INSERT INTO `student_management_app_attendance` (`id`, `attendance_date`, `creat
 (14, '2020-05-17', '2020-05-07 14:31:31.654667', '2020-05-07 14:31:31.654667', 1, 1),
 (15, '2020-05-10', '2020-05-07 14:39:11.790480', '2020-05-07 14:39:11.790480', 1, 2),
 (16, '2020-05-15', '2020-05-10 14:10:11.214771', '2020-05-10 14:10:11.214771', 1, 1);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_attendancereport
+-- =====================================================
+-- Table: student_management_app_attendancereport
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_attendancereport`;
+
 CREATE TABLE `student_management_app_attendancereport` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `status` tinyint(1) NOT NULL,
@@ -369,8 +377,7 @@ CREATE TABLE `student_management_app_attendancereport` (
   CONSTRAINT `student_management_a_student_id_id_5a58ceea_fk_student_m` FOREIGN KEY (`student_id_id`) REFERENCES `student_management_app_students` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_attendancereport`
-LOCK TABLES `student_management_app_attendancereport` WRITE;
+-- Data for table `student_management_app_attendancereport`
 INSERT INTO `student_management_app_attendancereport` (`id`, `status`, `created_at`, `updated_at`, `attendance_id_id`, `student_id_id`) VALUES
 (3, 1, '2020-04-12 11:49:25.305883', '2020-04-12 11:49:25.305883', 4, 2),
 (4, 0, '2020-04-12 11:49:25.309871', '2020-04-12 11:49:25.309871', 4, 3),
@@ -394,11 +401,14 @@ INSERT INTO `student_management_app_attendancereport` (`id`, `status`, `created_
 (22, 0, '2020-05-07 14:39:12.120941', '2020-05-07 14:39:12.120941', 15, 3),
 (23, 1, '2020-05-10 14:10:11.238705', '2020-05-10 14:10:11.238705', 16, 2),
 (24, 1, '2020-05-10 14:10:11.242699', '2020-05-10 14:10:11.242699', 16, 3);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_courses
+-- =====================================================
+-- Table: student_management_app_courses
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_courses`;
+
 CREATE TABLE `student_management_app_courses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `course_name` varchar(255) NOT NULL,
@@ -407,8 +417,7 @@ CREATE TABLE `student_management_app_courses` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_courses`
-LOCK TABLES `student_management_app_courses` WRITE;
+-- Data for table `student_management_app_courses`
 INSERT INTO `student_management_app_courses` (`id`, `course_name`, `created_at`, `updated_at`) VALUES
 (1, 'Cử nhân Tin học Ứng dụng', '2020-04-12 08:37:10.306437', '2020-04-12 08:37:10.306437'),
 (2, 'Cử nhân Quản trị Kinh doanh', '2020-04-12 08:37:14.880271', '2020-04-12 08:37:14.880271'),
@@ -428,11 +437,14 @@ INSERT INTO `student_management_app_courses` (`id`, `course_name`, `created_at`,
 (16, 'Ngôn ngữ Anh', '2025-10-20 09:46:01.939008', '2025-10-20 09:46:01.939026'),
 (17, 'Luật', '2025-10-20 09:46:01.942200', '2025-10-20 09:46:01.942223'),
 (18, 'Toán học', '2025-10-20 09:46:01.945065', '2025-10-20 09:46:01.945083');
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_customuser
+-- =====================================================
+-- Table: student_management_app_customuser
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_customuser`;
+
 CREATE TABLE `student_management_app_customuser` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `password` varchar(128) NOT NULL,
@@ -450,49 +462,51 @@ CREATE TABLE `student_management_app_customuser` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_customuser`
-LOCK TABLES `student_management_app_customuser` WRITE;
+-- Data for table `student_management_app_customuser`
 INSERT INTO `student_management_app_customuser` (`id`, `password`, `last_login`, `is_superuser`, `username`, `first_name`, `last_name`, `email`, `is_staff`, `is_active`, `date_joined`, `user_type`) VALUES
-(1, 'pbkdf2_sha256$600000$qZFNwj4k7F2rkedyDLoXAL$6GXJVwsYwMcPjYo6PrfHJpx2kTeJikGqZYFUkG8nKV0=', '2020-05-25 17:03:59.941387', 1, 'admin', 'Admin First 1', 'Admin Last 2', 'admin@gmail.com', 1, 1, '2020-04-12 08:16:06.881413', '1'),
-(2, 'pbkdf2_sha256$600000$5oQvga9MQ96tTUsGrzZxeE$vTWhNJEaGjuJy/BLx9MEAOU+gcHJNmcaRs1e1F+zasY=', '2025-10-20 11:25:13.861991', 0, 'staff1', 'Staff First 1 1', 'Staff One Address 3 1', 'staff1@gmail.com', 0, 1, '2020-04-12 08:38:05.596253', '2'),
-(3, 'pbkdf2_sha256$600000$bOiWGDBOs9KU1UMimsDdLQ$pTMSt1//Ql0avbCjkZRyYk/9XtXDJe8ND2bldJ7s9mc=', '2020-05-07 10:20:47.673389', 0, 'staff2', 'Staff', 'Two', 'staff2@gmail.com', 0, 1, '2020-04-12 08:38:29.881934', '2'),
-(4, 'pbkdf2_sha256$600000$6M66JtSCKgy5w7ODbhJ2Uu$NzyoA7/C4TqeVF8kvHVA7T6Rx0qpD5BDJtv9yxpco58=', NULL, 0, 'staff3', 'Staff', 'Three', 'staff3@gmail.com', 0, 1, '2020-04-12 08:38:51.139627', '2'),
-(5, 'pbkdf2_sha256$600000$a9EfTZs06mSxVzHdwwV0cD$QX+GlrSxylntkflXra7Rjii7NL9jXzZ3q/tgpmOy1IQ=', NULL, 0, 'staff4', 'Staff', 'Four', 'staff4@gmail.com', 0, 1, '2020-04-12 08:39:16.924296', '2'),
-(13, 'pbkdf2_sha256$1000000$awVNp4ddznXHp7Jw1Wlb4z$A6tfj0shrlsFa8LlWXMltnN5BvOOnMoOsj94dZQ1ZiU=', '2020-05-05 07:53:44.763359', 0, 'student1', 'Student', 'One', 'student1@gmail.com', 0, 1, '2020-04-12 08:59:08.372628', '3'),
-(14, 'pbkdf2_sha256$1000000$uBdpyZEKpunOXtuAKuTWEd$jXVVTL1R7gfHwH2+q9czLBmdp55XKzPKs0XpC/AwhGs=', '2020-05-26 08:14:12.403741', 0, 'student2', 'student First', 'Two Last', 'student2@gmail.com', 0, 1, '2020-04-12 09:00:14.371150', '3'),
-(16, 'pbkdf2_sha256$600000$SX8sVij2CJA8hQo8ML5r2g$4lhBbDgmsdxdOxdsOIPCoeWedvqIynMaxmeXp7Ua1B4=', '2025-10-20 09:42:47.137218', 1, 'admin_test', 'Admin', 'Test', 'admin_test@gmail.com', 1, 1, '2025-10-20 09:22:58.485498', '1'),
-(17, 'pbkdf2_sha256$600000$bYPi2YCylGwVfCw9WTP7Gg$V+vunNX5w5dDjiUG+/8uJy7vb2owTQk0zaseI35k2sA=', '2025-10-20 09:25:01.410642', 0, 'lecturer_test', 'Lecturer', 'Test', 'lecturer_test@gmail.com', 0, 1, '2025-10-20 09:22:58.746213', '2'),
-(18, 'pbkdf2_sha256$600000$BHFwIGi2q9Ttze7elLE6pN$M+k2LlsYry92i9ToY8Wxivet72z8UGzW/4nIB1lbfgM=', '2025-10-20 09:26:09.956157', 0, 'student_test', 'Student', 'Test', 'student_test@gmail.com', 0, 1, '2025-10-20 09:22:59.016949', '3'),
-(19, 'pbkdf2_sha256$600000$viauaWMYxkJKO18dz3VITB$BDvC+ucNdwB2ADk4NiU1jwmEMNqpXSUYYtSN+N64r5Q=', '2025-10-20 10:29:42.627616', 0, 'student_01', 'Hoàng Hoàng', 'Hoa', 'student01@example.com', 0, 1, '2025-10-20 10:04:24.153935', '3'),
-(20, 'pbkdf2_sha256$600000$diPTBzb7BQIei1XugIgrVb$+EU/3tqenBWMRSW2K6r2rWe639lKx0wi+HujBW6fosk=', NULL, 0, 'student_02', 'Vũ Hữu', 'Xuân', 'student02@example.com', 0, 1, '2025-10-20 10:04:24.413740', '3'),
-(21, 'pbkdf2_sha256$600000$auTspLrupCm1flhpWpocQV$04biAVhq0QgNjOmovfnx8xyAX7tCFk+N1TXm+aMExLw=', NULL, 0, 'student_03', 'Hồ Hồng', 'Quân', 'student03@example.com', 0, 1, '2025-10-20 10:04:24.669931', '3'),
-(22, 'pbkdf2_sha256$600000$Yg7KUgIWxF0njm8rRnuLFl$UxX2fVwfwDZk/jF5hQm2fKNTGtZng/mvLoex5fhcRTs=', NULL, 0, 'student_04', 'Đỗ Quốc', 'Chi', 'student04@example.com', 0, 1, '2025-10-20 10:04:24.927174', '3'),
-(23, 'pbkdf2_sha256$600000$wbxN4ou6oVZFpu6MyB6sQr$ddkxBPv7b773LtTGVkw1jeTChsDyCddg9Xx2Zzc6wyI=', NULL, 0, 'student_05', 'Phan Khánh', 'Nhung', 'student05@example.com', 0, 1, '2025-10-20 10:04:25.185963', '3'),
-(24, 'pbkdf2_sha256$600000$8qbk7zB70p0zZ0sx4yUjiR$7AKyWqBPf6b97wWjOUiXVYnJrZkxr7Oax8tDUg3eosc=', NULL, 0, 'student_06', 'Đỗ Hồng', 'Tú', 'student06@example.com', 0, 1, '2025-10-20 10:04:25.455828', '3'),
-(25, 'pbkdf2_sha256$600000$5J6CNBSJCE883Kbio0eHTI$20f7htPHs1f6nPGcCfmGrOYodiHAyyefOGgp8gVx9iA=', NULL, 0, 'student_07', 'Hồ Văn', 'Bảo', 'student07@example.com', 0, 1, '2025-10-20 10:04:25.713227', '3'),
-(26, 'pbkdf2_sha256$600000$Ey2AU1BNOKW15EK26LjDT9$YS5oakSfeqX5C5RXy66iasrrFFt4or0JXQtZnjqQdBQ=', NULL, 0, 'student_08', 'Hoàng Khánh', 'Xuân', 'student08@example.com', 0, 1, '2025-10-20 10:04:25.970490', '3'),
-(27, 'pbkdf2_sha256$600000$EXLWYcFfEdQt9zNyhVL1bv$NN76aZI+MTCnlyHwuyULlDe6VTREpjs+5DPSGD2q/lw=', NULL, 0, 'student_09', 'Vũ Thanh', 'Hoa', 'student09@example.com', 0, 1, '2025-10-20 10:04:26.220476', '3'),
-(28, 'pbkdf2_sha256$600000$MXA3Qd8ITU7X8sHicUnT6c$4Otm+B3GahW2GbeekI5mtq1+v6ZMMksMATqAildqz2k=', NULL, 0, 'student_10', 'Hồ Quốc', 'Hằng', 'student10@example.com', 0, 1, '2025-10-20 10:04:26.471851', '3'),
-(29, 'pbkdf2_sha256$600000$j5RtZB4OQJVmHaoKj4Ecxk$KfujqZjGS5HGObYyUUHasV2siQm/cxGHukIHuA8rjdM=', NULL, 0, 'student_14', 'Phan Như', 'Uyên', 'student14@example.com', 0, 1, '2025-10-20 10:16:40.268484', '3'),
-(30, 'pbkdf2_sha256$600000$yda4PCXdHXWjfk9lpAuTMJ$p6PQOQ3a4tRnqaEQp/fbkAcMh4L3UBvEnis5XFkhi7g=', NULL, 0, 'student_15', 'Trần Thanh', 'Hằng', 'student15@example.com', 0, 1, '2025-10-20 10:16:40.535772', '3'),
-(31, 'pbkdf2_sha256$600000$5UumKeCSeWNRSDGcV5xamn$T8iv1WEBImH1YNB89y4NBbrdIXkQ02g0jl/8DE4inpA=', NULL, 0, 'student_16', 'Hoàng Anh', 'Linh', 'student16@example.com', 0, 1, '2025-10-20 10:16:40.788686', '3'),
-(32, 'pbkdf2_sha256$600000$BYswdgloWPNsUcOkQ3NuY3$ryTau1MhrA9xZzJyZrfDsPtpBHAG5TEChOP6meSQ9e8=', NULL, 0, 'student_17', 'Võ Như', 'Yến', 'student17@example.com', 0, 1, '2025-10-20 10:16:41.042741', '3'),
-(33, 'pbkdf2_sha256$600000$3UUw6WHsnBMeQKvIMsqfvc$Piaja4TSX5NsUx167pfGbYdppukysGye/DPw23Ypp7o=', NULL, 0, 'student_18', 'Võ Bảo', 'Anh', 'student18@example.com', 0, 1, '2025-10-20 10:16:41.330354', '3'),
-(34, 'pbkdf2_sha256$600000$rGdbWu9GYtIgvmTc1JXAvA$sOLllT6UNBlGhlTzIcfwRWo6CwUWypfYjO0x2U/pXqY=', NULL, 0, 'student_19', 'Huỳnh Mai', 'Hoa', 'student19@example.com', 0, 1, '2025-10-20 10:16:41.597705', '3'),
-(35, 'pbkdf2_sha256$600000$tQPJf9VQFEX6RJflyoHZkl$v2EkiuU3c8Os8Kqj3YZ4QKYzfLgJCqOMnFwvFa6Nlns=', NULL, 0, 'student_20', 'Tô Bảo', 'Oanh', 'student20@example.com', 0, 1, '2025-10-20 10:16:41.849550', '3'),
-(36, 'pbkdf2_sha256$600000$Xn9dwhdxoNhRovvXKC8CIu$JRs5V/BI46e92gXFQjMueStnAjFPki7LEKGkryT8aCU=', NULL, 0, 'student_21', 'Lý Đức', 'Cường', 'student21@example.com', 0, 1, '2025-10-20 10:16:42.114250', '3'),
-(37, 'pbkdf2_sha256$600000$myHhBtTJA83bUA8gn7Hi6x$Qb26jmL5p9H9eTvcXJLjoNXopz4N/7UdJdSKPCChFNk=', NULL, 0, 'student_22', 'Dương Hoàng', 'Khánh', 'student22@example.com', 0, 1, '2025-10-20 10:16:42.381138', '3'),
-(38, 'pbkdf2_sha256$600000$q60JhGOxMHm41m2B4lmB27$HGLnkhphMSA/RpbV6lczV2DJjIPpfb5VUYnu9ILmLP8=', NULL, 0, 'student_23', 'Đinh Tuấn', 'Em', 'student23@example.com', 0, 1, '2025-10-20 10:16:42.642666', '3'),
-(39, 'pbkdf2_sha256$600000$eDia7FhirmNrBPcbA3BqAl$GRDJ5kV1MCPxSpBHIno5lNAVZhv95HVLUJbCkusDQbg=', NULL, 0, 'student_24', 'Dương Phương', 'Vân', 'student24@example.com', 0, 1, '2025-10-20 10:16:42.914174', '3'),
-(40, 'pbkdf2_sha256$600000$Y4GEduptEp7hJEu1gh5Dp1$z10LL5CvFEGRWqQrVCYpedgHXMsYwepKRFQdGN+HqY8=', NULL, 0, 'student_25', 'Nguyễn Thanh', 'Hà', 'student25@example.com', 0, 1, '2025-10-20 10:20:56.944934', '3'),
-(41, 'pbkdf2_sha256$600000$pW3iKZAl0UYFvYfl2zVJhC$hOaMFgSP3FrKq0IfA+gEGZoIZwcoK7r3xTnHNNS5j9o=', NULL, 0, 'student_26', 'Lê Đức', 'Em', 'student26@example.com', 0, 1, '2025-10-20 10:21:24.509533', '3'),
-(42, 'pbkdf2_sha256$600000$KVpxAfT3wlr4CAUn5Oli1c$yQTUFgCjhSntbaL70yAzbFR8tLP6nNiAHacfakE81SI=', NULL, 0, 'student_27', 'Lê Đức', 'Dũng', 'student27@example.com', 0, 1, '2025-10-20 10:21:30.633744', '3'),
-(43, 'pbkdf2_sha256$600000$L5gRQ1XEp7cRA2yaeAepJk$2bEHxykWU8wj76nfFrOkE1UfQ4drp4uVrCyb4jzeP4I=', NULL, 0, 'student_28', 'Hoàng Thanh', 'Cường', 'student28@example.com', 0, 1, '2025-10-20 10:22:27.638836', '3');
-UNLOCK TABLES;
+(1, 'pbkdf2_sha256$600000$H2TGL8idjsIeQZqsRFuloH$9+MuDpFzy0jeyWkml2/LZWOxKWgDZBKF3qz5VnvDrj8=', '2020-05-25 17:03:59.941387', 1, 'admin01@uni.com', 'Admin First 1', 'Admin Last 2', 'admin01@uni.com', 1, 1, '2020-04-12 08:16:06.881413', '1'),
+(2, 'pbkdf2_sha256$600000$lkj3etzhhiseM4RizitLZh$8SgDMUXYinfIRFxy+7HkAOYU1BAEvlaoNTF/YIwCuW4=', '2025-10-20 12:25:02.176645', 0, 'dmdat@uni.com', 'ThS. Đặng Minh', 'Đạt', 'dmdat@uni.com', 0, 1, '2020-04-12 08:38:05.596253', '2'),
+(3, 'pbkdf2_sha256$600000$340tGyuDE3yzkKHwNG9Wwc$3vPcljEgkjO8y3QBsEMOhuJZTRR239Hwb+5KgWFi7kA=', '2020-05-07 10:20:47.673389', 0, 'vhbinh@uni.com', 'TS. Võ Hữu', 'Bình', 'vhbinh@uni.com', 0, 1, '2020-04-12 08:38:29.881934', '2'),
+(4, 'pbkdf2_sha256$600000$AFHLyrP7RbQptBLXfRhiWL$tBuR/AXv7hgJzr+NWgXhBc/RQ/4Ol6TtfrrLNXO0RGo=', NULL, 0, 'hxhung@uni.com', 'TS. Huỳnh Xuân', 'Hùng', 'hxhung@uni.com', 0, 1, '2020-04-12 08:38:51.139627', '2'),
+(5, 'pbkdf2_sha256$600000$pmqsI3D1Tim4LQfPs0ySvX$z08kpkfRHok7dikZqhVJGfT+kEzpk7cDRXPx+6jBRkU=', NULL, 0, 'dhnga@uni.com', 'PGS.TS. Đặng Hà', 'Nga', 'dhnga@uni.com', 0, 1, '2020-04-12 08:39:16.924296', '2'),
+(13, 'pbkdf2_sha256$600000$GCgwMSbrtZoM0h78gklKvx$pK6HDCrHnVwMrwoj2oE8oz0+zAO6qLqrdxH6PiHiiBk=', '2020-05-05 07:53:44.763359', 0, 'sone@std.uni.com', 'Student', 'One', 'sone@std.uni.com', 0, 1, '2020-04-12 08:59:08.372628', '3'),
+(14, 'pbkdf2_sha256$600000$FvQRlmk2jhIZFYokq7600g$N/KxBTsnW5EgyB9XqY3eW0cvgQcC/uo/VA/OEwUwFqM=', '2020-05-26 08:14:12.403741', 0, 'sftlast@std.uni.com', 'student First', 'Two Last', 'sftlast@std.uni.com', 0, 1, '2020-04-12 09:00:14.371150', '3'),
+(16, 'pbkdf2_sha256$600000$wKk0T5YsWlospXCAMko3AN$eCG6eBdXN2/gubzi1qG8rq45xskAcvnoqK3AH4UzumA=', '2025-10-20 09:42:47.137218', 1, 'admin_test', 'Admin', 'Test', 'admin_test@gmail.com', 1, 1, '2025-10-20 09:22:58.485498', '1'),
+(17, 'pbkdf2_sha256$600000$0EGr5Ov4DeawL5h9BfZL0a$tEhStl2rrB8OEvj0XzaOOMWidOXCL+pMsWYAX2NfDyA=', '2025-10-20 09:25:01.410642', 0, 'ldphong@uni.com', 'TS. Lê Đức', 'Phong', 'ldphong@uni.com', 0, 1, '2025-10-20 09:22:58.746213', '2'),
+(18, 'pbkdf2_sha256$600000$JSut2Vt5tIdfTIhQd5YtqE$G81kJLBbwb1Z6zOd+tScUcjaUryU46iiRzLQHEbHoxY=', '2025-10-20 09:26:09.956157', 0, 'stest@std.uni.com', 'Student', 'Test', 'stest@std.uni.com', 0, 1, '2025-10-20 09:22:59.016949', '3'),
+(19, 'pbkdf2_sha256$600000$AzwOkIfpdK5LsP4YoCwTMW$2W8PTaufe+s5yqg26ILwxs7y5/D8LM06xzbCC/IEnWo=', '2025-10-20 10:29:42.627616', 0, 'hhhoa@std.uni.com', 'Hoàng Hoàng', 'Hoa', 'hhhoa@std.uni.com', 0, 1, '2025-10-20 10:04:24.153935', '3'),
+(20, 'pbkdf2_sha256$600000$x0LdgZg37jYhEUyzB5UBds$i7g1QRzZ51iv8fyOlZFOoYqK+T/lZbDBvmAW0tgIek4=', NULL, 0, 'vhxuan@std.uni.com', 'Vũ Hữu', 'Xuân', 'vhxuan@std.uni.com', 0, 1, '2025-10-20 10:04:24.413740', '3'),
+(21, 'pbkdf2_sha256$600000$9GFMu6YJfindzU5Th27zBv$c7su6fZtzvbCOngnVqKRIdGkUDqP5lypTFfAlMPDf9Y=', NULL, 0, 'hhquan@std.uni.com', 'Hồ Hồng', 'Quân', 'hhquan@std.uni.com', 0, 1, '2025-10-20 10:04:24.669931', '3'),
+(22, 'pbkdf2_sha256$600000$4Ig8W66Zq6yqFlrGfineLB$ftcHPXX/Vz2J1hsHXIZrjwqxTl6RjtWQUTdBN5iB5Uw=', NULL, 0, 'dqchi@std.uni.com', 'Đỗ Quốc', 'Chi', 'dqchi@std.uni.com', 0, 1, '2025-10-20 10:04:24.927174', '3'),
+(23, 'pbkdf2_sha256$600000$mZKSUNEHQbhgbVzCVRONaW$P6G1GfI67fMa6j+MnOgmaz+FsA6e6ZE9kpC567Vnchw=', NULL, 0, 'pknhung@std.uni.com', 'Phan Khánh', 'Nhung', 'pknhung@std.uni.com', 0, 1, '2025-10-20 10:04:25.185963', '3'),
+(24, 'pbkdf2_sha256$600000$FumNbAbUmF3nTRIUp9E0kO$3FQmQ4O4tSaeqjQSKAJxvGHE+cLlYrDtEHpAzbag9fk=', NULL, 0, 'dhtu@std.uni.com', 'Đỗ Hồng', 'Tú', 'dhtu@std.uni.com', 0, 1, '2025-10-20 10:04:25.455828', '3'),
+(25, 'pbkdf2_sha256$600000$XkNIapVnKM6U9Zth3uiL4D$zfwvy3XzQbysZ1o5QeWVfUWkAF+Nxar0xjyVRkCObaQ=', NULL, 0, 'hvbao@std.uni.com', 'Hồ Văn', 'Bảo', 'hvbao@std.uni.com', 0, 1, '2025-10-20 10:04:25.713227', '3'),
+(26, 'pbkdf2_sha256$600000$ukAM9bPH5pn7tcmYj3naJV$Um2hvojDQPlAudRqoqDQe4RrNrqWTkQENTnBjre9fyY=', NULL, 0, 'hkxuan@std.uni.com', 'Hoàng Khánh', 'Xuân', 'hkxuan@std.uni.com', 0, 1, '2025-10-20 10:04:25.970490', '3'),
+(27, 'pbkdf2_sha256$600000$5kIjWKrIKmtHIXCy2xJ4Bl$wMJwiX6z4mpnbvuvUSJV1thzY86nwugxLEF5t3C0HtY=', NULL, 0, 'vthoa@std.uni.com', 'Vũ Thanh', 'Hoa', 'vthoa@std.uni.com', 0, 1, '2025-10-20 10:04:26.220476', '3'),
+(28, 'pbkdf2_sha256$600000$fChgDxLgSeTueepJKHLkdV$LzPqOm1DyW1eyACl7N/BoS6sEvMz450dq9/T+8qkz3M=', NULL, 0, 'hqhang@std.uni.com', 'Hồ Quốc', 'Hằng', 'hqhang@std.uni.com', 0, 1, '2025-10-20 10:04:26.471851', '3'),
+(29, 'pbkdf2_sha256$600000$ampudEYuqnl9Uox1qGWlfe$uknCH+ssk2xLbaGqjXurMebYO5IZZ+vACCJZV2u08F0=', NULL, 0, 'pnuyen@std.uni.com', 'Phan Như', 'Uyên', 'pnuyen@std.uni.com', 0, 1, '2025-10-20 10:16:40.268484', '3'),
+(30, 'pbkdf2_sha256$600000$vgHogIfao2FHQsnHifQaCB$EUr0wR78U2isw4uIb+pCGVKb8JIMDwzVlvOPX9vQMOs=', NULL, 0, 'tthang@std.uni.com', 'Trần Thanh', 'Hằng', 'tthang@std.uni.com', 0, 1, '2025-10-20 10:16:40.535772', '3'),
+(31, 'pbkdf2_sha256$600000$i5UUEJmdlkvYXWrfHfi48Y$V6qUTE17g9TJ9TPZ3jrhiLeUKM7DC+cIUKYOHZSU7Q0=', NULL, 0, 'halinh@std.uni.com', 'Hoàng Anh', 'Linh', 'halinh@std.uni.com', 0, 1, '2025-10-20 10:16:40.788686', '3'),
+(32, 'pbkdf2_sha256$600000$aGRwZm0C62wA583XTOhHkP$UNAewMCgb7RCaQ48MYVk39Df31jQF2Tckv4oojUU9l0=', NULL, 0, 'vnyen@std.uni.com', 'Võ Như', 'Yến', 'vnyen@std.uni.com', 0, 1, '2025-10-20 10:16:41.042741', '3'),
+(33, 'pbkdf2_sha256$600000$P6keWwPQRbYfQJ1ManDcRH$Y6IgVLmEDjBHTvzP6SZ8lwVaUsUcN+IDJuijdyL7a2s=', NULL, 0, 'vbanh@std.uni.com', 'Võ Bảo', 'Anh', 'vbanh@std.uni.com', 0, 1, '2025-10-20 10:16:41.330354', '3'),
+(34, 'pbkdf2_sha256$600000$xa7Yx0mTAhLCQjgBlEoWN1$ohIqEw9mJBMY6ZaofWboyJ0iTerGJBWoszK5hSO97Xc=', NULL, 0, 'hmhoa@std.uni.com', 'Huỳnh Mai', 'Hoa', 'hmhoa@std.uni.com', 0, 1, '2025-10-20 10:16:41.597705', '3'),
+(35, 'pbkdf2_sha256$600000$4ceOhjvQUaUPclgEPcNc6R$+/xADOArRTXx/wO9FW2rsxGi/FXVDOrRkajbFeKF4lg=', NULL, 0, 'tboanh@std.uni.com', 'Tô Bảo', 'Oanh', 'tboanh@std.uni.com', 0, 1, '2025-10-20 10:16:41.849550', '3'),
+(36, 'pbkdf2_sha256$600000$DTM6IMwN5gc5LIoU4mFood$+nNkKzEsXVKC479RSW6zj+9wqVKSZRnifvBMc6LtnEM=', NULL, 0, 'ldcuong@std.uni.com', 'Lý Đức', 'Cường', 'ldcuong@std.uni.com', 0, 1, '2025-10-20 10:16:42.114250', '3'),
+(37, 'pbkdf2_sha256$600000$3ojCgHSHG7kR6nUZAszZxU$6B6Yswvl7FFNc5UTodj3OT0gLw6tArr+rhNHz9po0wQ=', NULL, 0, 'dhkhanh@std.uni.com', 'Dương Hoàng', 'Khánh', 'dhkhanh@std.uni.com', 0, 1, '2025-10-20 10:16:42.381138', '3'),
+(38, 'pbkdf2_sha256$600000$cNQA92eSTtVWr0L08Nqhsu$MSJK8J2oF48FOj6ydVD38wd2llAhg6+YUnZhCWSvJBM=', NULL, 0, 'dtem@std.uni.com', 'Đinh Tuấn', 'Em', 'dtem@std.uni.com', 0, 1, '2025-10-20 10:16:42.642666', '3'),
+(39, 'pbkdf2_sha256$600000$zahJOZp9ec9m59pIogCXK9$G/qsq1H4M8PqGg3sHt1yo8oTE4Q1f2WUWLaxPyG/VH0=', NULL, 0, 'dpvan@std.uni.com', 'Dương Phương', 'Vân', 'dpvan@std.uni.com', 0, 1, '2025-10-20 10:16:42.914174', '3'),
+(40, 'pbkdf2_sha256$600000$wgsR0afL2aa869vnYsrjHl$Zr/QnirbwVTl2eJWEymZhX0pOPgmCJhGWgp/Wi5dU7o=', NULL, 0, 'ntha@std.uni.com', 'Nguyễn Thanh', 'Hà', 'ntha@std.uni.com', 0, 1, '2025-10-20 10:20:56.944934', '3'),
+(41, 'pbkdf2_sha256$600000$FcNehryfL5ifiz5DmWLuS1$DQzDv2A6CH+lOHkuhI44KRDzOqhxw8KPFl/BUNbm4+M=', NULL, 0, 'ldem@std.uni.com', 'Lê Đức', 'Em', 'ldem@std.uni.com', 0, 1, '2025-10-20 10:21:24.509533', '3'),
+(42, 'pbkdf2_sha256$600000$UZd7a9mGE0DiJtTpM134iR$PMngdZgh1bUdlm7f+486BFLpNK+GYanArd8QH83Q4GA=', NULL, 0, 'lddung@std.uni.com', 'Lê Đức', 'Dũng', 'lddung@std.uni.com', 0, 1, '2025-10-20 10:21:30.633744', '3'),
+(43, 'pbkdf2_sha256$600000$3CHN1PnP7Te6xcxUqXNqcV$YDxWqeqU9HeO/OXWT11BL+vkTLFmKzAVs3L6kbMIwjE=', NULL, 0, 'htcuong@std.uni.com', 'Hoàng Thanh', 'Cường', 'htcuong@std.uni.com', 0, 1, '2025-10-20 10:22:27.638836', '3');
 
 
--- Bảng: student_management_app_customuser_groups
+-- =====================================================
+-- Table: student_management_app_customuser_groups
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_customuser_groups`;
+
 CREATE TABLE `student_management_app_customuser_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `customuser_id` int(11) NOT NULL,
@@ -506,8 +520,12 @@ CREATE TABLE `student_management_app_customuser_groups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: student_management_app_customuser_user_permissions
+-- =====================================================
+-- Table: student_management_app_customuser_user_permissions
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_customuser_user_permissions`;
+
 CREATE TABLE `student_management_app_customuser_user_permissions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `customuser_id` int(11) NOT NULL,
@@ -521,8 +539,12 @@ CREATE TABLE `student_management_app_customuser_user_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: student_management_app_feedbackstaffs
+-- =====================================================
+-- Table: student_management_app_feedbackstaffs
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_feedbackstaffs`;
+
 CREATE TABLE `student_management_app_feedbackstaffs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `feedback` longtext NOT NULL,
@@ -535,16 +557,18 @@ CREATE TABLE `student_management_app_feedbackstaffs` (
   CONSTRAINT `student_management_a_staff_id_id_6f22a616_fk_student_m` FOREIGN KEY (`staff_id_id`) REFERENCES `student_management_app_staffs` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_feedbackstaffs`
-LOCK TABLES `student_management_app_feedbackstaffs` WRITE;
+-- Data for table `student_management_app_feedbackstaffs`
 INSERT INTO `student_management_app_feedbackstaffs` (`id`, `feedback`, `feedback_reply`, `created_at`, `updated_at`, `staff_id_id`) VALUES
 (1, 'Testing Feedback Message', 'I will Contact You', '2020-05-02 13:39:42.882248', '2020-05-02 13:39:42.882248', 1),
 (2, 'New Testing', 'Thanks', '2020-05-02 13:40:58.015222', '2020-05-02 13:40:58.015222', 1);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_feedbackstudent
+-- =====================================================
+-- Table: student_management_app_feedbackstudent
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_feedbackstudent`;
+
 CREATE TABLE `student_management_app_feedbackstudent` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `feedback` longtext NOT NULL,
@@ -557,16 +581,18 @@ CREATE TABLE `student_management_app_feedbackstudent` (
   CONSTRAINT `student_management_a_student_id_id_099e23ad_fk_student_m` FOREIGN KEY (`student_id_id`) REFERENCES `student_management_app_students` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_feedbackstudent`
-LOCK TABLES `student_management_app_feedbackstudent` WRITE;
+-- Data for table `student_management_app_feedbackstudent`
 INSERT INTO `student_management_app_feedbackstudent` (`id`, `feedback`, `feedback_reply`, `created_at`, `updated_at`, `student_id_id`) VALUES
 (1, 'Need to Contact', 'Thanks for Message', '2020-05-15 09:47:31.700892', '2020-05-15 09:47:31.700892', 3),
 (2, 'Need to Contact', 'We Will Contact You', '2020-05-15 09:47:31.700892', '2020-05-15 09:47:31.700892', 3);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_leavereportstaff
+-- =====================================================
+-- Table: student_management_app_leavereportstaff
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_leavereportstaff`;
+
 CREATE TABLE `student_management_app_leavereportstaff` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `leave_date` varchar(255) NOT NULL,
@@ -580,17 +606,19 @@ CREATE TABLE `student_management_app_leavereportstaff` (
   CONSTRAINT `student_management_a_staff_id_id_c7710cd5_fk_student_m` FOREIGN KEY (`staff_id_id`) REFERENCES `student_management_app_staffs` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_leavereportstaff`
-LOCK TABLES `student_management_app_leavereportstaff` WRITE;
+-- Data for table `student_management_app_leavereportstaff`
 INSERT INTO `student_management_app_leavereportstaff` (`id`, `leave_date`, `leave_message`, `leave_status`, `created_at`, `updated_at`, `staff_id_id`) VALUES
 (1, '2020-05-17', 'Borther Marriage', 1, '2020-05-02 13:20:13.981434', '2020-05-02 13:20:13.981434', 1),
 (2, '2020-05-24', 'Sister Marriage', 2, '2020-05-02 13:21:20.513330', '2020-05-02 13:21:20.513330', 1),
 (3, '2020-05-31', 'Just Leave', 0, '2020-05-02 13:31:45.231819', '2020-05-02 13:31:45.231819', 1);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_leavereportstudent
+-- =====================================================
+-- Table: student_management_app_leavereportstudent
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_leavereportstudent`;
+
 CREATE TABLE `student_management_app_leavereportstudent` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `leave_date` varchar(255) NOT NULL,
@@ -604,17 +632,19 @@ CREATE TABLE `student_management_app_leavereportstudent` (
   CONSTRAINT `student_management_a_student_id_id_9ea5372c_fk_student_m` FOREIGN KEY (`student_id_id`) REFERENCES `student_management_app_students` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_leavereportstudent`
-LOCK TABLES `student_management_app_leavereportstudent` WRITE;
+-- Data for table `student_management_app_leavereportstudent`
 INSERT INTO `student_management_app_leavereportstudent` (`id`, `leave_date`, `leave_message`, `leave_status`, `created_at`, `updated_at`, `student_id_id`) VALUES
 (1, '2020-05-16', 'Formal Leave', 1, '2020-05-15 09:46:09.709208', '2020-05-15 09:46:09.709208', 3),
 (2, '2020-05-20', 'Leave', 2, '2020-05-15 09:46:20.765721', '2020-05-15 09:46:20.765721', 3),
 (3, '2020-05-20', 'Leave', 0, '2020-05-15 09:46:20.765721', '2020-05-15 09:46:20.765721', 3);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_notificationstaffs
+-- =====================================================
+-- Table: student_management_app_notificationstaffs
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_notificationstaffs`;
+
 CREATE TABLE `student_management_app_notificationstaffs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `message` longtext NOT NULL,
@@ -627,8 +657,12 @@ CREATE TABLE `student_management_app_notificationstaffs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: student_management_app_notificationstudent
+-- =====================================================
+-- Table: student_management_app_notificationstudent
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_notificationstudent`;
+
 CREATE TABLE `student_management_app_notificationstudent` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `message` longtext NOT NULL,
@@ -641,8 +675,12 @@ CREATE TABLE `student_management_app_notificationstudent` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Bảng: student_management_app_onlineclassroom
+-- =====================================================
+-- Table: student_management_app_onlineclassroom
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_onlineclassroom`;
+
 CREATE TABLE `student_management_app_onlineclassroom` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `room_name` varchar(255) NOT NULL,
@@ -662,8 +700,12 @@ CREATE TABLE `student_management_app_onlineclassroom` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
--- Bảng: student_management_app_schedule
+-- =====================================================
+-- Table: student_management_app_schedule
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_schedule`;
+
 CREATE TABLE `student_management_app_schedule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `weekday` int(11) NOT NULL,
@@ -681,8 +723,7 @@ CREATE TABLE `student_management_app_schedule` (
   CONSTRAINT `student_management_a_subject_id_id_2aa02d4c_fk_student_m` FOREIGN KEY (`subject_id_id`) REFERENCES `student_management_app_subjects` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dữ liệu cho bảng `student_management_app_schedule`
-LOCK TABLES `student_management_app_schedule` WRITE;
+-- Data for table `student_management_app_schedule`
 INSERT INTO `student_management_app_schedule` (`id`, `weekday`, `start_time`, `end_time`, `room`, `created_at`, `updated_at`, `session_year_id_id`, `subject_id_id`) VALUES
 (144, 2, '13:00:00', '16:50:00', 'B207', '2025-10-20 10:58:23.643225', '2025-10-20 10:58:23.643240', 1, 15),
 (145, 5, '8:00:00', '11:50:00', 'A109', '2025-10-20 10:58:23.696302', '2025-10-20 10:58:23.696318', 1, 17),
@@ -703,11 +744,14 @@ INSERT INTO `student_management_app_schedule` (`id`, `weekday`, `start_time`, `e
 (160, 3, '17:00:00', '19:50:00', 'C302', '2025-10-20 10:58:24.594239', '2025-10-20 10:58:24.594254', 1, 16),
 (161, 2, '17:00:00', '19:50:00', 'B205', '2025-10-20 10:58:24.816481', '2025-10-20 10:58:24.816494', 1, 18),
 (162, 0, '17:00:00', '19:50:00', 'B212', '2025-10-20 10:58:25.040031', '2025-10-20 10:58:25.040044', 1, 19);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_sessionyearmodel
+-- =====================================================
+-- Table: student_management_app_sessionyearmodel
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_sessionyearmodel`;
+
 CREATE TABLE `student_management_app_sessionyearmodel` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `session_start_year` date NOT NULL,
@@ -715,17 +759,19 @@ CREATE TABLE `student_management_app_sessionyearmodel` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_sessionyearmodel`
-LOCK TABLES `student_management_app_sessionyearmodel` WRITE;
+-- Data for table `student_management_app_sessionyearmodel`
 INSERT INTO `student_management_app_sessionyearmodel` (`id`, `session_start_year`, `session_end_year`) VALUES
 (1, '2020-01-01', '2023-01-01'),
 (2, '2020-01-01', '2022-01-01'),
 (3, '2024-01-01', '2024-12-31');
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_staffs
+-- =====================================================
+-- Table: student_management_app_staffs
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_staffs`;
+
 CREATE TABLE `student_management_app_staffs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `address` longtext NOT NULL,
@@ -738,19 +784,21 @@ CREATE TABLE `student_management_app_staffs` (
   CONSTRAINT `student_management_a_admin_id_5bfdd57d_fk_student_m` FOREIGN KEY (`admin_id`) REFERENCES `student_management_app_customuser` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_staffs`
-LOCK TABLES `student_management_app_staffs` WRITE;
+-- Data for table `student_management_app_staffs`
 INSERT INTO `student_management_app_staffs` (`id`, `address`, `created_at`, `updated_at`, `admin_id`, `fcm_token`) VALUES
 (1, 'Staff One Address 1', '2020-04-12 08:38:05.762808', '2020-04-12 08:38:05.762808', 2, ''),
 (2, 'Staff Two Address', '2020-04-12 08:38:30.048488', '2020-04-12 08:38:30.049488', 3, ''),
 (3, 'Staff Three Address', '2020-04-12 08:38:51.316112', '2020-04-12 08:38:51.316112', 4, ''),
 (4, 'Staff Four Address', '2020-04-12 08:39:17.451888', '2020-04-12 08:39:17.451888', 5, ''),
 (5, 'Test Address', '2025-10-20 09:22:59.012272', '2025-10-20 09:22:59.012286', 17, '');
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_studentenrollment
+-- =====================================================
+-- Table: student_management_app_studentenrollment
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_studentenrollment`;
+
 CREATE TABLE `student_management_app_studentenrollment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `enrollment_date` datetime(6) NOT NULL,
@@ -769,8 +817,7 @@ CREATE TABLE `student_management_app_studentenrollment` (
   CONSTRAINT `student_management_a_subject_id_id_f8c3ec2a_fk_student_m` FOREIGN KEY (`subject_id_id`) REFERENCES `student_management_app_subjects` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1702 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dữ liệu cho bảng `student_management_app_studentenrollment`
-LOCK TABLES `student_management_app_studentenrollment` WRITE;
+-- Data for table `student_management_app_studentenrollment`
 INSERT INTO `student_management_app_studentenrollment` (`id`, `enrollment_date`, `is_active`, `created_at`, `updated_at`, `session_year_id_id`, `student_id_id`, `subject_id_id`) VALUES
 (1531, '2025-10-20 10:58:23.262207', 1, '2025-10-20 10:58:23.262240', '2025-10-20 10:58:23.262250', 1, 2, 5),
 (1532, '2025-10-20 10:58:23.264092', 1, '2025-10-20 10:58:23.264115', '2025-10-20 10:58:23.264123', 1, 2, 9),
@@ -871,8 +918,7 @@ INSERT INTO `student_management_app_studentenrollment` (`id`, `enrollment_date`,
 (1627, '2025-10-20 10:58:23.445523', 1, '2025-10-20 10:58:23.445544', '2025-10-20 10:58:23.445550', 1, 17, 7),
 (1628, '2025-10-20 10:58:23.447491', 1, '2025-10-20 10:58:23.447505', '2025-10-20 10:58:23.447510', 1, 17, 5),
 (1629, '2025-10-20 10:58:23.449261', 1, '2025-10-20 10:58:23.449275', '2025-10-20 10:58:23.449282', 1, 17, 15),
-(1630, '2025-10-20 10:58:23.452203', 1, '2025-10-20 10:58:23.452222', '2025-10-20 10:58:23.452228', 1, 18, 19);
-INSERT INTO `student_management_app_studentenrollment` (`id`, `enrollment_date`, `is_active`, `created_at`, `updated_at`, `session_year_id_id`, `student_id_id`, `subject_id_id`) VALUES
+(1630, '2025-10-20 10:58:23.452203', 1, '2025-10-20 10:58:23.452222', '2025-10-20 10:58:23.452228', 1, 18, 19),
 (1631, '2025-10-20 10:58:23.454243', 1, '2025-10-20 10:58:23.454263', '2025-10-20 10:58:23.454270', 1, 18, 6),
 (1632, '2025-10-20 10:58:23.456138', 1, '2025-10-20 10:58:23.456151', '2025-10-20 10:58:23.456157', 1, 18, 16),
 (1633, '2025-10-20 10:58:23.458184', 1, '2025-10-20 10:58:23.458209', '2025-10-20 10:58:23.458219', 1, 18, 2),
@@ -944,11 +990,14 @@ INSERT INTO `student_management_app_studentenrollment` (`id`, `enrollment_date`,
 (1699, '2025-10-20 10:58:23.584540', 1, '2025-10-20 10:58:23.584558', '2025-10-20 10:58:23.584563', 1, 29, 16),
 (1700, '2025-10-20 10:58:23.586181', 1, '2025-10-20 10:58:23.586193', '2025-10-20 10:58:23.586199', 1, 29, 9),
 (1701, '2025-10-20 10:58:23.587744', 1, '2025-10-20 10:58:23.587757', '2025-10-20 10:58:23.587764', 1, 29, 6);
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_studentresult
+-- =====================================================
+-- Table: student_management_app_studentresult
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_studentresult`;
+
 CREATE TABLE `student_management_app_studentresult` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_id_id` int(11) NOT NULL,
@@ -964,8 +1013,7 @@ CREATE TABLE `student_management_app_studentresult` (
   CONSTRAINT `student_management_app_studentresult_ibfk_2` FOREIGN KEY (`subject_id_id`) REFERENCES `student_management_app_subjects` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_studentresult`
-LOCK TABLES `student_management_app_studentresult` WRITE;
+-- Data for table `student_management_app_studentresult`
 INSERT INTO `student_management_app_studentresult` (`id`, `student_id_id`, `subject_id_id`, `subject_exam_marks`, `subject_assignment_marks`, `created_at`, `updated_at`) VALUES
 (1, 2, 5, 57.3, 30.3, '2025-10-20', '2025-10-20'),
 (2, 2, 6, 41.5, 27.2, '2025-10-20', '2025-10-20'),
@@ -1066,8 +1114,7 @@ INSERT INTO `student_management_app_studentresult` (`id`, `student_id_id`, `subj
 (97, 17, 13, 54.8, 32.5, '2025-10-20', '2025-10-20'),
 (98, 17, 15, 30.4, 16.6, '2025-10-20', '2025-10-20'),
 (99, 17, 19, 53.6, 18.0, '2025-10-20', '2025-10-20'),
-(100, 18, 2, 59.5, 38.8, '2025-10-20', '2025-10-20');
-INSERT INTO `student_management_app_studentresult` (`id`, `student_id_id`, `subject_id_id`, `subject_exam_marks`, `subject_assignment_marks`, `created_at`, `updated_at`) VALUES
+(100, 18, 2, 59.5, 38.8, '2025-10-20', '2025-10-20'),
 (101, 18, 5, 37.4, 28.8, '2025-10-20', '2025-10-20'),
 (102, 18, 6, 45.3, 31.0, '2025-10-20', '2025-10-20'),
 (103, 18, 16, 32.1, 26.9, '2025-10-20', '2025-10-20'),
@@ -1139,11 +1186,14 @@ INSERT INTO `student_management_app_studentresult` (`id`, `student_id_id`, `subj
 (169, 29, 10, 37.8, 29.9, '2025-10-20', '2025-10-20'),
 (170, 29, 16, 21.1, 21.5, '2025-10-20', '2025-10-20'),
 (171, 29, 19, 52.0, 25.6, '2025-10-20', '2025-10-20');
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_students
+-- =====================================================
+-- Table: student_management_app_students
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_students`;
+
 CREATE TABLE `student_management_app_students` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `gender` varchar(255) NOT NULL,
@@ -1164,8 +1214,7 @@ CREATE TABLE `student_management_app_students` (
   CONSTRAINT `student_management_a_session_year_id_id_594fc55d_fk_student_m` FOREIGN KEY (`session_year_id_id`) REFERENCES `student_management_app_sessionyearmodel` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_students`
-LOCK TABLES `student_management_app_students` WRITE;
+-- Data for table `student_management_app_students`
 INSERT INTO `student_management_app_students` (`id`, `gender`, `profile_pic`, `address`, `created_at`, `updated_at`, `admin_id`, `course_id_id`, `session_year_id_id`, `fcm_token`) VALUES
 (2, 'Male', '/media/python-student-10_Sa6Q7zb.png', 'Student One Address', '2020-04-12 08:59:08.573132', '2020-04-12 08:59:08.573132', 13, 1, 1, ''),
 (3, 'Male', '/media/python-student-10_cv5uwSU.png', 'Staff Two Address Addd', '2020-04-12 09:00:14.779121', '2020-04-12 09:00:14.779121', 14, 1, 1, ''),
@@ -1195,11 +1244,14 @@ INSERT INTO `student_management_app_students` (`id`, `gender`, `profile_pic`, `a
 (27, 'Female', '', '456 Nguyễn Huệ, Q1, TP.HCM', '2025-10-20 10:21:24.764203', '2025-10-20 10:21:24.764216', 41, 1, 1, ''),
 (28, 'Male', '', '123 Lê Lợi, Q1, TP.HCM', '2025-10-20 10:21:30.891509', '2025-10-20 10:21:30.891523', 42, 1, 1, ''),
 (29, 'Male', '', '456 Nguyễn Huệ, Q1, TP.HCM', '2025-10-20 10:22:27.896044', '2025-10-20 10:22:27.896056', 43, 1, 1, '');
-UNLOCK TABLES;
 
 
--- Bảng: student_management_app_subjects
+-- =====================================================
+-- Table: student_management_app_subjects
+-- =====================================================
+
 DROP TABLE IF EXISTS `student_management_app_subjects`;
+
 CREATE TABLE `student_management_app_subjects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `subject_name` varchar(255) NOT NULL,
@@ -1220,8 +1272,7 @@ CREATE TABLE `student_management_app_subjects` (
   CONSTRAINT `student_management_a_staff_id_id_5f47119a_fk_student_m` FOREIGN KEY (`staff_id_id`) REFERENCES `student_management_app_customuser` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu cho bảng `student_management_app_subjects`
-LOCK TABLES `student_management_app_subjects` WRITE;
+-- Data for table `student_management_app_subjects`
 INSERT INTO `student_management_app_subjects` (`id`, `subject_name`, `subject_code`, `created_at`, `updated_at`, `course_id_id`, `staff_id_id`, `credit_hours`, `fee_per_credit`, `subject_description_file`, `description`, `description_file`) VALUES
 (1, 'Java', 'MH_1', '2020-04-12 08:39:32.320256', '2020-04-12 08:39:32.320256', 1, 2, 3, '500000.00', '', NULL, ''),
 (2, 'PHP', 'MH_2', '2020-04-12 08:39:36.671226', '2020-04-12 08:39:36.671226', 1, 2, 3, '500000.00', '', NULL, ''),
@@ -1242,8 +1293,10 @@ INSERT INTO `student_management_app_subjects` (`id`, `subject_name`, `subject_co
 (17, 'Phát triển Web với Django', 'PH_TRIỂN', '2025-10-20 09:53:10.609656', '2025-10-20 09:53:10.609681', 1, 2, 4, '500000.00', '', NULL, ''),
 (18, 'Trí tuệ nhân tạo ứng dụng', 'TR_TUỆ', '2025-10-20 09:53:10.612764', '2025-10-20 09:53:10.612782', 1, 2, 3, '500000.00', '', NULL, ''),
 (19, 'An ninh mạng', 'AN_NINH', '2025-10-20 09:53:10.615643', '2025-10-20 09:53:10.615670', 1, 2, 3, '500000.00', '', NULL, '');
-UNLOCK TABLES;
 
 
 SET FOREIGN_KEY_CHECKS=1;
-COMMIT;
+
+-- =====================================================
+-- END OF EXPORT
+-- =====================================================

@@ -110,19 +110,9 @@ http://localhost:8000
 
 ## 🔐 Test Accounts
 
-All accounts have password: **admin123**
-
-| Email | Role |
-|-------|------|
-| admin@gmail.com | Admin/HOD |
-| staff1@gmail.com | Lecturer 1 |
-| staff2@gmail.com | Lecturer 2 |
-| staff3@gmail.com | Lecturer 3 |
-| staff4@gmail.com | Lecturer 4 |
-| student1@gmail.com | Student 1 |
-| student2@gmail.com | Student 2 |
-
----
+Staff:    dmdat@uni.com / admin
+Student:  hhhoa@std.uni.com / admin
+Admin:    admin01@uni.com / admin
 
 ## 📚 Documentation
 
