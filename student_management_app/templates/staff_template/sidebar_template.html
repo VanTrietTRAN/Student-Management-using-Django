@@ -87,9 +87,8 @@
 
           <!-- Subject Materials -->
           {% url 'manage_subject_description' as manage_subject_description %}
-          {% url 'upload_subject_description' as upload_subject_description %}
-          <li class="nav-item {% if request.path == manage_subject_description or request.path == upload_subject_description %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == manage_subject_description or request.path == upload_subject_description %}active{% endif %}">
+          <li class="nav-item {% if request.path == manage_subject_description %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == manage_subject_description %}active{% endif %}">
               <i class="nav-icon fas fa-file-pdf"></i>
               <p>
                 Subject Materials
@@ -97,12 +96,6 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'upload_subject_description' %}" class="nav-link {% if request.path == upload_subject_description %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Upload PDF</p>
-                </a>
-              </li>
               <li class="nav-item">
                 <a href="{% url 'manage_subject_description' %}" class="nav-link {% if request.path == manage_subject_description %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
