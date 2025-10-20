@@ -22,14 +22,21 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          
+          <!-- ==================== TỔNG QUAN ==================== -->
+          <li class="nav-header">TỔNG QUAN</li>
+          
           <!-- Dashboard -->
           <li class="nav-item">
             {% url 'admin_home' as admin_home %}
             <a href="{{ admin_home }}" class="nav-link {% if request.path == admin_home %}active{% endif %}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>Dashboard</p>
+              <p>Bảng Điều Khiển</p>
             </a>
           </li>
+
+          <!-- ==================== QUẢN LÝ NGƯỜI DÙNG ==================== -->
+          <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
 
           <!-- Staff Management -->
           {% url 'add_staff' as add_staff %}
@@ -39,7 +46,7 @@
             <a href="#" class="nav-link {% if request.path == add_staff or request.path == manage_staff or request.path == edit_staff %}active{% endif %}">
               <i class="nav-icon fas fa-chalkboard-teacher"></i>
               <p>
-                Staff Management
+                Quản Lý Giảng Viên
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -47,13 +54,13 @@
               <li class="nav-item">
                 <a href="{{ add_staff }}" class="nav-link {% if request.path == add_staff %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Staff</p>
+                  <p>Thêm Giảng Viên</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ manage_staff }}" class="nav-link {% if request.path == manage_staff or request.path == edit_staff %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Manage Staff</p>
+                  <p>Danh Sách Giảng Viên</p>
                 </a>
               </li>
             </ul>
@@ -67,7 +74,7 @@
             <a href="#" class="nav-link {% if request.path == add_student or request.path == manage_student or request.path == edit_student %}active{% endif %}">
               <i class="nav-icon fas fa-user-graduate"></i>
               <p>
-                Student Management
+                Quản Lý Sinh Viên
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -75,17 +82,20 @@
               <li class="nav-item">
                 <a href="{{ add_student }}" class="nav-link {% if request.path == add_student %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Student</p>
+                  <p>Thêm Sinh Viên</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ manage_student }}" class="nav-link {% if request.path == manage_student or request.path == edit_student %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Manage Students</p>
+                  <p>Danh Sách Sinh Viên</p>
                 </a>
               </li>
             </ul>
           </li>
+
+          <!-- ==================== QUẢN LÝ ĐÀO TẠO ==================== -->
+          <li class="nav-header">QUẢN LÝ ĐÀO TẠO</li>
 
           <!-- Course Management -->
           {% url 'add_course' as add_course %}
@@ -93,9 +103,9 @@
           {% url 'edit_course' course_id=id as edit_course %}
           <li class="nav-item {% if request.path == add_course or request.path == manage_course or request.path == edit_course %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if request.path == add_course or request.path == manage_course or request.path == edit_course %}active{% endif %}">
-              <i class="nav-icon fas fa-book"></i>
+              <i class="nav-icon fas fa-graduation-cap"></i>
               <p>
-                Course Management
+                Quản Lý Khóa Học
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -103,13 +113,13 @@
               <li class="nav-item">
                 <a href="{{ add_course }}" class="nav-link {% if request.path == add_course %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Course</p>
+                  <p>Thêm Khóa Học</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ manage_course }}" class="nav-link {% if request.path == manage_course or request.path == edit_course %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Manage Courses</p>
+                  <p>Danh Sách Khóa Học</p>
                 </a>
               </li>
             </ul>
@@ -123,7 +133,7 @@
             <a href="#" class="nav-link {% if request.path == add_subject or request.path == manage_subject or request.path == edit_subject %}active{% endif %}">
               <i class="nav-icon fas fa-book-open"></i>
               <p>
-                Subject Management
+                Quản Lý Môn Học
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -131,19 +141,62 @@
               <li class="nav-item">
                 <a href="{{ add_subject }}" class="nav-link {% if request.path == add_subject %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Subject</p>
+                  <p>Thêm Môn Học</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ manage_subject }}" class="nav-link {% if request.path == manage_subject or request.path == edit_subject %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Manage Subjects</p>
+                  <p>Danh Sách Môn Học</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <!-- Grade Management (NEW) -->
+          <!-- Session Year -->
+          {% url 'manage_session' as manage_session %}
+          <li class="nav-item">
+            <a href="{{ manage_session }}" class="nav-link {% if request.path == manage_session %}active{% endif %}">
+              <i class="nav-icon fas fa-calendar"></i>
+              <p>Quản Lý Năm Học</p>
+            </a>
+          </li>
+
+          <!-- Schedule Management -->
+          {% url 'manage_schedule' as manage_schedule %}
+          {% url 'add_schedule' as add_schedule %}
+          {% url 'edit_schedule' schedule_id=id as edit_schedule %}
+          <li class="nav-item {% if request.path == manage_schedule or request.path == add_schedule or request.path == edit_schedule %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == manage_schedule or request.path == add_schedule or request.path == edit_schedule %}active{% endif %}">
+              <i class="nav-icon fas fa-calendar-alt"></i>
+              <p>
+                Quản Lý Lịch Học
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'manage_schedule' %}" class="nav-link {% if request.path == manage_schedule or request.path == add_schedule or request.path == edit_schedule %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Danh Sách Lịch Học</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- ==================== QUẢN LÝ HỌC TẬP ==================== -->
+          <li class="nav-header">QUẢN LÝ HỌC TẬP</li>
+
+          <!-- Attendance -->
+          {% url 'admin_view_attendance' as admin_view_attendance %}
+          <li class="nav-item">
+            <a href="{{ admin_view_attendance }}" class="nav-link {% if request.path == admin_view_attendance %}active{% endif %}">
+              <i class="nav-icon fas fa-clipboard-check"></i>
+              <p>Xem Điểm Danh</p>
+            </a>
+          </li>
+
+          <!-- Grade Management -->
           {% url 'admin_grade_subjects' as admin_grade_subjects %}
           {% url 'admin_enter_grades' subject_id=1 as admin_enter_grades_sample %}
           <li class="nav-item {% if 'admin_grade' in request.path or 'admin_enter_grades' in request.path %}menu-open{% endif %}">
@@ -164,6 +217,9 @@
             </ul>
           </li>
 
+          <!-- ==================== BÁO CÁO & THỐNG KÊ ==================== -->
+          <li class="nav-header">BÁO CÁO & THỐNG KÊ</li>
+
           <!-- Reports (NEW) -->
           {% url 'admin_reports' as admin_reports %}
           <li class="nav-item">
@@ -172,6 +228,9 @@
               <p>Báo Cáo & Xuất Dữ Liệu</p>
             </a>
           </li>
+
+          <!-- ==================== TƯƠNG TÁC & THÔNG BÁO ==================== -->
+          <li class="nav-header">TƯƠNG TÁC & THÔNG BÁO</li>
 
           <!-- Notification Management (NEW) -->
           {% url 'admin_view_notifications' as admin_view_notifications %}
@@ -207,37 +266,6 @@
             </ul>
           </li>
 
-          <!-- Schedule Management -->
-          {% url 'manage_schedule' as manage_schedule %}
-          {% url 'add_schedule' as add_schedule %}
-          {% url 'edit_schedule' schedule_id=id as edit_schedule %}
-          <li class="nav-item {% if request.path == manage_schedule or request.path == add_schedule or request.path == edit_schedule %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == manage_schedule or request.path == add_schedule or request.path == edit_schedule %}active{% endif %}">
-              <i class="nav-icon fas fa-calendar-alt"></i>
-              <p>
-                Schedule Management
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'manage_schedule' %}" class="nav-link {% if request.path == manage_schedule or request.path == add_schedule or request.path == edit_schedule %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Manage Schedule</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <!-- Attendance -->
-          {% url 'admin_view_attendance' as admin_view_attendance %}
-          <li class="nav-item">
-            <a href="{{ admin_view_attendance }}" class="nav-link {% if request.path == admin_view_attendance %}active{% endif %}">
-              <i class="nav-icon fas fa-clipboard-check"></i>
-              <p>View Attendance</p>
-            </a>
-          </li>
-
           <!-- Feedback -->
           {% url 'student_feedback_message' as student_feedback_message %}
           {% url 'staff_feedback_message' as staff_feedback_message %}
@@ -245,7 +273,7 @@
             <a href="#" class="nav-link {% if request.path == student_feedback_message or request.path == staff_feedback_message %}active{% endif %}">
               <i class="nav-icon fas fa-comments"></i>
               <p>
-                Feedback
+                Phản Hồi
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -253,13 +281,13 @@
               <li class="nav-item">
                 <a href="{{ student_feedback_message }}" class="nav-link {% if request.path == student_feedback_message %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Student Feedback</p>
+                  <p>Phản Hồi Sinh Viên</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ staff_feedback_message }}" class="nav-link {% if request.path == staff_feedback_message %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Staff Feedback</p>
+                  <p>Phản Hồi Giảng Viên</p>
                 </a>
               </li>
             </ul>
@@ -272,7 +300,7 @@
             <a href="#" class="nav-link {% if request.path == student_leave_view or request.path == staff_leave_view %}active{% endif %}">
               <i class="nav-icon fas fa-calendar-times"></i>
               <p>
-                Leave Management
+                Quản Lý Nghỉ Phép
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -280,52 +308,16 @@
               <li class="nav-item">
                 <a href="{{ student_leave_view }}" class="nav-link {% if request.path == student_leave_view %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Student Leave</p>
+                  <p>Nghỉ Phép Sinh Viên</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ staff_leave_view }}" class="nav-link {% if request.path == staff_leave_view %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Staff Leave</p>
+                  <p>Nghỉ Phép Giảng Viên</p>
                 </a>
               </li>
             </ul>
-          </li>
-
-          <!-- Notifications -->
-          {% url 'admin_send_notification_staff' as admin_send_notification_staff %}
-          {% url 'admin_send_notification_student' as admin_send_notification_student %}
-          <li class="nav-item {% if request.path == admin_send_notification_staff or request.path == admin_send_notification_student %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == admin_send_notification_staff or request.path == admin_send_notification_student %}active{% endif %}">
-              <i class="nav-icon fas fa-bell"></i>
-              <p>
-                Notifications
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ admin_send_notification_staff }}" class="nav-link {% if request.path == admin_send_notification_staff %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Send to Staff</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ admin_send_notification_student }}" class="nav-link {% if request.path == admin_send_notification_student %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Send to Students</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <!-- Session Year -->
-          {% url 'manage_session' as manage_session %}
-          <li class="nav-item">
-            <a href="{{ manage_session }}" class="nav-link {% if request.path == manage_session %}active{% endif %}">
-              <i class="nav-icon fas fa-calendar"></i>
-              <p>Manage Session Year</p>
-            </a>
           </li>
 
         </ul>
