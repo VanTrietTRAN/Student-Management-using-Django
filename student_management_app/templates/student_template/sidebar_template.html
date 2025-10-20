@@ -22,61 +22,101 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+          <!-- Dashboard -->
           <li class="nav-item">
             {% url 'student_home' as student_home %}
-            <a href="{{ student_home }}" class="nav-link {% if request.path == student_home %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Home
-              </p>
+            <a href="{{ student_home }}" class="nav-link {% if request.path == student_home %}active{% endif %}">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>Dashboard</p>
             </a>
           </li>
+
+          <!-- Enrollment & Courses -->
+          {% url 'view_subjects' as view_subjects %}
+          {% url 'enroll_subject' as enroll_subject %}
+          {% url 'view_schedule' as view_schedule %}
+          <li class="nav-item {% if request.path == view_subjects or request.path == enroll_subject or request.path == view_schedule %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == view_subjects or request.path == enroll_subject or request.path == view_schedule %}active{% endif %}">
+              <i class="nav-icon fas fa-book-reader"></i>
+              <p>
+                My Courses
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'view_subjects' %}" class="nav-link {% if request.path == view_subjects %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Available Subjects</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'enroll_subject' %}" class="nav-link {% if request.path == enroll_subject %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Enroll in Subjects</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'view_schedule' %}" class="nav-link {% if request.path == view_schedule %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Class Schedule</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Fees -->
+          {% url 'view_fees' as view_fees %}
           <li class="nav-item">
-            {% url 'student_view_attendance' as student_view_attendance %}
-            {% url 'student_view_attendance_post' as student_view_attendance_post %}
-            <a href="{{ student_view_attendance }}" class="nav-link {% if request.path == student_view_attendance %} active {% endif %} {% if request.path == student_view_attendance_post %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                View Attendance
-              </p>
+            <a href="{% url 'view_fees' %}" class="nav-link {% if request.path == view_fees %}active{% endif %}">
+              <i class="nav-icon fas fa-dollar-sign"></i>
+              <p>My Fees</p>
             </a>
           </li>
-           <li class="nav-item">
-            {% url 'student_apply_leave' as student_apply_leave %}
-            <a href="{{ student_apply_leave }}" class="nav-link {% if request.path == student_apply_leave %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Apply for Leave
-              </p>
-            </a>
-          </li>
-           <li class="nav-item">
-            {% url 'student_feedback' as student_feedback %}
-            <a href="{{ student_feedback }}" class="nav-link {% if request.path == student_feedback %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Feedback Message
-              </p>
-            </a>
-          </li>
+
+          <!-- Attendance -->
+          {% url 'student_view_attendance' as student_view_attendance %}
+          {% url 'student_view_attendance_post' as student_view_attendance_post %}
           <li class="nav-item">
-            {% url 'student_view_result' as student_view_result %}
-            <a href="{{ student_view_result }}" class="nav-link {% if request.path == student_view_result %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Grade Card
-              </p>
+            <a href="{{ student_view_attendance }}" class="nav-link {% if request.path == student_view_attendance or request.path == student_view_attendance_post %}active{% endif %}">
+              <i class="nav-icon fas fa-clipboard-check"></i>
+              <p>My Attendance</p>
             </a>
           </li>
+
+          <!-- Results/Grades -->
+          {% url 'student_view_result' as student_view_result %}
           <li class="nav-item">
-            {% url 'student_all_notification' as student_all_notification %}
-            <a href="{{ student_all_notification }}" class="nav-link {% if request.path == student_all_notification %} active {% endif %}">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Notifications
-              </p>
+            <a href="{{ student_view_result }}" class="nav-link {% if request.path == student_view_result %}active{% endif %}">
+              <i class="nav-icon fas fa-chart-line"></i>
+              <p>Grade Card</p>
+            </a>
+          </li>
+
+          <!-- Leave Application -->
+          {% url 'student_apply_leave' as student_apply_leave %}
+          <li class="nav-item">
+            <a href="{{ student_apply_leave }}" class="nav-link {% if request.path == student_apply_leave %}active{% endif %}">
+              <i class="nav-icon fas fa-calendar-times"></i>
+              <p>Apply for Leave</p>
+            </a>
+          </li>
+
+          <!-- Feedback -->
+          {% url 'student_feedback' as student_feedback %}
+          <li class="nav-item">
+            <a href="{{ student_feedback }}" class="nav-link {% if request.path == student_feedback %}active{% endif %}">
+              <i class="nav-icon fas fa-comments"></i>
+              <p>Send Feedback</p>
+            </a>
+          </li>
+
+          <!-- Notifications -->
+          {% url 'student_all_notification' as student_all_notification %}
+          <li class="nav-item">
+            <a href="{{ student_all_notification }}" class="nav-link {% if request.path == student_all_notification %}active{% endif %}">
+              <i class="nav-icon fas fa-bell"></i>
+              <p>Notifications</p>
             </a>
           </li>
 
