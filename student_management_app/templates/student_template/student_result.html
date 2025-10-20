@@ -24,12 +24,14 @@ Kết quả học tập
                                         <th style="width: 100px;" class="text-center">Tín chỉ</th>
                                         <th style="width: 120px;" class="text-center">Điểm bài tập</th>
                                         <th style="width: 120px;" class="text-center">Điểm thi</th>
-                                        <th style="width: 120px;" class="text-center">Điểm trung bình</th>
-                                        <th style="width: 100px;" class="text-center">Xếp loại</th>
+                                        <th style="width: 120px;" class="text-center">Điểm TB</th>
+                                        <th style="width: 100px;" class="text-center">Điểm chữ</th>
+                                        <th style="width: 100px;" class="text-center">Kết quả</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for row in studentresult %}
+                                    {% with total=row.subject_assignment_marks|add:row.subject_exam_marks %}
                                     <tr>
                                         <td class="text-center">{{ forloop.counter }}</td>
                                         <td>
@@ -37,28 +39,43 @@ Kết quả học tập
                                         </td>
                                         <td class="text-center">{{ row.subject_id.credit_hours }}</td>
                                         <td class="text-center">
-                                            <span class="badge badge-info">{{ row.subject_assignment_marks }}</span>
+                                            <span class="badge badge-info">{{ row.subject_assignment_marks|floatformat:1 }}</span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge badge-primary">{{ row.subject_exam_marks }}</span>
+                                            <span class="badge badge-primary">{{ row.subject_exam_marks|floatformat:1 }}</span>
                                         </td>
                                         <td class="text-center">
-                                            {% widthratio row.subject_assignment_marks 1 40|add:row.subject_exam_marks|floatformat:1 as avg %}
-                                            <strong style="font-size: 1.1em;">{{ avg|default:"0" }}/100</strong>
+                                            <strong style="font-size: 1.1em;">{{ total|floatformat:1 }}</strong>
                                         </td>
                                         <td class="text-center">
-                                            {% if row.subject_exam_marks >= 40 %}
+                                            {% if total >= 95 %}
+                                                <span class="badge" style="background-color: #800080; color: white; font-size: 0.9em;">A+</span>
+                                            {% elif total >= 85 %}
+                                                <span class="badge badge-success" style="font-size: 0.9em;">A</span>
+                                            {% elif total >= 70 %}
+                                                <span class="badge badge-primary" style="font-size: 0.9em;">B</span>
+                                            {% elif total >= 55 %}
+                                                <span class="badge badge-warning" style="font-size: 0.9em;">C</span>
+                                            {% elif total >= 40 %}
+                                                <span class="badge badge-secondary" style="font-size: 0.9em;">D</span>
+                                            {% else %}
+                                                <span class="badge badge-danger" style="font-size: 0.9em;">F</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if total >= 40 %}
                                                 <span class="badge badge-success" style="font-size: 0.9em;">ĐẠT</span>
                                             {% else %}
                                                 <span class="badge badge-danger" style="font-size: 0.9em;">CHƯA ĐẠT</span>
                                             {% endif %}
                                         </td>
                                     </tr>
+                                    {% endwith %}
                                     {% endfor %}
                                 </tbody>
                                 <tfoot class="bg-light">
                                     <tr>
-                                        <td colspan="7" class="text-center">
+                                        <td colspan="8" class="text-center">
                                             <strong>Tổng số môn: {{ studentresult.count }}</strong>
                                         </td>
                                     </tr>
@@ -66,15 +83,31 @@ Kết quả học tập
                             </table>
                         </div>
 
-                        <div class="mt-3">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Ghi chú:</strong>
-                                <ul class="mb-0 mt-2">
-                                    <li>Điểm bài tập: Tối đa 40 điểm</li>
-                                    <li>Điểm thi: Tối đa 60 điểm</li>
-                                    <li>Điểm đạt: Điểm thi ≥ 40 điểm</li>
-                                </ul>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Thành phần điểm:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>Điểm bài tập: Tối đa 40 điểm</li>
+                                        <li>Điểm thi: Tối đa 60 điểm</li>
+                                        <li>Điểm trung bình = Điểm bài tập + Điểm thi</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <strong>Thang điểm chữ:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>A+</strong>: 95-100 (Xuất sắc)</li>
+                                        <li><strong>A</strong>: 85-94 (Giỏi)</li>
+                                        <li><strong>B</strong>: 70-84 (Khá)</li>
+                                        <li><strong>C</strong>: 55-69 (Trung bình)</li>
+                                        <li><strong>D</strong>: 40-54 (Đạt yêu cầu)</li>
+                                        <li><strong>F</strong>: 0-39 (Chưa đạt)</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
