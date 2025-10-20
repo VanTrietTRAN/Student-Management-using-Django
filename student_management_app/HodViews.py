@@ -168,9 +168,17 @@ def add_subject_save(request):
         course=Courses.objects.get(id=course_id)
         staff_id=request.POST.get("staff")
         staff=CustomUser.objects.get(id=staff_id)
+        credit_hours=request.POST.get("credit_hours", 3)  # Mặc định 3 tín chỉ
+        fee_per_credit=request.POST.get("fee_per_credit", 0)  # Mặc định 0
 
         try:
-            subject=Subjects(subject_name=subject_name,course_id=course,staff_id=staff)
+            subject=Subjects(
+                subject_name=subject_name,
+                course_id=course,
+                staff_id=staff,
+                credit_hours=credit_hours,
+                fee_per_credit=fee_per_credit
+            )
             subject.save()
             messages.success(request,"Successfully Added Subject")
             return HttpResponseRedirect(reverse("add_subject"))
@@ -312,6 +320,8 @@ def edit_subject_save(request):
         subject_name=request.POST.get("subject_name")
         staff_id=request.POST.get("staff")
         course_id=request.POST.get("course")
+        credit_hours=request.POST.get("credit_hours", 3)
+        fee_per_credit=request.POST.get("fee_per_credit", 0)
 
         try:
             subject=Subjects.objects.get(id=subject_id)
@@ -320,6 +330,8 @@ def edit_subject_save(request):
             subject.staff_id=staff
             course=Courses.objects.get(id=course_id)
             subject.course_id=course
+            subject.credit_hours=credit_hours
+            subject.fee_per_credit=fee_per_credit
             subject.save()
 
             messages.success(request,"Successfully Edited Subject")

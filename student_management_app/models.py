@@ -43,9 +43,16 @@ class Subjects(models.Model):
     subject_name=models.CharField(max_length=255)
     course_id=models.ForeignKey(Courses,on_delete=models.CASCADE,default=1)
     staff_id=models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    credit_hours=models.IntegerField(default=3)  # Số tín chỉ của môn học
+    fee_per_credit=models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Học phí mỗi tín chỉ
+    subject_description_file=models.FileField(upload_to='subject_descriptions/', blank=True, null=True)  # File PDF mô tả môn học
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
     objects=models.Manager()
+    
+    def get_total_fee(self):
+        """Tính tổng học phí của môn học"""
+        return self.credit_hours * self.fee_per_credit
 
 class Students(models.Model):
     id=models.AutoField(primary_key=True)
@@ -156,6 +163,50 @@ class OnlineClassRoom(models.Model):
     is_active=models.BooleanField(default=True)
     created_on=models.DateTimeField(auto_now_add=True)
     objects=models.Manager()
+
+
+# Model mới: Đăng ký môn học của sinh viên
+class StudentEnrollment(models.Model):
+    id=models.AutoField(primary_key=True)
+    student_id=models.ForeignKey(Students,on_delete=models.CASCADE)
+    subject_id=models.ForeignKey(Subjects,on_delete=models.CASCADE)
+    session_year_id=models.ForeignKey(SessionYearModel,on_delete=models.CASCADE)
+    enrollment_date=models.DateTimeField(auto_now_add=True)
+    is_active=models.BooleanField(default=True)  # Có thể hủy đăng ký
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    objects=models.Manager()
+    
+    class Meta:
+        # Đảm bảo sinh viên không đăng ký trùng môn trong cùng kỳ
+        unique_together = ('student_id', 'subject_id', 'session_year_id')
+
+
+# Model mới: Thời khóa biểu
+class Schedule(models.Model):
+    WEEKDAY_CHOICES = (
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday'),
+    )
+    
+    id=models.AutoField(primary_key=True)
+    subject_id=models.ForeignKey(Subjects,on_delete=models.CASCADE)
+    session_year_id=models.ForeignKey(SessionYearModel,on_delete=models.CASCADE)
+    weekday=models.IntegerField(choices=WEEKDAY_CHOICES)  # Thứ trong tuần
+    start_time=models.TimeField()  # Giờ bắt đầu
+    end_time=models.TimeField()  # Giờ kết thúc
+    room=models.CharField(max_length=100, blank=True)  # Phòng học
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    objects=models.Manager()
+    
+    def __str__(self):
+        return f"{self.subject_id.subject_name} - {self.get_weekday_display()} {self.start_time}-{self.end_time}"
 
 
 @receiver(post_save,sender=CustomUser)
