@@ -132,6 +132,11 @@ def do_staff_signup(request):
         return HttpResponseRedirect(reverse("show_login"))
 
 def do_signup_student(request):
+    if request.method != "POST":
+        messages.error(request, "Invalid Request Method")
+        return HttpResponseRedirect(reverse("signup_student"))
+    
+    # Get form data
     first_name = request.POST.get("first_name")
     last_name = request.POST.get("last_name")
     username = request.POST.get("username")
@@ -142,24 +147,64 @@ def do_signup_student(request):
     course_id = request.POST.get("course")
     sex = request.POST.get("sex")
 
-    profile_pic = request.FILES['profile_pic']
-    fs = FileSystemStorage()
-    filename = fs.save(profile_pic.name, profile_pic)
-    profile_pic_url = fs.url(filename)
+    # Validate required fields
+    if not all([first_name, last_name, username, email, password, address, session_year_id, course_id, sex]):
+        messages.error(request, "All fields are required")
+        return HttpResponseRedirect(reverse("signup_student"))
 
-    #try:
-    user = CustomUser.objects.create_user(username=username, password=password, email=email, last_name=last_name,
-                                          first_name=first_name, user_type=3)
-    user.students.address = address
-    course_obj = Courses.objects.get(id=course_id)
-    user.students.course_id = course_obj
-    session_year = SessionYearModel.object.get(id=session_year_id)
-    user.students.session_year_id = session_year
-    user.students.gender = sex
-    user.students.profile_pic = profile_pic_url
-    user.save()
-    messages.success(request, "Successfully Added Student")
-    return HttpResponseRedirect(reverse("show_login"))
-    #except:
-     #   messages.error(request, "Failed to Add Student")
-      #  return HttpResponseRedirect(reverse("show_login"))
+    try:
+        # Check if username or email already exists
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists")
+            return HttpResponseRedirect(reverse("signup_student"))
+        
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists")
+            return HttpResponseRedirect(reverse("signup_student"))
+
+        # Handle profile picture upload
+        profile_pic_url = ""
+        if 'profile_pic' in request.FILES:
+            profile_pic = request.FILES['profile_pic']
+            fs = FileSystemStorage()
+            filename = fs.save(profile_pic.name, profile_pic)
+            profile_pic_url = fs.url(filename)
+
+        # Create user
+        user = CustomUser.objects.create_user(
+            username=username, 
+            password=password, 
+            email=email, 
+            last_name=last_name,
+            first_name=first_name, 
+            user_type=3
+        )
+        
+        # Get course and session year objects
+        course_obj = Courses.objects.get(id=course_id)
+        session_year = SessionYearModel.object.get(id=session_year_id)
+        
+        # Create student profile
+        from student_management_app.models import Students
+        student = Students(
+            admin=user,
+            address=address,
+            course_id=course_obj,
+            session_year_id=session_year,
+            gender=sex,
+            profile_pic=profile_pic_url
+        )
+        student.save()
+        
+        messages.success(request, "Successfully Registered! You can now login with your credentials.")
+        return HttpResponseRedirect(reverse("show_login"))
+        
+    except Courses.DoesNotExist:
+        messages.error(request, "Selected course does not exist")
+        return HttpResponseRedirect(reverse("signup_student"))
+    except SessionYearModel.DoesNotExist:
+        messages.error(request, "Selected session year does not exist")
+        return HttpResponseRedirect(reverse("signup_student"))
+    except Exception as e:
+        messages.error(request, f"Failed to Register Student: {str(e)}")
+        return HttpResponseRedirect(reverse("signup_student"))

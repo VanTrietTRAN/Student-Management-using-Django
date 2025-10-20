@@ -2,6 +2,21 @@
 -- SQL Import File for Student Management System
 -- Tương thích với MySQL 5.7+ (XAMPP)
 -- ===================================================
+--
+-- ✅ TẤT CẢ USER ĐÃ CÓ PASSWORD: admin123 (đã hash)
+-- ✅ SAU KHI IMPORT - LOGIN NGAY!
+-- ✅ KHÔNG CẦN chạy reset_passwords.py
+--
+-- DANH SÁCH TÀI KHOẢN:
+-- 👨‍💼 admin@gmail.com / admin123
+-- 👨‍🏫 staff1@gmail.com / admin123
+-- 👨‍🏫 staff2@gmail.com / admin123
+-- 👨‍🏫 staff3@gmail.com / admin123
+-- 👨‍🏫 staff4@gmail.com / admin123
+-- 👨‍🎓 student1@gmail.com / admin123
+-- 👨‍🎓 student2@gmail.com / admin123
+--
+-- ===================================================
 
 SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -125,7 +140,15 @@ CREATE TABLE `student_management_app_customuser` (
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `student_management_app_customuser` WRITE;
-INSERT INTO `student_management_app_customuser` VALUES (1,'pbkdf2_sha256$150000$qIZjsqvYXRdX$Y/mpGB8dxhsomLsD+LopE5187P3rRgtX4O0FL38nkOg=','2020-05-25 17:03:59.941387',1,'admin','Admin First 1','Admin Last 2','admin@gmail.com',1,1,'2020-04-12 08:16:06.881413','1'),(2,'pbkdf2_sha256$150000$XFNEf9gsgdpQ$bCpKMAtPdqLmV9fNq1UWPvbphlJwfO8JGxD6g6XSGSQ=','2020-05-26 08:15:00.185950',0,'staff1','Staff First 1 1','Staff One Address 3 1','staff1@gmail.com',0,1,'2020-04-12 08:38:05.596253','2'),(3,'pbkdf2_sha256$150000$jwtDH5gWfF1A$V/uIUyGazpZFk9pPb/hXWeYLd0xlNflcf6gl0fClvAo=','2020-05-07 10:20:47.673389',0,'staff2','Staff','Two','staff2@gmail.com',0,1,'2020-04-12 08:38:29.881934','2'),(4,'pbkdf2_sha256$150000$unhQRM8i4uHa$B6rUl+U1OBjN2JLCGFfDkPSXPaoipMCoN7ApBAlnDo8=',NULL,0,'staff3','Staff','Three','staff3@gmail.com',0,1,'2020-04-12 08:38:51.139627','2'),(5,'pbkdf2_sha256$150000$PopAX0w5Coo0$uAM+MBkUKS2NHqUVTeHJxXz1pvMmg9HmIi72HQ0RmB8=',NULL,0,'staff4','Staff','Four','staff4@gmail.com',0,1,'2020-04-12 08:39:16.924296','2'),(13,'pbkdf2_sha256$150000$SJds04Sc9j3o$k7sWpFqxT71JPDhqVQR3hoHKBg6W5MqMvgcfda0DdME=','2020-05-05 07:53:44.763359',0,'student1','Student','One','sksanjeev362@gmail.com',0,1,'2020-04-12 08:59:08.372628','3'),(14,'pbkdf2_sha256$150000$YvyopCJTSH99$ijgtSu+77BwcofyB73bWdWgisfgEk2AwT9oX61JADSA=','2020-05-26 08:14:12.403741',0,'student2','student First','Two Last','student2@gmail.com',0,1,'2020-04-12 09:00:14.371150','3');
+-- ✅ TẤT CẢ USER ĐÃ CÓ PASSWORD: admin123 (đã hash)
+INSERT INTO `student_management_app_customuser` VALUES 
+(1,'pbkdf2_sha256$1000000$BncO3nTHxdTFZmQK58VEv7$abd3JFfzHn7wUH+AnDrptbvfEHw9Jjk8XiOBlIY3qt4=','2020-05-25 17:03:59.941387',1,'admin','Admin First 1','Admin Last 2','admin@gmail.com',1,1,'2020-04-12 08:16:06.881413','1'),
+(2,'pbkdf2_sha256$1000000$fuEjt7UNncVk32lKud7fIw$TywhzmNbaUxhAbhYm+IrWYlj8EK3mlFYWdxv8HCbOTM=','2020-05-26 08:15:00.185950',0,'staff1','Staff First 1 1','Staff One Address 3 1','staff1@gmail.com',0,1,'2020-04-12 08:38:05.596253','2'),
+(3,'pbkdf2_sha256$1000000$i5skAWxDjEiv7QKW7lfh2i$TGMCj6MfVb83OyQBaUXZ9dalKZNuwHMl5N8ko0GyxVY=','2020-05-07 10:20:47.673389',0,'staff2','Staff','Two','staff2@gmail.com',0,1,'2020-04-12 08:38:29.881934','2'),
+(4,'pbkdf2_sha256$1000000$Om7eIzQLZMRMVorogglpM4$KvgC6beqmzyvNzPo7HVVISSRse/0BO8/cJLws2w36yk=',NULL,0,'staff3','Staff','Three','staff3@gmail.com',0,1,'2020-04-12 08:38:51.139627','2'),
+(5,'pbkdf2_sha256$1000000$mqVQW1f0hUrVr4NfzXeL4w$zOJ4tqdueUZikXEyXcco2OMF9Nrc6NBIbiv7LgJXSiQ=',NULL,0,'staff4','Staff','Four','staff4@gmail.com',0,1,'2020-04-12 08:39:16.924296','2'),
+(13,'pbkdf2_sha256$1000000$awVNp4ddznXHp7Jw1Wlb4z$A6tfj0shrlsFa8LlWXMltnN5BvOOnMoOsj94dZQ1ZiU=','2020-05-05 07:53:44.763359',0,'student1','Student','One','student1@gmail.com',0,1,'2020-04-12 08:59:08.372628','3'),
+(14,'pbkdf2_sha256$1000000$uBdpyZEKpunOXtuAKuTWEd$jXVVTL1R7gfHwH2+q9czLBmdp55XKzPKs0XpC/AwhGs=','2020-05-26 08:14:12.403741',0,'student2','student First','Two Last','student2@gmail.com',0,1,'2020-04-12 09:00:14.371150','3');
 UNLOCK TABLES;
 
 -- student_management_app_customuser_groups
