@@ -687,3 +687,456 @@ def delete_schedule(request, schedule_id):
     return HttpResponseRedirect(reverse("manage_schedule"))
 
 
+# ========================================================================
+# ADMIN GRADE MANAGEMENT - Admin có thể nhập điểm cho tất cả môn học
+# ========================================================================
+
+def admin_grade_subjects(request):
+    """
+    Hiển thị danh sách TẤT CẢ môn học để admin chọn môn nhập điểm
+    """
+    from student_management_app.models import StudentResult
+    
+    subjects = Subjects.objects.all().select_related('staff_id', 'course_id')
+    
+    # Tính toán số lượng sinh viên cho mỗi môn
+    subjects_data = []
+    for subject in subjects:
+        enrolled_count = StudentEnrollment.objects.filter(subject_id=subject).count()
+        graded_count = StudentResult.objects.filter(
+            subject_id=subject
+        ).exclude(
+            subject_assignment_marks=0, 
+            subject_exam_marks=0
+        ).count()
+        
+        subjects_data.append({
+            'subject': subject,
+            'enrolled_count': enrolled_count,
+            'graded_count': graded_count,
+            'pending_count': enrolled_count - graded_count
+        })
+    
+    return render(request, "hod_template/admin_grade_subjects.html", {
+        "subjects_data": subjects_data
+    })
+
+
+def admin_enter_grades(request, subject_id):
+    """
+    Trang nhập điểm cho môn học (giống staff_enter_grades nhưng admin có thể vào tất cả môn)
+    """
+    from student_management_app.models import StudentResult
+    
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+    except:
+        messages.error(request, "Môn học không tồn tại!")
+        return HttpResponseRedirect(reverse("admin_grade_subjects"))
+    
+    # Lấy danh sách sinh viên đã đăng ký môn này
+    enrollments = StudentEnrollment.objects.filter(
+        subject_id=subject
+    ).select_related('student_id', 'student_id__admin')
+    
+    students_data = []
+    for enrollment in enrollments:
+        student = enrollment.student_id
+        
+        # Lấy kết quả điểm (nếu có)
+        try:
+            result = StudentResult.objects.get(
+                student_id=student,
+                subject_id=subject
+            )
+            # Chuyển điểm đã lưu (đã nhân hệ số) về dạng 0-100 để hiển thị
+            assignment_raw = round(result.subject_assignment_marks / 0.4) if result.subject_assignment_marks > 0 else 0
+            exam_raw = round(result.subject_exam_marks / 0.6) if result.subject_exam_marks > 0 else 0
+        except StudentResult.DoesNotExist:
+            assignment_raw = 0
+            exam_raw = 0
+        
+        students_data.append({
+            'student': student,
+            'enrollment': enrollment,
+            'assignment_marks': assignment_raw,
+            'exam_marks': exam_raw
+        })
+    
+    return render(request, "hod_template/admin_enter_grades.html", {
+        "subject": subject,
+        "students_data": students_data
+    })
+
+
+@csrf_exempt
+def admin_save_grades(request):
+    """
+    Lưu điểm do admin nhập (giống staff_save_grades)
+    """
+    from student_management_app.models import StudentResult
+    
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid request method"})
+    
+    try:
+        # Parse JSON data
+        data = json.loads(request.body)
+        subject_id = data.get('subject_id')
+        grades_data = data.get('grades', [])
+        
+        if not subject_id or not grades_data:
+            return JsonResponse({"status": "error", "message": "Thiếu dữ liệu"})
+        
+        subject = Subjects.objects.get(id=subject_id)
+        
+        success_count = 0
+        error_count = 0
+        
+        for grade in grades_data:
+            try:
+                student_id = grade['student_id']
+                assignment_marks = float(grade['assignment_marks'])  # 0-100
+                exam_marks = float(grade['exam_marks'])  # 0-100
+                
+                # Validate
+                if not (0 <= assignment_marks <= 100 and 0 <= exam_marks <= 100):
+                    error_count += 1
+                    continue
+                
+                student = Students.objects.get(id=student_id)
+                
+                # Nhân hệ số trước khi lưu
+                weighted_assignment = assignment_marks * 0.4
+                weighted_exam = exam_marks * 0.6
+                
+                # Update hoặc create
+                result, created = StudentResult.objects.get_or_create(
+                    student_id=student,
+                    subject_id=subject
+                )
+                
+                result.subject_assignment_marks = weighted_assignment
+                result.subject_exam_marks = weighted_exam
+                result.save()
+                
+                success_count += 1
+                
+            except Exception as e:
+                error_count += 1
+                print(f"Error saving grade: {e}")
+        
+        return JsonResponse({
+            "status": "success",
+            "message": f"Đã lưu {success_count} điểm. Lỗi: {error_count}",
+            "success_count": success_count,
+            "error_count": error_count
+        })
+        
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)})
+
+
+def admin_export_subject_grades(request, subject_id):
+    """
+    Export điểm của môn học ra CSV (giống staff export)
+    """
+    import csv
+    from django.http import HttpResponse
+    from student_management_app.models import StudentResult
+    
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+    except:
+        messages.error(request, "Môn học không tồn tại!")
+        return HttpResponseRedirect(reverse("admin_grade_subjects"))
+    
+    # Tạo response CSV
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = f'attachment; filename="diem_{subject.subject_code or subject.id}.csv"'
+    
+    # Write BOM for Excel UTF-8
+    response.write('\ufeff')
+    
+    writer = csv.writer(response)
+    
+    # Header
+    writer.writerow([
+        'STT', 
+        'Mã sinh viên', 
+        'Họ và tên', 
+        'Email',
+        'Điểm BT (0-100)', 
+        'Điểm thi (0-100)', 
+        'BT×40%', 
+        'Thi×60%', 
+        'Tổng điểm',
+        'Điểm chữ'
+    ])
+    
+    # Data
+    enrollments = StudentEnrollment.objects.filter(
+        subject_id=subject
+    ).select_related('student_id', 'student_id__admin')
+    
+    for idx, enrollment in enumerate(enrollments, 1):
+        student = enrollment.student_id
+        
+        try:
+            result = StudentResult.objects.get(
+                student_id=student,
+                subject_id=subject
+            )
+            
+            # Chuyển về 0-100
+            assignment_raw = round(result.subject_assignment_marks / 0.4) if result.subject_assignment_marks > 0 else 0
+            exam_raw = round(result.subject_exam_marks / 0.6) if result.subject_exam_marks > 0 else 0
+            
+            weighted_assignment = result.subject_assignment_marks
+            weighted_exam = result.subject_exam_marks
+            total = weighted_assignment + weighted_exam
+            
+            # Điểm chữ
+            if total >= 85:
+                letter_grade = 'A'
+            elif total >= 80:
+                letter_grade = 'B+'
+            elif total >= 70:
+                letter_grade = 'B'
+            elif total >= 65:
+                letter_grade = 'C+'
+            elif total >= 50:
+                letter_grade = 'C'
+            elif total >= 45:
+                letter_grade = 'D+'
+            elif total >= 40:
+                letter_grade = 'D'
+            else:
+                letter_grade = 'F'
+                
+        except StudentResult.DoesNotExist:
+            assignment_raw = 0
+            exam_raw = 0
+            weighted_assignment = 0
+            weighted_exam = 0
+            total = 0
+            letter_grade = 'N/A'
+        
+        writer.writerow([
+            idx,
+            student.admin.username,
+            f"{student.admin.first_name} {student.admin.last_name}",
+            student.admin.email,
+            assignment_raw,
+            exam_raw,
+            f"{weighted_assignment:.1f}",
+            f"{weighted_exam:.1f}",
+            f"{total:.1f}",
+            letter_grade
+        ])
+    
+    return response
+
+
+# ========================================================================
+# ADMIN REPORTS - Export báo cáo sinh viên và điểm
+# ========================================================================
+
+def admin_reports(request):
+    """
+    Trang quản lý báo cáo - có thể export danh sách SV và điểm
+    """
+    courses = Courses.objects.all()
+    subjects = Subjects.objects.all()
+    session_years = SessionYearModel.objects.all()
+    
+    return render(request, "hod_template/admin_reports.html", {
+        "courses": courses,
+        "subjects": subjects,
+        "session_years": session_years
+    })
+
+
+def admin_export_students(request):
+    """
+    Export danh sách sinh viên ra CSV/Excel
+    """
+    import csv
+    from django.http import HttpResponse
+    
+    course_id = request.GET.get('course_id', None)
+    session_id = request.GET.get('session_id', None)
+    
+    # Filter students
+    students = Students.objects.all().select_related('admin', 'course_id', 'session_year_id')
+    
+    if course_id:
+        students = students.filter(course_id=course_id)
+    if session_id:
+        students = students.filter(session_year_id=session_id)
+    
+    # Create CSV
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="danh_sach_sinh_vien.csv"'
+    response.write('\ufeff')
+    
+    writer = csv.writer(response)
+    
+    # Header
+    writer.writerow([
+        'STT',
+        'Mã sinh viên',
+        'Họ và tên',
+        'Email',
+        'Địa chỉ',
+        'Khóa học',
+        'Năm học',
+        'Ngày tham gia'
+    ])
+    
+    # Data
+    for idx, student in enumerate(students, 1):
+        writer.writerow([
+            idx,
+            student.admin.username,
+            f"{student.admin.first_name} {student.admin.last_name}",
+            student.admin.email,
+            student.address,
+            student.course_id.course_name,
+            f"{student.session_year_id.session_start_year} - {student.session_year_id.session_end_year}",
+            student.admin.date_joined.strftime('%Y-%m-%d')
+        ])
+    
+    return response
+
+
+def admin_export_grades(request):
+    """
+    Export điểm của tất cả sinh viên trong một môn ra CSV
+    """
+    import csv
+    from django.http import HttpResponse
+    from student_management_app.models import StudentResult
+    
+    subject_id = request.GET.get('subject_id', None)
+    
+    if not subject_id:
+        messages.error(request, "Vui lòng chọn môn học!")
+        return HttpResponseRedirect(reverse("admin_reports"))
+    
+    try:
+        subject = Subjects.objects.get(id=subject_id)
+    except:
+        messages.error(request, "Môn học không tồn tại!")
+        return HttpResponseRedirect(reverse("admin_reports"))
+    
+    # Create CSV
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = f'attachment; filename="diem_{subject.subject_code or subject.id}.csv"'
+    response.write('\ufeff')
+    
+    writer = csv.writer(response)
+    
+    # Header
+    writer.writerow([
+        'STT',
+        'Mã SV',
+        'Họ tên',
+        'Email',
+        'Môn học',
+        'Giảng viên',
+        'Điểm BT',
+        'Điểm thi',
+        'Tổng',
+        'Điểm chữ'
+    ])
+    
+    # Get all results for this subject
+    results = StudentResult.objects.filter(subject_id=subject).select_related(
+        'student_id', 'student_id__admin'
+    )
+    
+    for idx, result in enumerate(results, 1):
+        student = result.student_id
+        total = result.subject_assignment_marks + result.subject_exam_marks
+        
+        if total >= 85:
+            letter = 'A'
+        elif total >= 70:
+            letter = 'B'
+        elif total >= 50:
+            letter = 'C'
+        elif total >= 40:
+            letter = 'D'
+        else:
+            letter = 'F'
+        
+        writer.writerow([
+            idx,
+            student.admin.username,
+            f"{student.admin.first_name} {student.admin.last_name}",
+            student.admin.email,
+            subject.subject_name,
+            f"{subject.staff_id.first_name} {subject.staff_id.last_name}",
+            f"{result.subject_assignment_marks:.1f}",
+            f"{result.subject_exam_marks:.1f}",
+            f"{total:.1f}",
+            letter
+        ])
+    
+    return response
+
+
+# ========================================================================
+# USER MANAGEMENT - Activate/Deactivate, Reset Password
+# ========================================================================
+
+@csrf_exempt
+def toggle_user_status(request, user_id):
+    """
+    Bật/tắt trạng thái active của user
+    """
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid method"})
+    
+    try:
+        user = CustomUser.objects.get(id=user_id)
+        user.is_active = not user.is_active
+        user.save()
+        
+        status_text = "kích hoạt" if user.is_active else "vô hiệu hóa"
+        
+        return JsonResponse({
+            "status": "success",
+            "message": f"Đã {status_text} tài khoản {user.email}",
+            "is_active": user.is_active
+        })
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "User không tồn tại"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)})
+
+
+@csrf_exempt  
+def reset_user_password(request, user_id):
+    """
+    Reset password của user về 'admin'
+    """
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid method"})
+    
+    try:
+        user = CustomUser.objects.get(id=user_id)
+        user.set_password('admin')
+        user.save()
+        
+        return JsonResponse({
+            "status": "success",
+            "message": f"Đã reset password của {user.email} về 'admin'"
+        })
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "User không tồn tại"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)})
+
+
