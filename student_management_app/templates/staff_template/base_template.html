@@ -27,6 +27,47 @@
   <link rel="stylesheet" href="{% static "plugins/summernote/summernote-bs4.css" %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  
+  <!-- Custom CSS for Sidebar -->
+  <style>
+    /* Subject dropdown trong sidebar */
+    .nav-treeview .nav-treeview {
+      padding-left: 0.5rem;
+    }
+    
+    .nav-treeview .nav-treeview .nav-link {
+      padding-left: 3rem !important;
+    }
+    
+    /* Màu sắc cho các môn học */
+    .sidebar-dark-primary .nav-treeview > .nav-item > .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .sidebar-dark-primary .nav-treeview > .nav-item > .nav-link:hover,
+    .sidebar-dark-primary .nav-treeview > .nav-item > .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    /* Icon nhỏ hơn cho sub-menu */
+    .nav-treeview .text-xs {
+      font-size: 0.8rem;
+    }
+    
+    /* Truncate text cho tên môn học dài */
+    .nav-sidebar .nav-link p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    /* Animation cho collapse */
+    .collapse {
+      transition: height 0.3s ease;
+    }
+  </style>
+  
     {% block custom_css %}{% endblock custom_css %}
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -121,6 +162,37 @@
 <script src="{% static "dist/js/pages/dashboard.js" %}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{% static "dist/js/demo.js" %}"></script>
+
+<!-- Custom JS for Sidebar Subject Dropdown -->
+<script>
+$(document).ready(function() {
+  // Xử lý collapse cho môn học trong sidebar
+  $('[data-toggle="collapse"]').on('click', function(e) {
+    e.preventDefault();
+    var target = $(this).attr('href');
+    $(target).collapse('toggle');
+    
+    // Toggle icon
+    var icon = $(this).find('.fa-angle-left');
+    icon.toggleClass('fa-rotate-270');
+  });
+  
+  // Auto-expand submenu nếu đang ở trang con
+  $('.nav-treeview .collapse').each(function() {
+    if ($(this).find('.nav-link.active').length > 0) {
+      $(this).collapse('show');
+      // Rotate icon của parent
+      var parentLink = $('[href="#' + $(this).attr('id') + '"]');
+      parentLink.find('.fa-angle-left').addClass('fa-rotate-270');
+    }
+  });
+  
+  // Đảm bảo menu "Quản lý lớp học phần" mở khi ở trong các trang con
+  if ($('.nav-link.active').closest('.nav-item').parent().hasClass('nav-treeview')) {
+    $('.nav-link.active').closest('.nav-item').parent().parent('.nav-item').addClass('menu-open');
+  }
+});
+</script>
 
 {% block custom_js %}
 {% endblock custom_js %}

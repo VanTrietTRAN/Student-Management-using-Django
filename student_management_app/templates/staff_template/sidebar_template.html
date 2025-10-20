@@ -38,11 +38,8 @@
 
           <!-- Quản lý lớp học phần -->
           {% url 'staff_my_subjects' as staff_my_subjects %}
-          {% url 'staff_view_class_students' as staff_view_class_students %}
-          {% url 'staff_enter_grades' as staff_enter_grades %}
-          {% url 'staff_manage_description' as staff_manage_description %}
-          <li class="nav-item {% if request.path == staff_my_subjects or request.path == staff_view_class_students or request.path == staff_enter_grades or request.path == staff_manage_description %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == staff_my_subjects or request.path == staff_view_class_students or request.path == staff_enter_grades or request.path == staff_manage_description %}active{% endif %}">
+          <li class="nav-item {% if 'staff_my_subjects' in request.path or 'staff_view_class_students' in request.path or 'staff_enter_grades' in request.path or 'staff_manage_description' in request.path %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if 'staff_my_subjects' in request.path or 'staff_view_class_students' in request.path or 'staff_enter_grades' in request.path or 'staff_manage_description' in request.path %}active{% endif %}">
               <i class="nav-icon fas fa-chalkboard-teacher"></i>
               <p>
                 Quản lý lớp học phần
@@ -51,29 +48,45 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ staff_my_subjects }}" class="nav-link {% if request.path == staff_my_subjects %}active{% endif %}">
+                <a href="{{ staff_my_subjects }}" class="nav-link {% if 'staff_my_subjects' in request.path %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Môn học của tôi</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="{{ staff_view_class_students }}" class="nav-link {% if request.path == staff_view_class_students %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Danh sách sinh viên</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ staff_enter_grades }}" class="nav-link {% if request.path == staff_enter_grades %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Nhập điểm</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ staff_manage_description }}" class="nav-link {% if request.path == staff_manage_description %}active{% endif %}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Mô tả học phần</p>
-                </a>
-              </li>
+              {% if subjects %}
+                <!-- Dropdown các môn học -->
+                {% for subject in subjects %}
+                  <li class="nav-item ml-3">
+                    <a href="#subject-{{ subject.id }}" class="nav-link" data-toggle="collapse">
+                      <i class="fas fa-book nav-icon text-xs"></i>
+                      <p class="text-sm">
+                        {{ subject.subject_name|truncatewords:3 }}
+                        <i class="right fas fa-angle-left"></i>
+                      </p>
+                    </a>
+                    <ul class="nav nav-treeview collapse" id="subject-{{ subject.id }}">
+                      <li class="nav-item">
+                        <a href="{% url 'staff_view_class_students' subject.id %}" class="nav-link {% if request.resolver_match.url_name == 'staff_view_class_students' and subject.id|stringformat:'s' in request.path %}active{% endif %}">
+                          <i class="far fa-dot-circle nav-icon text-xs"></i>
+                          <p class="text-xs">Danh sách SV</p>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="{% url 'staff_enter_grades' subject.id %}" class="nav-link {% if request.resolver_match.url_name == 'staff_enter_grades' and subject.id|stringformat:'s' in request.path %}active{% endif %}">
+                          <i class="far fa-dot-circle nav-icon text-xs"></i>
+                          <p class="text-xs">Nhập điểm</p>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="{% url 'staff_manage_description' subject.id %}" class="nav-link {% if request.resolver_match.url_name == 'staff_manage_description' and subject.id|stringformat:'s' in request.path %}active{% endif %}">
+                          <i class="far fa-dot-circle nav-icon text-xs"></i>
+                          <p class="text-xs">Mô tả học phần</p>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                {% endfor %}
+              {% endif %}
             </ul>
           </li>
 
