@@ -32,7 +32,9 @@ Manage Subject
                       <th>ID</th>
                       <th>Subject Name</th>
                       <th>Course Name</th>
-                      <th>Course ID</th>
+                      <th>Credit Hours</th>
+                      <th>Fee/Credit</th>
+                      <th>Total Fee</th>
                       <th>Staff Name</th>
                       <th>Action</th>
                     </tr>
@@ -43,7 +45,19 @@ Manage Subject
                       <td>{{ subject.id }}</td>
                       <td>{{ subject.subject_name }}</td>
                       <td>{{ subject.course_id.course_name }}</td>
-                      <td>{{ subject.course_id.id }}</td>
+                      <td>{{ subject.credit_hours }}</td>
+                      <td>{{ subject.fee_per_credit|floatformat:0 }} đ</td>
+                      <td>
+                        <strong style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                       color: white; 
+                                       padding: 4px 12px; 
+                                       border-radius: 15px; 
+                                       display: inline-block;
+                                       font-size: 1.05em;
+                                       box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);">
+                            💰 {{ subject.get_total_fee|floatformat:0 }} đ
+                        </strong>
+                      </td>
                       <td>{{ subject.staff_id.first_name }} {{ subject.staff_id.last_name }}</td>
                       <td><a href="/edit_subject/{{ subject.id }}" class="btn btn-success">Edit</a></td>
                     </tr>
