@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -1144,5 +1144,45 @@ def reset_user_password(request, user_id):
         return JsonResponse({"status": "error", "message": "User không tồn tại"})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)})
+
+
+# ============================================================================
+# NOTIFICATION MANAGEMENT (Quản lý Thông báo)
+# ============================================================================
+
+def admin_view_notifications(request):
+    """
+    Admin xem lịch sử tất cả thông báo đã gửi cho staff và student
+    """
+    staff_notifications = NotificationStaffs.objects.all().order_by('-created_at')
+    student_notifications = NotificationStudent.objects.all().order_by('-created_at')
+    
+    context = {
+        'staff_notifications': staff_notifications,
+        'student_notifications': student_notifications,
+        'staff_count': staff_notifications.count(),
+        'student_count': student_notifications.count(),
+    }
+    return render(request, "hod_template/admin_view_notifications.html", context)
+
+
+def admin_delete_notification(request, notification_id, notification_type):
+    """
+    Admin xóa thông báo (staff hoặc student)
+    notification_type: 'staff' hoặc 'student'
+    """
+    try:
+        if notification_type == 'staff':
+            notification = NotificationStaffs.objects.get(id=notification_id)
+        else:
+            notification = NotificationStudent.objects.get(id=notification_id)
+        
+        notification.delete()
+        messages.success(request, "Đã xóa thông báo thành công!")
+    except Exception as e:
+        messages.error(request, f"Lỗi khi xóa thông báo: {str(e)}")
+    
+    return redirect('admin_view_notifications')
+
 
 

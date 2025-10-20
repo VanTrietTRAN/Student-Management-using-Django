@@ -173,6 +173,40 @@
             </a>
           </li>
 
+          <!-- Notification Management (NEW) -->
+          {% url 'admin_view_notifications' as admin_view_notifications %}
+          {% url 'admin_send_notification_student' as admin_send_notification_student %}
+          {% url 'admin_send_notification_staff' as admin_send_notification_staff %}
+          <li class="nav-item {% if request.path == admin_view_notifications or request.path == admin_send_notification_student or request.path == admin_send_notification_staff %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == admin_view_notifications or request.path == admin_send_notification_student or request.path == admin_send_notification_staff %}active{% endif %}">
+              <i class="nav-icon fas fa-bell"></i>
+              <p>
+                Quản Lý Thông Báo
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ admin_view_notifications }}" class="nav-link {% if request.path == admin_view_notifications %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Xem Lịch Sử Thông Báo</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ admin_send_notification_student }}" class="nav-link {% if request.path == admin_send_notification_student %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Gửi Cho Sinh Viên</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ admin_send_notification_staff }}" class="nav-link {% if request.path == admin_send_notification_staff %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Gửi Cho Giảng Viên</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
           <!-- Schedule Management -->
           {% url 'manage_schedule' as manage_schedule %}
           {% url 'add_schedule' as add_schedule %}

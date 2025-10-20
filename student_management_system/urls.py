@@ -102,6 +102,10 @@ urlpatterns = [
     # User Management
     path('toggle_user_status/<str:user_id>', HodViews.toggle_user_status, name="toggle_user_status"),
     path('reset_user_password/<str:user_id>', HodViews.reset_user_password, name="reset_user_password"),
+    
+    # Notification Management
+    path('admin_view_notifications', HodViews.admin_view_notifications, name="admin_view_notifications"),
+    path('admin_delete_notification/<str:notification_id>/<str:notification_type>', HodViews.admin_delete_notification, name="admin_delete_notification"),
 
                   #     Staff URL Path
     path('staff_home', StaffViews.staff_home, name="staff_home"),
