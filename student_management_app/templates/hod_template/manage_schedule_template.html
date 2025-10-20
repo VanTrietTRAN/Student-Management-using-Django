@@ -1,0 +1,91 @@
+{% extends 'hod_template/base_template.html' %}
+{% block page_title %}
+Manage Schedule
+{% endblock page_title %}
+{% block main_content %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Schedule</h3>
+                        <div class="card-tools">
+                            <a href="{% url 'add_schedule' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Add New Schedule
+                            </a>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% if message.tags == 'success' %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        
+                        <table id="scheduleTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Subject</th>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Room</th>
+                                    <th>Session Year</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.id }}</td>
+                                    <td>{{ schedule.subject_id.subject_name }}</td>
+                                    <td>{{ schedule.get_weekday_display }}</td>
+                                    <td>{{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</td>
+                                    <td>{{ schedule.room }}</td>
+                                    <td>{{ schedule.session_year_id.session_start_year|date:"Y" }} - {{ schedule.session_year_id.session_end_year|date:"Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_schedule' schedule.id %}" class="btn btn-success btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_schedule' schedule.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this schedule?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+
+<script>
+    $(document).ready(function() {
+        $('#scheduleTable').DataTable();
+    });
+</script>
+{% endblock main_content %}

@@ -129,6 +129,12 @@ urlpatterns = [
     path('firebase-messaging-sw.js',views.showFirebaseJS,name="show_firebase_js"),
     path('student_all_notification',StudentViews.student_all_notification,name="student_all_notification"),
     path('student_view_result',StudentViews.student_view_result,name="student_view_result"),
+    path('student_view_subjects', StudentViews.student_view_subjects, name="student_view_subjects"),
+    path('student_enroll_subject/<str:subject_id>', StudentViews.student_enroll_subject, name="student_enroll_subject"),
+    path('student_drop_subject/<str:subject_id>', StudentViews.student_drop_subject, name="student_drop_subject"),
+    path('student_view_fees', StudentViews.student_view_fees, name="student_view_fees"),
+    path('student_view_schedule', StudentViews.student_view_schedule, name="student_view_schedule"),
+    path('student_view_subject_description/<str:subject_id>', StudentViews.student_view_subject_description, name="student_view_subject_description"),
     path('join_class_room/<int:subject_id>/<int:session_year_id>',StudentViews.join_class_room,name="join_class_room"),
     path('node_modules/canvas-designer/widget.html',StaffViews.returnHtmlWidget,name="returnHtmlWidget"),
     path('testurl/',views.Testurl)
