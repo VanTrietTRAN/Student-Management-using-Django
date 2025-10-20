@@ -203,7 +203,8 @@ def staff_feedback_save(request):
 def staff_profile(request):
     user=CustomUser.objects.get(id=request.user.id)
     staff=Staffs.objects.get(admin=user)
-    return render(request,"staff_template/staff_profile.html",{"user":user,"staff":staff})
+    subjects_count=Subjects.objects.filter(staff_id=user.id).count()
+    return render(request,"staff_template/staff_profile.html",{"user":user,"staff":staff,"subjects_count":subjects_count})
 
 def staff_profile_save(request):
     if request.method!="POST":
@@ -223,11 +224,16 @@ def staff_profile_save(request):
 
             staff=Staffs.objects.get(admin=customuser.id)
             staff.address=address
+            
+            # Handle profile picture upload
+            if request.FILES.get('profile_pic'):
+                staff.profile_pic=request.FILES['profile_pic']
+            
             staff.save()
-            messages.success(request, "Successfully Updated Profile")
+            messages.success(request, "Cập nhật thông tin thành công!")
             return HttpResponseRedirect(reverse("staff_profile"))
-        except:
-            messages.error(request, "Failed to Update Profile")
+        except Exception as e:
+            messages.error(request, "Cập nhật thông tin thất bại!")
             return HttpResponseRedirect(reverse("staff_profile"))
 
 @csrf_exempt
