@@ -5,10 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
 
     <title>Canvas Designer | Muaz Khan</title>
-    <meta name="description" content="HTML5 Canvas Designer | Muaz Khan – A tool aimed to give you a full-fledged drawing surface and also auto generate appropriate code for you in different formats! Generator/Tool/Editor – 2D API/Context">
+    <meta name="description"
+        content="HTML5 Canvas Designer | Muaz Khan – A tool aimed to give you a full-fledged drawing surface and also auto generate appropriate code for you in different formats! Generator/Tool/Editor – 2D API/Context">
 
     <meta name="author" content="Muaz Khan">
     <link rel="author" type="text/html" href="https://plus.google.com/+MuazKhan">
@@ -16,16 +18,18 @@
     <style>
         /* Muaz Khan (@muazkh/@WebRTCWeb) */
 
-        textarea::::-webkit-scrollbar {
+        textarea::-webkit-scrollbar {
             width: 0;
             height: 0;
         }
+
         textarea::-webkit-scrollbar {
             height: 0;
             overflow: visible;
             width: 10px;
             border-left: 1px solid rgb(229, 229, 229);
         }
+
         textarea::-webkit-scrollbar-thumb {
             background-color: rgba(0, 0, 0, .2);
             background-clip: padding-box;
@@ -34,24 +38,29 @@
             box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .1), inset 0 -1px 0 rgba(0, 0, 0, .07);
             border-width: 1px 1px 1px 6px;
         }
+
         textarea::-webkit-scrollbar-button {
             height: 0;
             width: 0;
         }
+
         textarea::-webkit-scrollbar-track {
             background-clip: padding-box;
             border: solid transparent;
             border-width: 0 0 0 4px;
         }
+
         textarea::-webkit-scrollbar-corner {
             background: transparent;
         }
+
         ::selection,
         ::-moz-selection {
             background: #00A2E8;
             color: #fff;
             text-shadow: none;
         }
+
         html,
         body,
         input,
@@ -70,6 +79,7 @@
             user-select: none;
             font-family: Verdana, arial, helvetica, sans-serif;
         }
+
         html,
         body {
             background-color: #FBFBFB;
@@ -79,6 +89,7 @@
             color: Gray;
             overflow: hidden;
         }
+
         /* header */
 
         h1,
@@ -103,29 +114,35 @@
             background: linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(243, 243, 243, 1) 97%, rgba(237, 237, 237, 1) 97%, rgba(255, 255, 255, 1) 100%);
             /* W3C */
 
-            filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff', GradientType=0);
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ffffff', GradientType=0);
             /* IE6-9 */
         }
+
         /* links */
 
         a {
             color: #0b7aff;
             text-decoration: none;
         }
+
         a:hover {
             color: #043877;
         }
+
         /* design-surface */
 
         .design-surface {
             background-color: transparent;
         }
+
         .design-surface canvas {
             position: absolute;
         }
+
         .design-surface canvas:last-child {
             position: static;
         }
+
         /* toolbox */
 
         .tool-box {
@@ -143,7 +160,7 @@
         .tool-box::-webkit-scrollbar {
             width: 0;
             height: 0;
-            background-color:transparent;
+            background-color: transparent;
         }
 
         .tool-box::-webkit-scrollbar-button {
@@ -152,13 +169,13 @@
         }
 
         .tool-box::-webkit-scrollbar-thumb {
-            background-color:transparent;
+            background-color: transparent;
             border: 0;
         }
 
 
         .tool-box::-webkit-scrollbar-track {
-            background-color:transparent;
+            background-color: transparent;
             box-shadow: none;
         }
 
@@ -168,18 +185,22 @@
             margin-top: -4px;
             display: none;
         }
+
         .tool-box canvas:first-child,
         .tool-box canvas:first-child:hover {
             margin-top: 0;
             border-top: 0;
         }
+
         .tool-box canvas:hover {
             box-shadow: none;
             background: #eeeeee;
         }
+
         .selected-shape {
-            background: #eeeeee!important;
+            background: #eeeeee !important;
         }
+
         /* surface */
 
         .preview-panel {
@@ -188,25 +209,33 @@
             background-color: #FBFBFB;
             bottom: 0;
         }
+
         .preview-panel div {
             border: 1px solid #E5E5E5;
             display: inline-block;
             padding: 5px 10px;
         }
+
         .preview-panel #code-preview {
             margin-left: -6px;
         }
+
         .preview-panel div {
             border: 1px solid #E5E5E5;
         }
-        .preview-panel div:not(.preview-selected) {} .preview-panel div {
+
+        .preview-panel div:not(.preview-selected) {}
+
+        .preview-panel div {
             border: 1px solid rgb(9, 159, 243);
         }
+
         .preview-selected {
             margin-top: -4px;
             background-color: rgb(6, 205, 255);
             color: white;
         }
+
         /* input */
 
         input,
@@ -221,9 +250,11 @@
             user-select: initial;
             outline: none;
         }
+
         input:focus {
             border: 1px solid #043877;
         }
+
         /* select */
 
         .allow-select {
@@ -231,23 +262,28 @@
             -moz-user-select: initial;
             user-select: initial
         }
+
         /* arc */
 
-        .arc-range-container, #pdf-page-container {
+        .arc-range-container,
+        #pdf-page-container {
             position: absolute;
             z-index: 1000;
             display: none;
         }
+
         .arc-range {
             font-size: 18px;
             padding: 2px 16px;
             text-align: center;
             width: 40px;
         }
+
         .arc-range-container-guide {
             margin-top: 10px;
             color: #C5C5C5;
         }
+
         /* code viewer */
 
         .code-container {
@@ -256,6 +292,7 @@
             width: 100%;
             display: none;
         }
+
         .code-text {
             resize: none;
             width: 99%;
@@ -267,6 +304,7 @@
             font-family: Consolas, "Andale Mono", "Lucida Console", "Courier New", monospace;
             color: #666;
         }
+
         /* options */
 
         .options-container {
@@ -278,13 +316,16 @@
             background-color: #FBFBFB;
             display: none;
         }
+
         .options-container div {
             border-bottom: 1px solid #E5E5E5;
             padding: 5px;
         }
+
         .options-container div:last-child {
             border-bottom: 0;
         }
+
         /* context menu */
 
         .context-popup {
@@ -296,25 +337,30 @@
             background-color: #FBFBFB;
             box-shadow: inset 0 0 14px rgb(229, 229, 229);
         }
+
         .line-width-text,
         .colors-container input {
             width: 25px;
             padding: 2px 5px;
             text-align: center;
         }
+
         /* colors */
 
         .colors-container label {
             width: 100px;
             display: inline-block;
         }
+
         .colors-container input {
             width: 100px;
             text-align: left;
         }
+
         .colors-container .input-div {
             margin-bottom: 5px;
         }
+
         /* additional controls */
 
         .additional-container label,
@@ -322,9 +368,11 @@
             width: 200px;
             display: inline-block;
         }
+
         .additional-container select {
             width: 120px;
         }
+
         .btn-007 {
             font-family: Verdana, arial, helvetica, sans-serif;
             font-weight: normal;
@@ -343,16 +391,19 @@
             border: 1px solid red;
             outline: none;
         }
+
         .btn-007:hover,
         .btn-007:focus {
             background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(5%, rgb(221, 221, 221)), to(rgb(250, 250, 250)));
             border: 1px solid rgb(142, 142, 142);
         }
+
         .btn-007[disabled] {
             background: rgb(249, 249, 249);
             border: 1px solid rgb(218, 207, 207);
             color: rgb(197, 189, 189);
         }
+
         .fontSelect {
             position: relative;
             padding: 3px;
@@ -372,10 +423,12 @@
             border-radius: 4px;
             border: 1px solid #cecece;
         }
+
         .fontSelect span {
             overflow: hidden;
             margin-left: 5px;
         }
+
         .fontSelect .arrow-down {
             position: absolute;
             right: 10px;
@@ -384,6 +437,7 @@
             border-right: 6px solid transparent;
             border-top: 6px solid #AAA;
         }
+
         .fontSelectUl,
         .fontSizeUl {
             list-style: none;
@@ -394,9 +448,11 @@
             top: 35px;
             padding: 0;
         }
+
         .fontSelectUl {
             padding-left: 5px;
         }
+
         .fontSelectUl li,
         .fontSizeUl li {
             height: 24px;
@@ -408,6 +464,7 @@
             border-left: 1px solid #f0f0f0;
             border-right: 1px solid #f0f0f0;
         }
+
         .fontSelectUl li:last-child,
         .fontSizeUl li:last-child {
             -webkit-border-radius: 0 0 4px 4px;
@@ -415,54 +472,74 @@
             border-radius: 0 0 4px 4px;
             border-bottom: 1px solid #EEEEEE;
         }
+
         .fontSelectUl li:hover,
         .fontSizeUl li:hover {
             background: #DDD;
         }
+
         .fontSelectUl li.font-family-selected,
         .fontSizeUl li.font-size-selected {
-            background: rgb(6, 205, 255)!important;
-            color: white!important;
+            background: rgb(6, 205, 255) !important;
+            color: white !important;
         }
+
         #marker-selected-color,
-        #marker-selected-color-2, #pencil-selected-color,
+        #marker-selected-color-2,
+        #pencil-selected-color,
         #pencil-selected-color-2 {
             display: inline-block;
             vertical-align: middle;
             width: 30px;
             height: 30px;
         }
-        #marker-fill-colors, #pencil-fill-colors {
+
+        #marker-fill-colors,
+        #pencil-fill-colors {
             display: none;
         }
-        #marker-color-container, #pencil-color-container {
+
+        #marker-color-container,
+        #pencil-color-container {
             position: relative;
         }
-        #marker-fill-colors, #pencil-fill-colors {
+
+        #marker-fill-colors,
+        #pencil-fill-colors {
             left: 100%;
             top: 0;
             width: 100px;
             padding: 10px;
         }
-        #marker-fill-style, #pencil-fill-style {
+
+        #marker-fill-style,
+        #pencil-fill-style {
             width: 50px;
             display: inline-block;
         }
-        #marker-colors-list, #pencil-colors-list {
+
+        #marker-colors-list,
+        #pencil-colors-list {
             margin: 10px auto;
             border-collapse: collapse;
         }
-        #marker-colors-list td, #pencil-colors-list td {
+
+        #marker-colors-list td,
+        #pencil-colors-list td {
             width: 15px;
             height: 15px;
             border: 1px solid black;
             padding: 0;
         }
-        #marker-colors-list td:hover, #pencil-colors-list td:hover {
+
+        #marker-colors-list td:hover,
+        #pencil-colors-list td:hover {
             border: 1px solid white;
         }
 
-        #pdf-next, #pdf-prev, #pdf-close {
+        #pdf-next,
+        #pdf-prev,
+        #pdf-close {
             width: 22px;
             vertical-align: middle;
             cursor: pointer;
@@ -783,7 +860,7 @@
 
     <!-- url-parameters -->
     <script>
-        (function() {
+        (function () {
             var params = {},
                 r = /([^&=]+)=?([^&]*)/g;
 
