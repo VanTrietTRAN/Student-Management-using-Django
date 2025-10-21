@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,242 +10,246 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{% static "plugins/fontawesome-free/css/all.min.css" %}">
+  <link rel="stylesheet" href="{% static " plugins/fontawesome-free/css/all.min.css" %}">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="{% static "plugins/icheck-bootstrap/icheck-bootstrap.min.css" %}">
+  <link rel="stylesheet" href="{% static " plugins/icheck-bootstrap/icheck-bootstrap.min.css" %}">
   <!-- Theme style -->
-  <link rel="stylesheet" href="{% static "dist/css/adminlte.min.css" %}">
+  <link rel="stylesheet" href="{% static " dist/css/adminlte.min.css" %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 </head>
+
 <body class="hold-transition login-page">
-<div class="login-box">
-  <div class="login-logo">
-    <a href="../../index2.html"><b>Student</b> Management System</a>
-  </div>
-  <!-- /.login-logo -->
-  <div class="card">
-    <div class="card-body login-card-body">
-      <p class="login-box-msg">Signup Student in Student Management System</p>
-
-      <form action="/do_signup_student" method="post" id="student-signup-form" enctype="multipart/form-data">
-      {% csrf_token %}
-        
-        <!-- Email -->
-        <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="Email" name="email" required>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- First Name -->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="First Name" name="first_name" required>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-user"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Last Name -->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Last Name" name="last_name" required>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-user"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Username -->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Username" name="username" required>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-id-card"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Password (min 8 characters)" name="password" required minlength="8">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-lock"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address -->
-        <div class="input-group mb-3">
-          <textarea class="form-control" placeholder="Address" name="address" rows="2" required></textarea>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-home"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Course Selection -->
-        <div class="input-group mb-3">
-          <select class="form-control" name="course" required>
-            <option value="">-- Select Course --</option>
-            {% for course in courses %}
-              <option value="{{ course.id }}">{{ course.course_name }}</option>
-            {% endfor %}
-          </select>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-graduation-cap"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gender Selection -->
-        <div class="input-group mb-3">
-          <select class="form-control" name="sex" required>
-            <option value="">-- Select Gender --</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-venus-mars"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Profile Picture -->
-        <div class="input-group mb-3">
-          <div class="custom-file">
-            <input type="file" class="custom-file-input" name="profile_pic" id="profile_pic" accept="image/*">
-            <label class="custom-file-label" for="profile_pic">Choose profile picture</label>
-          </div>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-image"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Session Year Selection -->
-        <div class="input-group mb-3">
-          <select class="form-control" name="session_year" required>
-            <option value="">-- Select Session Year --</option>
-            {% for sessionyear in session_years %}
-              <option value="{{ sessionyear.id }}">{{ sessionyear.session_start_year }} - {{ sessionyear.session_end_year }}</option>
-            {% endfor %}
-          </select>
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-calendar"></span>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="row">
-          <!-- Submit Button -->
-          <div class="col-12">
-            <button type="submit" class="btn btn-primary btn-block">
-              <i class="fas fa-user-plus"></i> Register as Student
-            </button>
-          </div>
-          
-          <!-- Back to Login Link -->
-          <div class="col-12 text-center mt-3">
-            <a href="{% url 'show_login' %}" class="text-center">
-              <i class="fas fa-arrow-left"></i> Back to Login
-            </a>
-          </div>
-        </div>
-
-        <!-- Messages -->
-        <div class="row">
-          {% if messages %}
-         <div class="col-12">
-            {% for message in messages %}
-            {% if message.tags == 'error' %}
-            <div class="alert alert-danger alert-dismissible fade show" style="margin-top:10px" role="alert">
-              <i class="fas fa-exclamation-circle"></i> {{ message }}
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            {% endif %}
-            {% if message.tags == 'success' %}
-            <div class="alert alert-success alert-dismissible fade show" style="margin-top:10px" role="alert">
-              <i class="fas fa-check-circle"></i> {{ message }}
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            {% endif %}
-            {% endfor %}
-          </div>
-          {% endif %}
-        </div>
-      </form>
-
-      <!-- /.social-auth-links -->
-
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="../../index2.html"><b>Student</b> Management System</a>
     </div>
-    <!-- /.login-card-body -->
+    <!-- /.login-logo -->
+    <div class="card">
+      <div class="card-body login-card-body">
+        <p class="login-box-msg">Signup Student in Student Management System</p>
+
+        <form action="/do_signup_student" method="post" id="student-signup-form" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Email -->
+          <div class="input-group mb-3">
+            <input type="email" class="form-control" placeholder="Email" name="email" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- First Name -->
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="First Name" name="first_name" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Last Name" name="last_name" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Username" name="username" required>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-id-card"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="input-group mb-3">
+            <input type="password" class="form-control" placeholder="Password (min 8 characters)" name="password"
+              required minlength="8">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="input-group mb-3">
+            <textarea class="form-control" placeholder="Address" name="address" rows="2" required></textarea>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-home"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Selection -->
+          <div class="input-group mb-3">
+            <select class="form-control" name="course" required>
+              <option value="">-- Select Course --</option>
+              {% for course in courses %}
+              <option value="{{ course.id }}">{{ course.course_name }}</option>
+              {% endfor %}
+            </select>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-graduation-cap"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gender Selection -->
+          <div class="input-group mb-3">
+            <select class="form-control" name="sex" required>
+              <option value="">-- Select Gender --</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-venus-mars"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Picture -->
+          <div class="input-group mb-3">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" name="profile_pic" id="profile_pic" accept="image/*">
+              <label class="custom-file-label" for="profile_pic">Choose profile picture</label>
+            </div>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-image"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Year Selection -->
+          <div class="input-group mb-3">
+            <select class="form-control" name="session_year" required>
+              <option value="">-- Select Session Year --</option>
+              {% for sessionyear in session_years %}
+              <option value="{{ sessionyear.id }}">{{ sessionyear.session_start_year }} - {{
+                sessionyear.session_end_year }}</option>
+              {% endfor %}
+            </select>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-calendar"></span>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <!-- Submit Button -->
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-user-plus"></i> Register as Student
+              </button>
+            </div>
+
+            <!-- Back to Login Link -->
+            <div class="col-12 text-center mt-3">
+              <a href="{% url 'show_login' %}" class="text-center">
+                <i class="fas fa-arrow-left"></i> Back to Login
+              </a>
+            </div>
+          </div>
+
+          <!-- Messages -->
+          <div class="row">
+            {% if messages %}
+            <div class="col-12">
+              {% for message in messages %}
+              {% if message.tags == 'error' %}
+              <div class="alert alert-danger alert-dismissible fade show" style="margin-top:10px" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              {% endif %}
+              {% if message.tags == 'success' %}
+              <div class="alert alert-success alert-dismissible fade show" style="margin-top:10px" role="alert">
+                <i class="fas fa-check-circle"></i> {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </form>
+
+        <!-- /.social-auth-links -->
+
+      </div>
+      <!-- /.login-card-body -->
+    </div>
   </div>
-</div>
-<!-- /.login-box -->
+  <!-- /.login-box -->
 
-<!-- jQuery -->
-<script src="{% static "plugins/jquery/jquery.min.js" %}"></script>
-<!-- Bootstrap 4 -->
-<script src="{% static "plugins/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static "dist/js/adminlte.min.js" %}"></script>
+  <!-- jQuery -->
+  <script src="{% static " plugins/jquery/jquery.min.js" %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static " plugins/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static " dist/js/adminlte.min.js" %}"></script>
 
-<script>
-// Display file name when file is selected
-$(document).ready(function(){
-  $('.custom-file-input').on('change', function() {
-    let fileName = $(this).val().split('\\').pop();
-    $(this).next('.custom-file-label').addClass("selected").html(fileName);
-  });
+  <script>
+    // Display file name when file is selected
+    $(document).ready(function () {
+      $('.custom-file-input').on('change', function () {
+        let fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass("selected").html(fileName);
+      });
 
-  // Form validation
-  $('#student-signup-form').on('submit', function(e) {
-    var password = $('input[name="password"]').val();
-    
-    if (password.length < 8) {
-      e.preventDefault();
-      alert('Password must be at least 8 characters long');
-      return false;
-    }
-    
-    // Check if course is selected
-    if ($('select[name="course"]').val() === '') {
-      e.preventDefault();
-      alert('Please select a course');
-      return false;
-    }
-    
-    // Check if session year is selected
-    if ($('select[name="session_year"]').val() === '') {
-      e.preventDefault();
-      alert('Please select a session year');
-      return false;
-    }
-    
-    return true;
-  });
-});
-</script>
+      // Form validation
+      $('#student-signup-form').on('submit', function (e) {
+        var password = $('input[name="password"]').val();
+
+        if (password.length < 8) {
+          e.preventDefault();
+          alert('Password must be at least 8 characters long');
+          return false;
+        }
+
+        // Check if course is selected
+        if ($('select[name="course"]').val() === '') {
+          e.preventDefault();
+          alert('Please select a course');
+          return false;
+        }
+
+        // Check if session year is selected
+        if ($('select[name="session_year"]').val() === '') {
+          e.preventDefault();
+          alert('Please select a session year');
+          return false;
+        }
+
+        return true;
+      });
+    });
+  </script>
 
 </body>
+
 </html>
