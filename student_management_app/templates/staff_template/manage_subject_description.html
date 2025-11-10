@@ -34,7 +34,7 @@ Manage Subject Descriptions
                         {% endif %}
                         {% endfor %}
                         {% endif %}
-                        
+
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -51,7 +51,8 @@ Manage Subject Descriptions
                                     <td>{{ subject.course_id.course_name }}</td>
                                     <td>
                                         {% if subject.subject_description_file %}
-                                        <a href="{{ subject.subject_description_file.url }}" target="_blank" class="btn btn-sm btn-info">
+                                        <a href="{{ subject.subject_description_file.url }}" target="_blank"
+                                            class="btn btn-sm btn-info">
                                             <i class="fas fa-file-pdf"></i> View PDF
                                         </a>
                                         {% else %}
@@ -59,38 +60,47 @@ Manage Subject Descriptions
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#uploadModal{{ subject.id }}">
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                            data-target="#uploadModal{{ subject.id }}">
                                             <i class="fas fa-upload"></i> Upload
                                         </button>
                                         {% if subject.subject_description_file %}
-                                        <a href="{% url 'delete_subject_description' subject.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this file?')">
+                                        <a href="{% url 'delete_subject_description' subject.id %}"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to delete this file?')">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>
                                         {% endif %}
                                     </td>
                                 </tr>
-                                
+
                                 <!-- Upload Modal -->
                                 <div class="modal fade" id="uploadModal{{ subject.id }}" tabindex="-1" role="dialog">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title">Upload Description for {{ subject.subject_name }}</h5>
+                                                <h5 class="modal-title">Upload Description for {{ subject.subject_name
+                                                    }}</h5>
                                                 <button type="button" class="close" data-dismiss="modal">
                                                     <span>&times;</span>
                                                 </button>
                                             </div>
-                                            <form method="post" action="{% url 'upload_subject_description' subject.id %}" enctype="multipart/form-data">
+                                            <form method="post"
+                                                action="{% url 'upload_subject_description' subject.id %}"
+                                                enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                 <div class="modal-body">
                                                     <div class="form-group">
                                                         <label>Select PDF File</label>
-                                                        <input type="file" class="form-control-file" name="subject_description_file" accept=".pdf" required>
-                                                        <small class="form-text text-muted">Please upload a PDF file</small>
+                                                        <input type="file" class="form-control-file"
+                                                            name="subject_description_file" accept=".pdf" required>
+                                                        <small class="form-text text-muted">Please upload a PDF
+                                                            file</small>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
                                                     <button type="submit" class="btn btn-primary">Upload</button>
                                                 </div>
                                             </form>
