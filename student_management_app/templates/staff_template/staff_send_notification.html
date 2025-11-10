@@ -3,96 +3,97 @@
 Gửi Thông Báo
 {% endblock page_title %}
 {% block main_content %}
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-          <div class="row">
-              <div class="col-md-12">
-                  <!-- Card form gửi thông báo -->
-                  <div class="card card-primary">
-                      <div class="card-header">
-                          <h3 class="card-title">Gửi Thông Báo Cho Sinh Viên</h3>
-                      </div>
-                      <!-- form start -->
-                      <form action="{% url 'staff_send_notification_save' %}" method="post">
-                          {% csrf_token %}
-                          <div class="card-body">
-                              <div class="form-group">
-                                  <label>Chọn Môn Học</label>
-                                  <select class="form-control" name="subject_id" id="subject_id" required>
-                                      <option value="">-- Chọn môn học --</option>
-                                      {% for subject in subjects %}
-                                          <option value="{{ subject.subject_id }}">
-                                              {{ subject.subject_name }} ({{ subject.student_count }} sinh viên)
-                                          </option>
-                                      {% endfor %}
-                                  </select>
-                              </div>
-                              <div class="form-group">
-                                  <label>Nội Dung Thông Báo</label>
-                                  <textarea class="form-control" rows="6" name="message" placeholder="Nhập nội dung thông báo..." required></textarea>
-                              </div>
-                              <div class="form-group">
-                                  {% if messages %}
-                                      {% for message in messages %}
-                                          {% if message.tags == 'error' %}
-                                              <div class="alert alert-danger" style="margin-top:10px">{{ message }}</div>
-                                          {% endif %}
-                                          {% if message.tags == 'success' %}
-                                              <div class="alert alert-success" style="margin-top:10px">{{ message }}</div>
-                                          {% endif %}
-                                      {% endfor %}
-                                  {% endif %}
-                              </div>
-                          </div>
-                          <!-- /.card-body -->
-                          <div class="card-footer">
-                              <button type="submit" class="btn btn-primary btn-block">
-                                  <i class="fas fa-paper-plane"></i> Gửi Thông Báo
-                              </button>
-                          </div>
-                      </form>
-                  </div>
-                  <!-- /.card -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Card form gửi thông báo -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Gửi Thông Báo Cho Sinh Viên</h3>
+                    </div>
+                    <!-- form start -->
+                    <form action="{% url 'staff_send_notification_save' %}" method="post">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Chọn Môn Học</label>
+                                <select class="form-control" name="subject_id" id="subject_id" required>
+                                    <option value="">-- Chọn môn học --</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.subject_id }}">
+                                        {{ subject.subject_name }} ({{ subject.student_count }} sinh viên)
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nội Dung Thông Báo</label>
+                                <textarea class="form-control" rows="6" name="message"
+                                    placeholder="Nhập nội dung thông báo..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                {% if messages %}
+                                {% for message in messages %}
+                                {% if message.tags == 'error' %}
+                                <div class="alert alert-danger" style="margin-top:10px">{{ message }}</div>
+                                {% endif %}
+                                {% if message.tags == 'success' %}
+                                <div class="alert alert-success" style="margin-top:10px">{{ message }}</div>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-paper-plane"></i> Gửi Thông Báo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
 
-                  <!-- Card hiển thị lịch sử thông báo -->
-                  <div class="card card-info">
-                      <div class="card-header">
-                          <h3 class="card-title">Lịch Sử Thông Báo Gần Đây</h3>
-                      </div>
-                      <div class="card-body table-responsive p-0">
-                          <table class="table table-hover text-nowrap">
-                              <thead>
-                                  <tr>
-                                      <th>ID</th>
-                                      <th>Nội Dung</th>
-                                      <th>Thời Gian Gửi</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  {% if notifications %}
-                                      {% for notification in notifications %}
-                                          <tr>
-                                              <td>{{ notification.id }}</td>
-                                              <td>{{ notification.message }}</td>
-                                              <td>{{ notification.created_at|date:"d/m/Y H:i" }}</td>
-                                          </tr>
-                                      {% endfor %}
-                                  {% else %}
-                                      <tr>
-                                          <td colspan="3" class="text-center text-muted">
-                                              <i class="fas fa-info-circle"></i> Chưa có thông báo nào được gửi
-                                          </td>
-                                      </tr>
-                                  {% endif %}
-                              </tbody>
-                          </table>
-                      </div>
-                  </div>
-                  <!-- /.card -->
-              </div>
-          </div>
-      </div>
-    </section>
-    <!-- /.content -->
+                <!-- Card hiển thị lịch sử thông báo -->
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Lịch Sử Thông Báo Gần Đây</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nội Dung</th>
+                                    <th>Thời Gian Gửi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if notifications %}
+                                {% for notification in notifications %}
+                                <tr>
+                                    <td>{{ notification.id }}</td>
+                                    <td>{{ notification.message }}</td>
+                                    <td>{{ notification.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        <i class="fas fa-info-circle"></i> Chưa có thông báo nào được gửi
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
 {% endblock main_content %}
