@@ -4,108 +4,107 @@
 Môn học của tôi
 {% endblock page_title %}
 {% block main_content %}
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-          <div class="row">
-              <div class="col-12">
-                  <div class="card">
-                      <div class="card-header">
-                          <h3 class="card-title">Danh sách môn học giảng dạy</h3>
-                      </div>
-                      
-                      <div class="card-body">
-                          {% if messages %}
-                              {% for message in messages %}
-                              {% if message.tags == 'error' %}
-                              <div class="alert alert-danger alert-dismissible fade show">
-                                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                  {{ message }}
-                              </div>
-                              {% endif %}
-                              {% if message.tags == 'success' %}
-                              <div class="alert alert-success alert-dismissible fade show">
-                                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                  {{ message }}
-                              </div>
-                              {% endif %}
-                              {% endfor %}
-                          {% endif %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh sách môn học giảng dạy</h3>
+                    </div>
 
-                          {% if subjects %}
-                          <div class="table-responsive">
-                              <table id="subjectsTable" class="table table-bordered table-hover">
-                                  <thead class="thead-light">
-                                      <tr>
-                                          <th style="width: 5%">STT</th>
-                                          <th style="width: 20%">Mã môn học</th>
-                                          <th style="width: 25%">Tên môn học</th>
-                                          <th style="width: 10%">Tín chỉ</th>
-                                          <th style="width: 10%">Số SV</th>
-                                          <th style="width: 15%">Lịch học</th>
-                                          <th style="width: 15%">Thao tác</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      {% for subject in subjects %}
-                                      <tr>
-                                          <td>{{ forloop.counter }}</td>
-                                          <td><span class="badge badge-info">{{ subject.subject_code }}</span></td>
-                                          <td><strong>{{ subject.subject_name }}</strong></td>
-                                          <td class="text-center">{{ subject.credit_hours }}</td>
-                                          <td class="text-center">
-                                              <span class="badge badge-success">{{ subject.student_count }} sinh viên</span>
-                                          </td>
-                                          <td>
-                                              {% if subject.schedule %}
-                                              <small>
-                                                  <i class="far fa-calendar-alt"></i> {{ subject.schedule.weekday }}<br>
-                                                  <i class="far fa-clock"></i> {{ subject.schedule.start_time }} - {{ subject.schedule.end_time }}<br>
-                                                  <i class="fas fa-door-open"></i> {{ subject.schedule.room }}
-                                              </small>
-                                              {% else %}
-                                              <span class="text-muted">Chưa có lịch</span>
-                                              {% endif %}
-                                          </td>
-                                          <td>
-                                              <div class="btn-group btn-group-sm" role="group">
-                                                  <a href="{% url 'staff_view_class_students' subject.id %}" 
-                                                     class="btn btn-primary" 
-                                                     title="Xem sinh viên">
-                                                      <i class="fas fa-users"></i>
-                                                  </a>
-                                                  <a href="{% url 'staff_enter_grades' subject.id %}" 
-                                                     class="btn btn-success" 
-                                                     title="Nhập điểm">
-                                                      <i class="fas fa-pen"></i>
-                                                  </a>
-                                                  <a href="{% url 'staff_manage_description' subject.id %}" 
-                                                     class="btn btn-info" 
-                                                     title="Mô tả học phần">
-                                                      <i class="fas fa-file-alt"></i>
-                                                  </a>
-                                              </div>
-                                          </td>
-                                      </tr>
-                                      {% endfor %}
-                                  </tbody>
-                              </table>
-                          </div>
-                          {% else %}
-                          <div class="alert alert-info">
-                              <i class="icon fas fa-info-circle"></i>
-                              Bạn chưa được phân công giảng dạy môn học nào.
-                          </div>
-                          {% endif %}
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-    </section>
-    
-    <script>
-    $(document).ready(function() {
+                    <div class="card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                        {% if message.tags == 'success' %}
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+
+                        {% if subjects %}
+                        <div class="table-responsive">
+                            <table id="subjectsTable" class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 5%">STT</th>
+                                        <th style="width: 20%">Mã môn học</th>
+                                        <th style="width: 25%">Tên môn học</th>
+                                        <th style="width: 10%">Tín chỉ</th>
+                                        <th style="width: 10%">Số SV</th>
+                                        <th style="width: 15%">Lịch học</th>
+                                        <th style="width: 15%">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in subjects %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><span class="badge badge-info">{{ subject.subject_code }}</span></td>
+                                        <td><strong>{{ subject.subject_name }}</strong></td>
+                                        <td class="text-center">{{ subject.credit_hours }}</td>
+                                        <td class="text-center">
+                                            <span class="badge badge-success">{{ subject.student_count }} sinh
+                                                viên</span>
+                                        </td>
+                                        <td>
+                                            {% if subject.schedule %}
+                                            <small>
+                                                <i class="far fa-calendar-alt"></i> {{ subject.schedule.weekday }}<br>
+                                                <i class="far fa-clock"></i> {{ subject.schedule.start_time }} - {{
+                                                subject.schedule.end_time }}<br>
+                                                <i class="fas fa-door-open"></i> {{ subject.schedule.room }}
+                                            </small>
+                                            {% else %}
+                                            <span class="text-muted">Chưa có lịch</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'staff_view_class_students' subject.id %}"
+                                                    class="btn btn-primary" title="Xem sinh viên">
+                                                    <i class="fas fa-users"></i>
+                                                </a>
+                                                <a href="{% url 'staff_enter_grades' subject.id %}"
+                                                    class="btn btn-success" title="Nhập điểm">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
+                                                <a href="{% url 'staff_manage_description' subject.id %}"
+                                                    class="btn btn-info" title="Mô tả học phần">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="icon fas fa-info-circle"></i>
+                            Bạn chưa được phân công giảng dạy môn học nào.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
         $('#subjectsTable').DataTable({
             "paging": true,
             "lengthChange": true,
@@ -130,5 +129,5 @@ Môn học của tôi
             }
         });
     });
-    </script>
+</script>
 {% endblock main_content %}
