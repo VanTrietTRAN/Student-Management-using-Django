@@ -4,151 +4,145 @@
 Mô tả học phần - {{ subject.subject_name }}
 {% endblock page_title %}
 {% block main_content %}
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-          <div class="row">
-              <div class="col-12">
-                  <div class="card">
-                      <div class="card-header">
-                          <h3 class="card-title">
-                              <i class="fas fa-file-alt"></i> Quản lý mô tả học phần
-                          </h3>
-                          <div class="card-tools">
-                              <a href="{% url 'staff_my_subjects' %}" class="btn btn-secondary btn-sm">
-                                  <i class="fas fa-arrow-left"></i> Quay lại
-                              </a>
-                          </div>
-                      </div>
-                      
-                      <div class="card-body">
-                          <!-- Subject Info -->
-                          <div class="alert alert-info">
-                              <h5><i class="icon fas fa-book"></i> {{ subject.subject_name }}</h5>
-                              <p class="mb-0">
-                                  <strong>Mã môn:</strong> {{ subject.subject_code }} | 
-                                  <strong>Tín chỉ:</strong> {{ subject.credit_hours }}
-                              </p>
-                          </div>
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-file-alt"></i> Quản lý mô tả học phần
+                        </h3>
+                        <div class="card-tools">
+                            <a href="{% url 'staff_my_subjects' %}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </div>
 
-                          {% if messages %}
-                              {% for message in messages %}
-                              {% if message.tags == 'error' %}
-                              <div class="alert alert-danger alert-dismissible fade show">
-                                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                  {{ message }}
-                              </div>
-                              {% endif %}
-                              {% if message.tags == 'success' %}
-                              <div class="alert alert-success alert-dismissible fade show">
-                                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                  {{ message }}
-                              </div>
-                              {% endif %}
-                              {% endfor %}
-                          {% endif %}
+                    <div class="card-body">
+                        <!-- Subject Info -->
+                        <div class="alert alert-info">
+                            <h5><i class="icon fas fa-book"></i> {{ subject.subject_name }}</h5>
+                            <p class="mb-0">
+                                <strong>Mã môn:</strong> {{ subject.subject_code }} |
+                                <strong>Tín chỉ:</strong> {{ subject.credit_hours }}
+                            </p>
+                        </div>
 
-                          <!-- Current Description -->
-                          {% if subject.description %}
-                          <div class="card card-outline card-primary mb-3">
-                              <div class="card-header">
-                                  <h3 class="card-title">Mô tả hiện tại</h3>
-                              </div>
-                              <div class="card-body">
-                                  <div class="description-content">
-                                      {{ subject.description|linebreaks }}
-                                  </div>
-                              </div>
-                          </div>
-                          {% endif %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                        {% if message.tags == 'success' %}
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
 
-                          <!-- Edit Form -->
-                          <form action="{% url 'staff_save_description' %}" method="post" enctype="multipart/form-data">
-                              {% csrf_token %}
-                              <input type="hidden" name="subject_id" value="{{ subject.id }}">
-                              
-                              <div class="form-group">
-                                  <label for="description">Mô tả môn học <span class="text-danger">*</span></label>
-                                  <textarea class="form-control" 
-                                            id="description" 
-                                            name="description" 
-                                            rows="10" 
-                                            placeholder="Nhập mô tả chi tiết về môn học: mục tiêu, nội dung, yêu cầu..."
-                                            required>{{ subject.description|default:'' }}</textarea>
-                                  <small class="form-text text-muted">
-                                      Nội dung mô tả sẽ hiển thị cho sinh viên xem
-                                  </small>
-                              </div>
+                        <!-- Current Description -->
+                        {% if subject.description %}
+                        <div class="card card-outline card-primary mb-3">
+                            <div class="card-header">
+                                <h3 class="card-title">Mô tả hiện tại</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="description-content">
+                                    {{ subject.description|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
 
-                              <div class="form-group">
-                                  <label for="description_file">Tài liệu mô tả (PDF)</label>
-                                  
-                                  {% if subject.description_file %}
-                                  <div class="alert alert-success mb-2">
-                                      <i class="fas fa-file-pdf"></i> 
-                                      <strong>File hiện tại:</strong> 
-                                      <a href="{{ subject.description_file.url }}" target="_blank" class="text-white">
-                                          Xem file PDF
-                                      </a>
-                                  </div>
-                                  {% endif %}
-                                  
-                                  <div class="custom-file">
-                                      <input type="file" 
-                                             class="custom-file-input" 
-                                             id="description_file" 
-                                             name="description_file" 
-                                             accept=".pdf">
-                                      <label class="custom-file-label" for="description_file">
-                                          {% if subject.description_file %}
-                                          Chọn file PDF mới (để thay thế)
-                                          {% else %}
-                                          Chọn file PDF
-                                          {% endif %}
-                                      </label>
-                                  </div>
-                                  <small class="form-text text-muted">
-                                      Chỉ chấp nhận file PDF. Kích thước tối đa: 10MB
-                                  </small>
-                              </div>
+                        <!-- Edit Form -->
+                        <form action="{% url 'staff_save_description' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="subject_id" value="{{ subject.id }}">
 
-                              <div class="form-group">
-                                  <button type="submit" class="btn btn-primary btn-lg">
-                                      <i class="fas fa-save"></i> Lưu mô tả
-                                  </button>
-                                  <a href="{% url 'staff_my_subjects' %}" class="btn btn-secondary btn-lg">
-                                      <i class="fas fa-times"></i> Hủy
-                                  </a>
-                              </div>
-                          </form>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-    </section>
-    
-    <script>
+                            <div class="form-group">
+                                <label for="description">Mô tả môn học <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" name="description" rows="10"
+                                    placeholder="Nhập mô tả chi tiết về môn học: mục tiêu, nội dung, yêu cầu..."
+                                    required>{{ subject.description|default:'' }}</textarea>
+                                <small class="form-text text-muted">
+                                    Nội dung mô tả sẽ hiển thị cho sinh viên xem
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description_file">Tài liệu mô tả (PDF)</label>
+
+                                {% if subject.description_file %}
+                                <div class="alert alert-success mb-2">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <strong>File hiện tại:</strong>
+                                    <a href="{{ subject.description_file.url }}" target="_blank" class="text-white">
+                                        Xem file PDF
+                                    </a>
+                                </div>
+                                {% endif %}
+
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="description_file"
+                                        name="description_file" accept=".pdf">
+                                    <label class="custom-file-label" for="description_file">
+                                        {% if subject.description_file %}
+                                        Chọn file PDF mới (để thay thế)
+                                        {% else %}
+                                        Chọn file PDF
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Chỉ chấp nhận file PDF. Kích thước tối đa: 10MB
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save"></i> Lưu mô tả
+                                </button>
+                                <a href="{% url 'staff_my_subjects' %}" class="btn btn-secondary btn-lg">
+                                    <i class="fas fa-times"></i> Hủy
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
     // Update file input label when file is selected
-    document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+    document.querySelector('.custom-file-input').addEventListener('change', function (e) {
         var fileName = e.target.files[0] ? e.target.files[0].name : 'Chọn file PDF';
         var nextSibling = e.target.nextElementSibling;
         nextSibling.innerText = fileName;
     });
-    
+
     // Validate file size and type
-    document.querySelector('form').addEventListener('submit', function(e) {
+    document.querySelector('form').addEventListener('submit', function (e) {
         var fileInput = document.getElementById('description_file');
         if (fileInput.files.length > 0) {
             var file = fileInput.files[0];
             var maxSize = 10 * 1024 * 1024; // 10MB
-            
+
             if (file.size > maxSize) {
                 alert('File quá lớn! Kích thước tối đa là 10MB.');
                 e.preventDefault();
                 return false;
             }
-            
+
             if (file.type !== 'application/pdf') {
                 alert('Chỉ chấp nhận file PDF!');
                 e.preventDefault();
@@ -156,5 +150,5 @@ Mô tả học phần - {{ subject.subject_name }}
             }
         }
     });
-    </script>
+</script>
 {% endblock main_content %}
