@@ -57,6 +57,22 @@ class Subjects(models.Model):
         """Tính tổng học phí của môn học"""
         return self.credit_hours * self.fee_per_credit
 
+
+class SubjectDescriptionFile(models.Model):
+    """Model để lưu nhiều file PDF mô tả cho một môn học"""
+    id=models.AutoField(primary_key=True)
+    subject=models.ForeignKey(Subjects, on_delete=models.CASCADE, related_name='description_files')
+    file=models.FileField(upload_to='subject_descriptions/')
+    file_name=models.CharField(max_length=255)  # Tên file gốc
+    uploaded_at=models.DateTimeField(auto_now_add=True)
+    objects=models.Manager()
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+    
+    def __str__(self):
+        return f"{self.subject.subject_name} - {self.file_name}"
+
 class Students(models.Model):
     id=models.AutoField(primary_key=True)
     admin=models.OneToOneField(CustomUser,on_delete=models.CASCADE)

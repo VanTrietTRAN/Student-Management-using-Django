@@ -36,31 +36,31 @@
             </a>
           </li>
 
-          <!-- Khóa học -->
-          {% url 'student_view_schedule' as view_schedule %}
-          {% url 'student_view_result' as view_result %}
-          <li class="nav-item {% if request.path == view_schedule or request.path == view_result %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == view_schedule or request.path == view_result %}active{% endif %}">
-              <i class="nav-icon fas fa-graduation-cap"></i>
-              <p>
-                Khóa học
-                <i class="right fas fa-angle-left"></i>
-              </p>
+          <!-- Danh sách môn học đã đăng ký -->
+          {% url 'student_view_subjects' as view_subjects %}
+          <li class="nav-item">
+            <a href="{% url 'student_view_subjects' %}" class="nav-link {% if request.path == view_subjects %}active{% endif %}">
+              <i class="nav-icon fas fa-book-open"></i>
+              <p>Môn học của tôi</p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'student_view_schedule' %}" class="nav-link {% if request.path == view_schedule %}active{% endif %}">
-                  <i class="far fa-calendar-alt nav-icon"></i>
-                  <p>Lịch học</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{% url 'student_view_result' %}" class="nav-link {% if request.path == view_result %}active{% endif %}">
-                  <i class="far fa-chart-bar nav-icon"></i>
-                  <p>Kết quả học tập</p>
-                </a>
-              </li>
-            </ul>
+          </li>
+
+          <!-- Thời khóa biểu -->
+          {% url 'student_view_schedule' as view_schedule %}
+          <li class="nav-item">
+            <a href="{% url 'student_view_schedule' %}" class="nav-link {% if request.path == view_schedule %}active{% endif %}">
+              <i class="nav-icon fas fa-calendar-week"></i>
+              <p>Thời khóa biểu</p>
+            </a>
+          </li>
+
+          <!-- Kết quả học tập -->
+          {% url 'student_view_result' as view_result %}
+          <li class="nav-item">
+            <a href="{% url 'student_view_result' %}" class="nav-link {% if request.path == view_result %}active{% endif %}">
+              <i class="nav-icon fas fa-chart-line"></i>
+              <p>Kết quả học tập</p>
+            </a>
           </li>
 
           <!-- Học phí -->

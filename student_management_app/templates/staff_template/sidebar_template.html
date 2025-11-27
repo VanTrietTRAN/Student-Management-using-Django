@@ -78,9 +78,9 @@
                         </a>
                       </li>
                       <li class="nav-item">
-                        <a href="{% url 'staff_manage_description' subject.id %}" class="nav-link {% if request.resolver_match.url_name == 'staff_manage_description' and subject.id|stringformat:'s' in request.path %}active{% endif %}">
+                        <a href="{% url 'staff_manage_subject_description' subject.id %}" class="nav-link {% if 'staff_manage_subject_description' in request.path and subject.id|stringformat:'s' in request.path %}active{% endif %}">
                           <i class="far fa-dot-circle nav-icon text-xs"></i>
-                          <p class="text-xs">Mô tả học phần</p>
+                          <p class="text-xs">Mô tả & Tài liệu</p>
                         </a>
                       </li>
                     </ul>

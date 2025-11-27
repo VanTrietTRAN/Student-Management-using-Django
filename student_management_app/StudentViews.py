@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from student_management_app.models import Students, Courses, Subjects, CustomUser, Attendance, AttendanceReport, \
     LeaveReportStudent, FeedBackStudent, NotificationStudent, StudentResult, OnlineClassRoom, SessionYearModel, \
-    StudentEnrollment, Schedule
+    StudentEnrollment, Schedule, SubjectDescriptionFile
 
 
 def student_home(request):
@@ -249,15 +249,20 @@ def student_view_subjects(request):
     all_subjects = Subjects.objects.filter(course_id=course)
     
     # Lấy các môn đã đăng ký
-    enrolled_subjects = StudentEnrollment.objects.filter(
+    enrolled_subject_ids = StudentEnrollment.objects.filter(
         student_id=student,
         session_year_id=session_year,
         is_active=True
     ).values_list('subject_id', flat=True)
     
-    return render(request, "student_template/view_subjects.html", {
-        "subjects": all_subjects,
-        "enrolled_subjects": enrolled_subjects,
+    # Phân tách môn đã đăng ký và môn chưa đăng ký
+    enrolled_subjects_list = all_subjects.filter(id__in=enrolled_subject_ids)
+    available_subjects = all_subjects.exclude(id__in=enrolled_subject_ids)
+    
+    return render(request, "student_template/view_subjects_new.html", {
+        "enrolled_subjects_list": enrolled_subjects_list,
+        "available_subjects": available_subjects,
+        "enrolled_subjects": enrolled_subject_ids,  # For backward compatibility
         "student": student
     })
 
@@ -391,17 +396,29 @@ def student_view_schedule(request):
 
 
 def student_view_subject_description(request, subject_id):
-    """Xem/Download file mô tả môn học"""
+    """Xem mô tả và file PDF của môn học (chỉ nếu đã đăng ký)"""
     try:
+        student = Students.objects.get(admin=request.user.id)
         subject = Subjects.objects.get(id=subject_id)
         
-        if subject.subject_description_file:
-            return render(request, "student_template/view_subject_description.html", {
-                "subject": subject
-            })
-        else:
-            messages.warning(request, "No description file available for this subject")
+        # Kiểm tra sinh viên đã đăng ký môn này chưa
+        from student_management_app.models import StudentEnrollment
+        is_enrolled = StudentEnrollment.objects.filter(
+            student_id=student,
+            subject_id=subject
+        ).exists()
+        
+        if not is_enrolled:
+            messages.warning(request, "Bạn cần đăng ký môn học này trước khi xem tài liệu")
             return HttpResponseRedirect(reverse("student_view_subjects"))
+        
+        # Lấy tất cả các file mô tả của môn học
+        description_files = subject.description_files.all()
+        
+        return render(request, "student_template/view_subject_description.html", {
+            "subject": subject,
+            "description_files": description_files
+        })
     except:
-        messages.error(request, "Subject not found")
+        messages.error(request, "Không tìm thấy môn học")
         return HttpResponseRedirect(reverse("student_view_subjects"))

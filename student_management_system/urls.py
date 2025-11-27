@@ -140,6 +140,7 @@ urlpatterns = [
     path('start_live_classroom',StaffViews.start_live_classroom, name="start_live_classroom"),
     path('start_live_classroom_process',StaffViews.start_live_classroom_process, name="start_live_classroom_process"),
     path('manage_subject_description', StaffViews.manage_subject_description, name="manage_subject_description"),
+    path('staff_manage_subject_description/<str:subject_id>', StaffViews.staff_manage_subject_description, name="staff_manage_subject_description"),
     path('upload_subject_description/<str:subject_id>', StaffViews.upload_subject_description, name="upload_subject_description"),
     path('delete_subject_description/<str:subject_id>', StaffViews.delete_subject_description, name="delete_subject_description"),
 
