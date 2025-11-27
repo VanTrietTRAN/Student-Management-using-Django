@@ -77,17 +77,20 @@
                           <p class="text-xs">Nhập điểm</p>
                         </a>
                       </li>
-                      <li class="nav-item">
-                        <a href="{% url 'staff_manage_description' subject.id %}" class="nav-link {% if request.resolver_match.url_name == 'staff_manage_description' and subject.id|stringformat:'s' in request.path %}active{% endif %}">
-                          <i class="far fa-dot-circle nav-icon text-xs"></i>
-                          <p class="text-xs">Mô tả học phần</p>
-                        </a>
-                      </li>
                     </ul>
                   </li>
                 {% endfor %}
               {% endif %}
             </ul>
+          </li>
+
+          <!-- Quản lý Mô tả & PDF -->
+          {% url 'manage_subject_description' as manage_subject_description %}
+          <li class="nav-item">
+            <a href="{{ manage_subject_description }}" class="nav-link {% if request.path == manage_subject_description %}active{% endif %}">
+              <i class="nav-icon fas fa-file-alt"></i>
+              <p>Mô tả & File PDF</p>
+            </a>
           </li>
 
           <!-- Thông báo -->

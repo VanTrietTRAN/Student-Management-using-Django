@@ -431,13 +431,13 @@ Tất cả tài khoản có password: **admin123**
 ### Staff (Giảng viên):
 | Email | Role | Môn giảng dạy |
 |-------|------|---------------|
-| staff1@gmail.com | Lecturer | (Tự gán khi tạo môn) |
+|    | Lecturer | (Tự gán khi tạo môn) |
 | staff2@gmail.com | Lecturer | (Tự gán khi tạo môn) |
 | staff3@gmail.com | Lecturer | (Tự gán khi tạo môn) |
 | staff4@gmail.com | Lecturer | (Tự gán khi tạo môn) |
 
 ### Student (Sinh viên):
-| Email | Role | Khóa |
+| Email | Role | Khóa | 
 |-------|------|------|
 | student1@gmail.com | Student | (Được gán khi tạo) |
 | student2@gmail.com | Student | (Được gán khi tạo) |

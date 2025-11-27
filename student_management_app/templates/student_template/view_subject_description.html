@@ -1,91 +1,113 @@
 {% extends 'student_template/base_template.html' %}
 {% block page_title %}
-{{ subject.subject_name }} - Description
+{{ subject.subject_name }} - Tài liệu & Mô tả
 {% endblock page_title %}
 {% block main_content %}
-<!-- Main content -->
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header bg-info">
-                        <h3 class="card-title">{{ subject.subject_name }} - Course Description</h3>
+                        <h3 class="card-title">
+                            <i class="fas fa-book"></i> {{ subject.subject_name }}
+                        </h3>
                     </div>
-                    <!-- /.card-header -->
                     <div class="card-body">
-                        <div class="row mb-3">
+                        <!-- Thông tin môn học -->
+                        <div class="row mb-4">
                             <div class="col-md-6">
-                                <h5>Subject Information</h5>
-                                <table class="table table-bordered">
+                                <h5><i class="fas fa-info-circle"></i> Thông tin môn học</h5>
+                                <table class="table table-sm table-bordered">
                                     <tr>
-                                        <th width="40%">Subject Name</th>
-                                        <td>{{ subject.subject_name }}</td>
+                                        <th width="40%">Mã môn</th>
+                                        <td>{{ subject.subject_code|default:"N/A" }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Lecturer</th>
+                                        <th>Tên môn học</th>
+                                        <td><strong>{{ subject.subject_name }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Giảng viên</th>
                                         <td>{{ subject.staff_id.first_name }} {{ subject.staff_id.last_name }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Course</th>
+                                        <th>Khóa học</th>
                                         <td>{{ subject.course_id.course_name }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Credit Hours</th>
+                                        <th>Số tín chỉ</th>
                                         <td>{{ subject.credit_hours }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Fee Per Credit</th>
+                                        <th>Học phí/tín chỉ</th>
                                         <td>{{ subject.fee_per_credit|floatformat:0 }} VNĐ</td>
                                     </tr>
-                                    <tr style="background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);">
-                                        <th style="font-size: 1.2em; color: #856404;">
-                                            <i class="fas fa-dollar-sign"></i> Total Fee (Tổng học phí)
-                                        </th>
-                                        <td>
-                                            <strong style="color: #d9534f; 
-                                                           font-size: 1.5em; 
-                                                           text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-                                                           display: inline-block;
-                                                           padding: 5px 15px;
-                                                           background: white;
-                                                           border-radius: 10px;
-                                                           box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                                💰 {{ subject.get_total_fee|floatformat:0 }} VNĐ
-                                            </strong>
-                                        </td>
+                                    <tr class="table-warning">
+                                        <th><i class="fas fa-money-bill-wave"></i> Tổng học phí</th>
+                                        <td><strong class="text-danger" style="font-size: 1.2em;">{{ subject.get_total_fee|floatformat:0 }} VNĐ</strong></td>
                                     </tr>
                                 </table>
                             </div>
+                            
                             <div class="col-md-6">
-                                <h5>Course Description File</h5>
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <i class="fas fa-file-pdf fa-5x text-danger mb-3"></i>
-                                        <p class="mb-3">{{ subject.subject_description_file.name }}</p>
-                                        <a href="{{ subject.subject_description_file.url }}" target="_blank" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-eye"></i> View PDF
-                                        </a>
-                                        <a href="{{ subject.subject_description_file.url }}" download class="btn btn-success btn-lg">
-                                            <i class="fas fa-download"></i> Download PDF
-                                        </a>
+                                <h5><i class="fas fa-file-pdf text-danger"></i> Tài liệu PDF ({{ description_files.count }} file(s))</h5>
+                                {% if description_files %}
+                                    <div class="list-group">
+                                        {% for file in description_files %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <i class="fas fa-file-pdf text-danger fa-2x mr-2"></i>
+                                                    <strong>{{ file.file_name }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-calendar"></i> {{ file.uploaded_at|date:"d/m/Y H:i" }}
+                                                    </small>
+                                                </div>
+                                                <div>
+                                                    <a href="{{ file.file.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i> Xem
+                                                    </a>
+                                                    <a href="{{ file.file.url }}" download class="btn btn-sm btn-success">
+                                                        <i class="fas fa-download"></i> Tải về
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i> Giảng viên chưa upload tài liệu PDF
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Mô tả môn học -->
+                        {% if subject.description %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5><i class="fas fa-align-left"></i> Mô tả chi tiết môn học</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{ subject.description|linebreaks }}
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                         
-                        <div class="mt-4">
+                        <div class="mt-3">
                             <a href="{% url 'student_view_subjects' %}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Subjects
+                                <i class="fas fa-arrow-left"></i> Quay lại danh sách môn học
                             </a>
                         </div>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
             </div>
         </div>
     </div>
 </section>
-<!-- /.content -->
 {% endblock main_content %}

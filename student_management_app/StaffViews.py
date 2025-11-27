@@ -11,7 +11,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from student_management_app.models import Subjects, SessionYearModel, Students, Attendance, AttendanceReport, \
-    LeaveReportStaff, Staffs, FeedBackStaffs, CustomUser, Courses, NotificationStaffs, StudentResult, OnlineClassRoom
+    LeaveReportStaff, Staffs, FeedBackStaffs, CustomUser, Courses, NotificationStaffs, StudentResult, OnlineClassRoom, \
+    SubjectDescriptionFile
 from django.core.files.storage import FileSystemStorage
 
 
@@ -663,44 +664,114 @@ def returnHtmlWidget(request):
 def manage_subject_description(request):
     """Quản lý file mô tả môn học của giảng viên"""
     subjects = Subjects.objects.filter(staff_id=request.user.id)
+    # Lấy thêm thông tin về số lượng files đã upload cho mỗi subject
+    for subject in subjects:
+        subject.uploaded_files_count = subject.description_files.count()
     return render(request, "staff_template/manage_subject_description.html", {"subjects": subjects})
 
 
 def upload_subject_description(request, subject_id):
-    """Upload PDF mô tả môn học"""
+    """Upload nhiều file PDF mô tả môn học (tối đa 3 files)"""
     if request.method == "POST":
         try:
             subject = Subjects.objects.get(id=subject_id, staff_id=request.user.id)
             
-            if "subject_description_file" in request.FILES:
-                description_file = request.FILES['subject_description_file']
-                fs = FileSystemStorage()
+            # DEBUG: In ra để kiểm tra
+            print("="*50)
+            print(f"DEBUG - POST data keys: {request.POST.keys()}")
+            print(f"DEBUG - FILES data keys: {request.FILES.keys()}")
+            print(f"DEBUG - Content-Type: {request.content_type}")
+            
+            # Thử cả hai cách lấy files
+            files = request.FILES.getlist('subject_description_files')
+            print(f"DEBUG - getlist() returned: {len(files)} files")
+            
+            # Nếu getlist không có kết quả, thử lấy từng file
+            if not files:
+                print("DEBUG - Trying alternative method...")
+                for key in request.FILES.keys():
+                    print(f"DEBUG - Found key in FILES: {key}")
+                    file_item = request.FILES[key]
+                    files.append(file_item)
+            
+            print(f"DEBUG - Final file count: {len(files)}")
+            for idx, f in enumerate(files):
+                print(f"DEBUG - File {idx+1}: {f.name} ({f.size} bytes)")
+            print("="*50)
+            
+            if not files:
+                messages.error(request, "Không có file nào được chọn. Vui lòng chọn ít nhất 1 file PDF")
+                return HttpResponseRedirect(reverse("manage_subject_description"))
+            
+            # Giới hạn tối đa 3 files
+            if len(files) > 3:
+                messages.error(request, f"Bạn đã chọn {len(files)} files. Chỉ được upload tối đa 3 files cùng lúc")
+                return HttpResponseRedirect(reverse("manage_subject_description"))
+            
+            uploaded_count = 0
+            skipped_files = []
+            fs = FileSystemStorage()
+            
+            for description_file in files:
+                print(f"DEBUG - Processing file: {description_file.name}")
+                
+                # Kiểm tra file có phải PDF không
+                if not description_file.name.lower().endswith('.pdf'):
+                    skipped_files.append(description_file.name)
+                    continue
+                    
+                # Lưu file
                 filename = fs.save(description_file.name, description_file)
-                file_url = fs.url(filename)
+                print(f"DEBUG - Saved file as: {filename}")
                 
-                subject.subject_description_file = filename
-                subject.save()
-                
-                messages.success(request, "Successfully Uploaded Subject Description")
+                # Tạo record trong database
+                SubjectDescriptionFile.objects.create(
+                    subject=subject,
+                    file=filename,
+                    file_name=description_file.name
+                )
+                uploaded_count += 1
+            
+            if uploaded_count > 0:
+                msg = f"✅ Đã upload thành công {uploaded_count} file(s)"
+                if skipped_files:
+                    msg += f". Bỏ qua {len(skipped_files)} file không phải PDF: {', '.join(skipped_files)}"
+                messages.success(request, msg)
             else:
-                messages.error(request, "No file selected")
+                messages.error(request, "Không tìm thấy file PDF hợp lệ nào")
                 
             return HttpResponseRedirect(reverse("manage_subject_description"))
-        except:
-            messages.error(request, "Failed to Upload Subject Description")
+        except Exception as e:
+            import traceback
+            print(f"DEBUG - Exception: {str(e)}")
+            print(f"DEBUG - Traceback: {traceback.format_exc()}")
+            messages.error(request, f"Lỗi khi upload files: {str(e)}")
             return HttpResponseRedirect(reverse("manage_subject_description"))
     else:
         return HttpResponse("<h2>Method Not Allowed</h2>")
 
 
 def delete_subject_description(request, subject_id):
-    """Xóa file mô tả môn học"""
+    """Xóa một file mô tả môn học cụ thể"""
     try:
-        subject = Subjects.objects.get(id=subject_id, staff_id=request.user.id)
-        subject.subject_description_file = None
-        subject.save()
-        messages.success(request, "Successfully Deleted Subject Description")
-    except:
-        messages.error(request, "Failed to Delete Subject Description")
+        # subject_id ở đây thực chất là file_id
+        file_obj = SubjectDescriptionFile.objects.get(id=subject_id)
+        
+        # Kiểm tra quyền: chỉ giảng viên của môn học mới có quyền xóa
+        if file_obj.subject.staff_id.id != request.user.id:
+            messages.error(request, "You don't have permission to delete this file")
+            return HttpResponseRedirect(reverse("manage_subject_description"))
+        
+        # Xóa file vật lý
+        if file_obj.file:
+            import os
+            if os.path.isfile(file_obj.file.path):
+                os.remove(file_obj.file.path)
+        
+        # Xóa record trong database
+        file_obj.delete()
+        messages.success(request, "Successfully Deleted File")
+    except Exception as e:
+        messages.error(request, f"Failed to Delete File: {str(e)}")
     
     return HttpResponseRedirect(reverse("manage_subject_description"))

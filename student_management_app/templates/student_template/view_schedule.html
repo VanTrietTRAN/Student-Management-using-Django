@@ -104,13 +104,19 @@ Lịch học
                         <div class="row">
                             {% for enrollment in enrolled_subjects %}
                             <div class="col-md-6 mb-3">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-primary"><i class="fas fa-book-open"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">{{ enrollment.subject_id.subject_name }}</span>
-                                        <span class="info-box-number">
-                                            <small>{{ enrollment.subject_id.credit_hours }} tín chỉ</small>
-                                        </span>
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">
+                                            <i class="fas fa-book-open"></i> {{ enrollment.subject_id.subject_name }}
+                                        </h5>
+                                        <p class="card-text mb-2">
+                                            <strong>Số tín chỉ:</strong> {{ enrollment.subject_id.credit_hours }}<br>
+                                            <strong>Giảng viên:</strong> {{ enrollment.subject_id.staff_id.first_name }} {{ enrollment.subject_id.staff_id.last_name }}<br>
+                                            <strong>Học phí:</strong> {{ enrollment.subject_id.get_total_fee|floatformat:0 }} VNĐ
+                                        </p>
+                                        <a href="{% url 'student_view_subject_description' enrollment.subject_id.id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-file-pdf"></i> Xem tài liệu & mô tả
+                                        </a>
                                     </div>
                                 </div>
                             </div>

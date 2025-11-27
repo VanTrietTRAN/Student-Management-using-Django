@@ -99,7 +99,7 @@ DATABASES = {
         'ENGINE':'django.db.backends.mysql',
         'NAME':'student_management_system',
         'USER':'root',
-        'PASSWORD':'',  # Thay đổi password MySQL của bạn ở đây
+        'PASSWORD':'123123123',  # Thay đổi password MySQL của bạn ở đây
         'HOST':'localhost',
         'PORT':'3306'
     }
