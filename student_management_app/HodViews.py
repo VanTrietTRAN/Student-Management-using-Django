@@ -948,7 +948,7 @@ def admin_reports(request):
     """
     courses = Courses.objects.all()
     subjects = Subjects.objects.all()
-    session_years = SessionYearModel.objectss.all()
+    session_years = SessionYearModel.objects.all()
     
     # Thống kê
     students_count = Students.objects.all().count()
