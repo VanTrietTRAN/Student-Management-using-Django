@@ -200,30 +200,221 @@ Sau khi tạo superuser, bạn có thể:
 
 ```
 Student-Management-using-Django/
-├── student_management_app/          # App chính
-│   ├── models.py                    # Database models
-│   ├── views.py                     # Main views
-│   ├── HodViews.py                  # Admin views
-│   ├── StaffViews.py                # Lecturer views
-│   ├── StudentViews.py              # Student views
-│   ├── forms.py                     # Django forms
-│   ├── templates/                   # HTML templates
-│   │   ├── hod_template/            # Admin templates
-│   │   ├── staff_template/          # Lecturer templates
-│   │   └── student_template/        # Student templates
-│   └── static/                      # CSS, JS, Images
-│       └── custom/
-│           └── modern-theme.css     # Custom theme
-├── student_management_system/       # Project settings
-│   ├── settings.py                  # Django settings
-│   ├── urls.py                      # URL routing
-│   └── wsgi.py                      # WSGI config
-├── media/                           # Uploaded files
-├── static/                          # Collected static files
-├── requirements.txt                 # Python dependencies
-├── manage.py                        # Django management script
-└── README.md                        # Documentation
+│
+├── 📂 student_management_system/     # Django Project Configuration
+│   ├── settings.py                   # Cấu hình chính: Database, Apps, Middleware
+│   ├── urls.py                       # URL routing chính
+│   ├── wsgi.py                       # WSGI configuration cho deployment
+│   └── __init__.py
+│
+├── 📂 student_management_app/        # Main Application
+│   │
+│   ├── 📄 Core Files
+│   │   ├── models.py                 # Database Models (CustomUser, Students, Subjects, etc.)
+│   │   ├── admin.py                  # Django Admin configuration
+│   │   ├── apps.py                   # App configuration
+│   │   └── __init__.py
+│   │
+│   ├── 📄 Authentication & Middleware
+│   │   ├── EmailBackEnd.py           # Custom email authentication backend
+│   │   ├── LoginCheckMiddleWare.py   # Middleware kiểm tra quyền truy cập
+│   │   └── context_processors.py     # Custom context processors
+│   │
+│   ├── 📄 Views Layer (MVC Pattern)
+│   │   ├── views.py                  # General views (Login, Signup, Logout)
+│   │   ├── HodViews.py               # Admin/HOD views (Quản lý hệ thống)
+│   │   ├── StaffViews.py             # Lecturer views (Giảng viên)
+│   │   ├── StudentViews.py           # Student views (Sinh viên)
+│   │   └── EditResultVIewClass.py    # Class-based view cho edit results
+│   │
+│   ├── 📄 Forms
+│   │   └── forms.py                  # Django Forms (AddStudent, EditStudent, etc.)
+│   │
+│   ├── 📂 templates/                 # HTML Templates (Organized by role)
+│   │   ├── hod_template/             # ✅ Admin Interface
+│   │   │   ├── base_template.html    #    └─ Base layout
+│   │   │   ├── sidebar_template.html #    └─ Sidebar navigation
+│   │   │   ├── home_content.html     #    └─ Dashboard
+│   │   │   ├── manage_student_template.html
+│   │   │   ├── manage_staff_template.html
+│   │   │   ├── manage_subject_template.html
+│   │   │   ├── manage_course_template.html
+│   │   │   ├── manage_session_template.html
+│   │   │   ├── manage_schedule_template.html
+│   │   │   ├── admin_view_attendance.html
+│   │   │   ├── admin_grade_subjects.html
+│   │   │   ├── admin_enter_grades.html
+│   │   │   ├── admin_reports.html
+│   │   │   ├── student_feedback_template.html
+│   │   │   ├── staff_feedback_template.html
+│   │   │   ├── student_leave_view.html
+│   │   │   ├── staff_leave_view.html
+│   │   │   └── admin_view_notifications.html
+│   │   │
+│   │   ├── staff_template/           # ✅ Lecturer Interface
+│   │   │   ├── base_template.html    #    └─ Base layout
+│   │   │   ├── sidebar_template.html #    └─ Sidebar navigation
+│   │   │   ├── home_content.html     #    └─ Dashboard
+│   │   │   ├── staff_my_subjects.html
+│   │   │   ├── staff_view_class_students.html
+│   │   │   ├── staff_enter_grades.html
+│   │   │   ├── staff_manage_subject_description.html
+│   │   │   ├── manage_subject_description.html
+│   │   │   ├── staff_take_attendance.html
+│   │   │   ├── staff_update_attendance.html
+│   │   │   ├── staff_apply_leave.html
+│   │   │   ├── staff_feedback.html
+│   │   │   ├── staff_profile.html
+│   │   │   └── staff_all_notification.html
+│   │   │
+│   │   ├── student_template/         # ✅ Student Interface
+│   │   │   ├── base_template.html    #    └─ Base layout
+│   │   │   ├── sidebar_template.html #    └─ Sidebar navigation
+│   │   │   ├── student_home_template.html
+│   │   │   ├── view_subjects_new.html      # Card-based subject view
+│   │   │   ├── view_schedule.html          # Thời khóa biểu
+│   │   │   ├── view_subject_description.html
+│   │   │   ├── student_view_attendance.html
+│   │   │   ├── student_result.html
+│   │   │   ├── view_fees.html
+│   │   │   ├── student_apply_leave.html
+│   │   │   ├── student_feedback.html
+│   │   │   ├── student_profile.html
+│   │   │   └── all_notification.html
+│   │   │
+│   │   ├── login_page.html           # Login interface
+│   │   ├── signup_admin_page.html
+│   │   ├── signup_staff_page.html
+│   │   └── signup_student_page.html
+│   │
+│   ├── 📂 static/                    # Static Files (CSS, JS, Images)
+│   │   ├── custom/
+│   │   │   └── modern-theme.css      # ⭐ Custom theme với gradient design
+│   │   ├── dist/                     # AdminLTE distribution files
+│   │   ├── plugins/                  # jQuery, DataTables, FontAwesome, etc.
+│   │   └── bootstrap/
+│   │
+│   ├── 📂 migrations/                # Database migrations
+│   │   └── 0001_initial.py           # Initial schema
+│   │
+│   └── 📄 tests.py                   # Unit tests
+│
+├── 📂 media/                         # User uploaded files
+│   ├── profile_pics/                 # Profile pictures
+│   └── subject_descriptions/         # Subject PDF materials
+│
+├── 📂 static/                        # Collected static files (Production)
+│   └── (Generated by collectstatic)
+│
+├── 📂 screenshots/                   # Application screenshots
+│
+├── 📄 Configuration Files
+│   ├── manage.py                     # Django management script
+│   ├── requirements.txt              # Python dependencies
+│   ├── runtime.txt                   # Python version for Heroku
+│   ├── Procfile                      # Heroku deployment config
+│   ├── .gitignore                    # Git ignore rules
+│   └── db.sqlite3                    # SQLite database (development)
+│
+├── 📄 Documentation
+│   ├── README.md                     # This file
+│   ├── UPDATE_NOTES.md              # Recent changes log
+│   ├── LICENSE                       # MIT License
+│   └── database.sql                  # Database schema export
+│
+└── 📂 .venv/                         # Virtual environment (not in git)
 ```
+
+### 🎯 Giải thích cấu trúc theo chức năng:
+
+#### 1. **Core Application Layer** (`student_management_app/`)
+- **Models** (`models.py`): Định nghĩa 15+ models cho toàn bộ hệ thống
+  - User Management: `CustomUser`, `Admin`, `Staffs`, `Students`
+  - Academic: `Courses`, `Subjects`, `SessionYearModel`, `Schedule`
+  - Assessment: `StudentResult`, `Attendance`, `AttendanceReport`
+  - Enrollment: `StudentEnrollment`, `SubjectDescriptionFile`
+  - Communication: `FeedBackStudent`, `FeedBackStaffs`, `LeaveReportStudent`, `LeaveReportStaff`
+  - Notifications: `NotificationStudent`, `NotificationStaffs`
+
+#### 2. **Presentation Layer** (Views)
+Tổ chức theo **Role-Based Access Control (RBAC)**:
+
+- **`views.py`**: Authentication & Public views
+  - Login/Logout
+  - Signup (Admin, Staff, Student)
+  - Password Reset
+  
+- **`HodViews.py`**: Admin/Head of Department (30+ functions)
+  - Dashboard & Statistics
+  - CRUD operations: Staff, Student, Course, Subject, Session
+  - Schedule Management
+  - Attendance Monitoring
+  - Grade Management
+  - Reports & Analytics
+  - Notification Broadcasting
+  - Leave Management
+  
+- **`StaffViews.py`**: Lecturer Interface (25+ functions)
+  - Personal Dashboard
+  - My Subjects Management
+  - Student List by Subject
+  - Attendance Taking & Updates
+  - Grade Entry & Export
+  - Subject Materials Upload (PDF)
+  - Student Notifications
+  - Leave Applications
+  
+- **`StudentViews.py`**: Student Interface (15+ functions)
+  - Personal Dashboard
+  - Subject Enrollment/Drop
+  - Schedule Viewing
+  - Attendance History
+  - Grade Viewing
+  - Fee Calculation
+  - Material Downloads
+  - Feedback & Leave
+
+#### 3. **Template Organization** (Frontend)
+Tổ chức theo **Module Pattern**:
+
+- **Base Templates**: Layout chung cho mỗi role
+- **Sidebar Templates**: Navigation riêng cho mỗi role
+- **Feature Templates**: Mỗi chức năng có template riêng
+- **Responsive Design**: Bootstrap 4 + Custom CSS
+
+#### 4. **Static Assets** (Frontend Resources)
+```
+static/
+├── custom/modern-theme.css     # Custom styling (500+ lines)
+├── dist/                       # AdminLTE core
+├── plugins/                    # Third-party libraries
+│   ├── datatables/            # Table management
+│   ├── chart.js/              # Charts & graphs
+│   ├── fontawesome-free/      # Icons
+│   ├── daterangepicker/       # Date selection
+│   └── summernote/            # Rich text editor
+└── bootstrap/                  # Bootstrap framework
+```
+
+#### 5. **Business Logic Layer**
+- **Forms** (`forms.py`): Validation & data processing
+- **Middleware** (`LoginCheckMiddleWare.py`): Request/Response processing
+- **Authentication** (`EmailBackEnd.py`): Custom auth logic
+- **Context Processors** (`context_processors.py`): Global template variables
+
+#### 6. **Data Layer**
+- **Models**: ORM definitions
+- **Migrations**: Database schema versioning
+- **Media**: User-generated content storage
+
+### 📊 Design Patterns Used:
+
+1. **MVC/MVT Pattern**: Django's Model-View-Template
+2. **Role-Based Access Control (RBAC)**: Separated views by user role
+3. **DRY Principle**: Reusable base templates
+4. **Separation of Concerns**: Views, Models, Templates separated
+5. **Repository Pattern**: Models as data repositories
+6. **Factory Pattern**: Form factories for different user types
 
 ## 🎯 Workflow sử dụng
 
