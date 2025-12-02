@@ -146,10 +146,10 @@ Nhập Điểm - {{ subject.subject_name }}
                                                    placeholder="0-100">
                                         </td>
                                         <td class="text-center weighted-assignment weighted-score">
-                                            {{ data.assignment_marks|floatformat:1 }}
+                                            {{ data.assignment_marks|floatformat:2 }}
                                         </td>
                                         <td class="text-center weighted-exam weighted-score">
-                                            {{ data.exam_marks|floatformat:1 }}
+                                            {{ data.exam_marks|floatformat:2 }}
                                         </td>
                                         <td class="text-center total-score">
                                             <strong>-</strong>
@@ -232,9 +232,9 @@ $(document).ready(function() {
         const total = weightedAssignment + weightedExam;
         
         // Update display
-        row.find('.weighted-assignment').text(weightedAssignment.toFixed(1));
-        row.find('.weighted-exam').text(weightedExam.toFixed(1));
-        row.find('.total-score strong').text(total.toFixed(1));
+        row.find('.weighted-assignment').text(weightedAssignment.toFixed(2));
+        row.find('.weighted-exam').text(weightedExam.toFixed(2));
+        row.find('.total-score strong').text(total.toFixed(2));
         
         // Calculate letter grade
         let letter, badgeClass;

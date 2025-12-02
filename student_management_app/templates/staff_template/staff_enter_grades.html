@@ -219,11 +219,11 @@ Nhập điểm - {{ subject.subject_name }}
             var total = assignmentWeighted + examWeighted;
             
             // Update weighted scores
-            $('.assignment-weighted[data-student="' + studentId + '"]').text(assignmentMarksRaw.toFixed(1) + '×0.4');
-            $('.exam-weighted[data-student="' + studentId + '"]').text(examMarksRaw.toFixed(1) + '×0.6');
+            $('.assignment-weighted[data-student="' + studentId + '"]').text(assignmentMarksRaw.toFixed(2) + '×0.4');
+            $('.exam-weighted[data-student="' + studentId + '"]').text(examMarksRaw.toFixed(2) + '×0.6');
             
             // Update total
-            $('.total-marks[data-student="' + studentId + '"]').text(total.toFixed(1));
+            $('.total-marks[data-student="' + studentId + '"]').text(total.toFixed(2));
             
             // Update grade badge
             var gradeBadge = '';
