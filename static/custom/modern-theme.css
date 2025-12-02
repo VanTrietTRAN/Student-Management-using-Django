@@ -516,6 +516,42 @@ body {
     animation: fadeIn 0.5s ease-in-out;
 }
 
+/* ==== FORM CONTROLS - DROPDOWN TEXT VISIBILITY ==== */
+select.form-control,
+.form-control select {
+    color: #1e293b !important;
+    font-weight: 500 !important;
+    font-size: 14px;
+}
+
+select.form-control option,
+.form-control select option {
+    color: #1e293b !important;
+    background-color: #ffffff !important;
+    font-weight: 500 !important;
+    padding: 8px 12px;
+}
+
+select.form-control option:first-child,
+.form-control select option:first-child {
+    color: #64748b !important;
+    font-style: italic;
+    font-weight: 600 !important;
+}
+
+/* Ensure disabled options are visible */
+select.form-control option:disabled,
+.form-control select option:disabled {
+    color: #94a3b8 !important;
+}
+
+/* Better focus state for dropdowns */
+select.form-control:focus,
+.form-control select:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(91, 33, 182, 0.25) !important;
+}
+
 /* ==== RESPONSIVE ==== */
 @media (max-width: 768px) {
     .small-box h3 {
