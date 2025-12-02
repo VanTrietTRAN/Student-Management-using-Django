@@ -29,7 +29,7 @@ class AddStudentForm(forms.Form):
 
     session_list = []
     try:
-        sessions = SessionYearModel.object.all()
+        sessions = SessionYearModel.objects.all()
 
         for ses in sessions:
             small_ses = (ses.id, str(ses.session_start_year)+"   TO  "+str(ses.session_end_year))
@@ -66,7 +66,7 @@ class EditStudentForm(forms.Form):
 
     session_list = []
     try:
-        sessions = SessionYearModel.object.all()
+        sessions = SessionYearModel.objects.all()
 
         for ses in sessions:
             small_ses = (ses.id, str(ses.session_start_year)+"   TO  "+str(ses.session_end_year))
@@ -101,7 +101,7 @@ class EditResultForm(forms.Form):
 
     session_list=[]
     try:
-        sessions=SessionYearModel.object.all()
+        sessions=SessionYearModel.objects.all()
         for session in sessions:
             session_single=(session.id,str(session.session_start_year)+" TO "+str(session.session_end_year))
             session_list.append(session_single)

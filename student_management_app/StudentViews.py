@@ -41,7 +41,7 @@ def student_home(request):
     enrolled_count = enrolled_subjects.count()
     
     # Online classroom
-    session_obj=SessionYearModel.object.get(id=student_obj.session_year_id.id)
+    session_obj=SessionYearModel.objects.get(id=student_obj.session_year_id.id)
     class_room=OnlineClassRoom.objects.filter(
         subject__in=subject_ids,
         is_active=True,
@@ -84,10 +84,10 @@ def student_home(request):
     })
 
 def join_class_room(request,subject_id,session_year_id):
-    session_year_obj=SessionYearModel.object.get(id=session_year_id)
+    session_year_obj=SessionYearModel.objects.get(id=session_year_id)
     subjects=Subjects.objects.filter(id=subject_id)
     if subjects.exists():
-        session=SessionYearModel.object.filter(id=session_year_obj.id)
+        session=SessionYearModel.objects.filter(id=session_year_obj.id)
         if session.exists():
             subject_obj=Subjects.objects.get(id=subject_id)
             course=Courses.objects.get(id=subject_obj.course_id.id)

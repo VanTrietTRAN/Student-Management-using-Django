@@ -139,7 +139,7 @@ def add_student_save(request):
                 user.students.address=address
                 course_obj=Courses.objects.get(id=course_id)
                 user.students.course_id=course_obj
-                session_year=SessionYearModel.object.get(id=session_year_id)
+                session_year=SessionYearModel.objects.get(id=session_year_id)
                 user.students.session_year_id=session_year
                 user.students.gender=sex
                 user.students.profile_pic=profile_pic_url
@@ -287,7 +287,7 @@ def edit_student_save(request):
 
                 student=Students.objects.get(admin=student_id)
                 student.address=address
-                session_year = SessionYearModel.object.get(id=session_year_id)
+                session_year = SessionYearModel.objects.get(id=session_year_id)
                 student.session_year_id = session_year
                 student.gender=sex
                 course=Courses.objects.get(id=course_id)
@@ -470,7 +470,7 @@ def staff_disapprove_leave(request,leave_id):
 
 def admin_view_attendance(request):
     subjects=Subjects.objects.all()
-    session_year_id=SessionYearModel.object.all()
+    session_year_id=SessionYearModel.objects.all()
     return render(request,"hod_template/admin_view_attendance.html",{"subjects":subjects,"session_year_id":session_year_id})
 
 @csrf_exempt
@@ -478,7 +478,7 @@ def admin_get_attendance_dates(request):
     subject=request.POST.get("subject")
     session_year_id=request.POST.get("session_year_id")
     subject_obj=Subjects.objects.get(id=subject)
-    session_year_obj=SessionYearModel.object.get(id=session_year_id)
+    session_year_obj=SessionYearModel.objects.get(id=session_year_id)
     attendance=Attendance.objects.filter(subject_id=subject_obj,session_year_id=session_year_obj)
     attendance_obj=[]
     for attendance_single in attendance:
@@ -584,7 +584,7 @@ def send_staff_notification(request):
 def manage_schedule(request):
     """Quản lý thời khóa biểu - Hiển thị danh sách lịch học"""
     schedules = Schedule.objects.all().order_by('weekday', 'start_time')
-    session_years = SessionYearModel.object.all()
+    session_years = SessionYearModel.objects.all()
     return render(request, "hod_template/manage_schedule_template.html", {
         "schedules": schedules,
         "session_years": session_years
@@ -594,7 +594,7 @@ def manage_schedule(request):
 def add_schedule(request):
     """Thêm lịch học mới"""
     subjects = Subjects.objects.all()
-    session_years = SessionYearModel.object.all()
+    session_years = SessionYearModel.objects.all()
     return render(request, "hod_template/add_schedule_template.html", {
         "subjects": subjects,
         "session_years": session_years
@@ -615,7 +615,7 @@ def add_schedule_save(request):
 
         try:
             subject = Subjects.objects.get(id=subject_id)
-            session_year = SessionYearModel.object.get(id=session_year_id)
+            session_year = SessionYearModel.objects.get(id=session_year_id)
             
             schedule = Schedule(
                 subject_id=subject,
@@ -637,7 +637,7 @@ def edit_schedule(request, schedule_id):
     """Chỉnh sửa lịch học"""
     schedule = Schedule.objects.get(id=schedule_id)
     subjects = Subjects.objects.all()
-    session_years = SessionYearModel.object.all()
+    session_years = SessionYearModel.objects.all()
     return render(request, "hod_template/edit_schedule_template.html", {
         "schedule": schedule,
         "subjects": subjects,
@@ -662,7 +662,7 @@ def edit_schedule_save(request):
         try:
             schedule = Schedule.objects.get(id=schedule_id)
             schedule.subject_id = Subjects.objects.get(id=subject_id)
-            schedule.session_year_id = SessionYearModel.object.get(id=session_year_id)
+            schedule.session_year_id = SessionYearModel.objects.get(id=session_year_id)
             schedule.weekday = weekday
             schedule.start_time = start_time
             schedule.end_time = end_time
@@ -948,7 +948,7 @@ def admin_reports(request):
     """
     courses = Courses.objects.all()
     subjects = Subjects.objects.all()
-    session_years = SessionYearModel.objects.all()
+    session_years = SessionYearModel.objectss.all()
     
     # Thống kê
     students_count = Students.objects.all().count()

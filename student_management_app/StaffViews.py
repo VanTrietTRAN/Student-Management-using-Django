@@ -63,7 +63,7 @@ def staff_home(request):
 
 def staff_take_attendance(request):
     subjects=Subjects.objects.filter(staff_id=request.user.id)
-    session_years=SessionYearModel.object.all()
+    session_years=SessionYearModel.objects.all()
     return render(request,"staff_template/staff_take_attendance.html",{"subjects":subjects,"session_years":session_years})
 
 @csrf_exempt
@@ -72,7 +72,7 @@ def get_students(request):
     session_year=request.POST.get("session_year")
 
     subject=Subjects.objects.get(id=subject_id)
-    session_model=SessionYearModel.object.get(id=session_year)
+    session_model=SessionYearModel.objects.get(id=session_year)
     students=Students.objects.filter(course_id=subject.course_id,session_year_id=session_model)
     list_data=[]
 
@@ -89,7 +89,7 @@ def save_attendance_data(request):
     session_year_id=request.POST.get("session_year_id")
 
     subject_model=Subjects.objects.get(id=subject_id)
-    session_model=SessionYearModel.object.get(id=session_year_id)
+    session_model=SessionYearModel.objects.get(id=session_year_id)
     json_sstudent=json.loads(student_ids)
     #print(data[0]['id'])
 
@@ -108,7 +108,7 @@ def save_attendance_data(request):
 
 def staff_update_attendance(request):
     subjects=Subjects.objects.filter(staff_id=request.user.id)
-    session_year_id=SessionYearModel.object.all()
+    session_year_id=SessionYearModel.objects.all()
     return render(request,"staff_template/staff_update_attendance.html",{"subjects":subjects,"session_year_id":session_year_id})
 
 @csrf_exempt
@@ -116,7 +116,7 @@ def get_attendance_dates(request):
     subject=request.POST.get("subject")
     session_year_id=request.POST.get("session_year_id")
     subject_obj=Subjects.objects.get(id=subject)
-    session_year_obj=SessionYearModel.object.get(id=session_year_id)
+    session_year_obj=SessionYearModel.objects.get(id=session_year_id)
     attendance=Attendance.objects.filter(subject_id=subject_obj,session_year_id=session_year_obj)
     attendance_obj=[]
     for attendance_single in attendance:
@@ -584,7 +584,7 @@ def staff_all_notification(request):
 
 def staff_add_result(request):
     subjects=Subjects.objects.filter(staff_id=request.user.id)
-    session_years=SessionYearModel.object.all()
+    session_years=SessionYearModel.objects.all()
     return render(request,"staff_template/staff_add_result.html",{"subjects":subjects,"session_years":session_years})
 
 def save_student_result(request):
@@ -632,7 +632,7 @@ def fetch_result_student(request):
 
 def start_live_classroom(request):
     subjects=Subjects.objects.filter(staff_id=request.user.id)
-    session_years=SessionYearModel.object.all()
+    session_years=SessionYearModel.objects.all()
     return render(request,"staff_template/start_live_classroom.html",{"subjects":subjects,"session_years":session_years})
 
 def start_live_classroom_process(request):
@@ -640,7 +640,7 @@ def start_live_classroom_process(request):
     subject=request.POST.get("subject")
 
     subject_obj=Subjects.objects.get(id=subject)
-    session_obj=SessionYearModel.object.get(id=session_year)
+    session_obj=SessionYearModel.objects.get(id=session_year)
     checks=OnlineClassRoom.objects.filter(subject=subject_obj,session_years=session_obj,is_active=True).exists()
     if checks:
         data=OnlineClassRoom.objects.get(subject=subject_obj,session_years=session_obj,is_active=True)
