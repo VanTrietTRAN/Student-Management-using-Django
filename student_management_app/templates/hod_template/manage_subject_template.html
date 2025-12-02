@@ -46,7 +46,7 @@ Quản Lý Môn Học
                       <td>{{ subject.subject_name }}</td>
                       <td>{{ subject.course_id.course_name }}</td>
                       <td>{{ subject.credit_hours }}</td>
-                      <td>{{ subject.fee_per_credit|floatformat:0 }} đ</td>
+                      <td>{{ subject.fee_per_credit|floatformat:0|intcomma }} đ</td>
                       <td>
                         <strong style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                                        color: white; 
@@ -55,7 +55,7 @@ Quản Lý Môn Học
                                        display: inline-block;
                                        font-size: 1.05em;
                                        box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);">
-                            💰 {{ subject.get_total_fee|floatformat:0 }} đ
+                            💰 {{ subject.get_total_fee|floatformat:0|intcomma }} đ
                         </strong>
                       </td>
                       <td>{{ subject.staff_id.first_name }} {{ subject.staff_id.last_name }}</td>

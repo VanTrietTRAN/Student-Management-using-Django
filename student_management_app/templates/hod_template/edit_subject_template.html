@@ -48,8 +48,8 @@ Chỉnh Sửa Môn Học | ID Môn Học : {{ subject.id }}
                     <input type="number" class="form-control" name="fee_per_credit" placeholder="Nhập học phí mỗi tín chỉ" value="{{ subject.fee_per_credit }}" min="0" step="0.01" required>
                     <div class="alert alert-warning mt-2" style="background-color: #fff3cd; border-color: #ffc107;">
                       <i class="fas fa-calculator"></i> <strong style="color: #856404;">
-                        Tổng học phí = {{ subject.credit_hours }} × {{ subject.fee_per_credit|floatformat:0 }} VNĐ = 
-                        <span style="font-size: 1.2em; color: #d9534f;">{{ subject.get_total_fee|floatformat:0 }} VNĐ</span>
+                        Tổng học phí = {{ subject.credit_hours }} × {{ subject.fee_per_credit|floatformat:0|intcomma }} VNĐ = 
+                        <span style="font-size: 1.2em; color: #d9534f;">{{ subject.get_total_fee|floatformat:0|intcomma }} VNĐ</span>
                       </strong>
                     </div>
                   </div>

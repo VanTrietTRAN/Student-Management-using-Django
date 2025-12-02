@@ -29,7 +29,7 @@ My Tuition Fees
                                     <span class="info-box-icon" style="background: rgba(255,255,255,0.3);"><i class="fas fa-dollar-sign"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text" style="font-size: 1.1em; font-weight: 500;">💰 Total Tuition Fee (Tổng học phí)</span>
-                                        <span class="info-box-number" style="font-size: 2.5em; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">{{ total_fee|floatformat:0 }} VNĐ</span>
+                                        <span class="info-box-number" style="font-size: 2.5em; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">{{ total_fee|floatformat:0|intcomma }} VNĐ</span>
                                     </div>
                                 </div>
                             </div>
@@ -52,8 +52,8 @@ My Tuition Fees
                                     <td>{{ detail.subject.subject_name }}</td>
                                     <td>{{ detail.subject.staff_id.first_name }} {{ detail.subject.staff_id.last_name }}</td>
                                     <td>{{ detail.credit_hours }}</td>
-                                    <td>{{ detail.fee_per_credit|floatformat:0 }} VNĐ</td>
-                                    <td><strong style="color: #28a745; font-size: 1.1em;">{{ detail.total_fee|floatformat:0 }} VNĐ</strong></td>
+                                    <td>{{ detail.fee_per_credit|floatformat:0|intcomma }} VNĐ</td>
+                                    <td><strong style="color: #28a745; font-size: 1.1em;">{{ detail.total_fee|floatformat:0|intcomma }} VNĐ</strong></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -62,7 +62,7 @@ My Tuition Fees
                                     <th colspan="2" style="font-size: 1.2em;">💰 TỔNG CỘNG</th>
                                     <th style="font-size: 1.1em;">{{ total_credits }}</th>
                                     <th>-</th>
-                                    <th><strong style="font-size: 1.3em; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">{{ total_fee|floatformat:0 }} VNĐ</strong></th>
+                                    <th><strong style="font-size: 1.3em; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">{{ total_fee|floatformat:0|intcomma }} VNĐ</strong></th>
                                 </tr>
                             </tfoot>
                         </table>
