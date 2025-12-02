@@ -31,6 +31,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Modern Theme CSS -->
   <link rel="stylesheet" href="{% static "custom/modern-theme.css" %}">
+  <style>
+    /* CRITICAL: Force all dropdown text to be visible - Override all other styles */
+    select.form-control,
+    select.form-control option,
+    .form-control select,
+    .form-control select option,
+    select,
+    select option {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+        font-weight: 600 !important;
+        font-size: 15px !important;
+        -webkit-text-fill-color: #000000 !important;
+        opacity: 1 !important;
+    }
+    /* Labels must be dark and visible */
+    label,
+    .form-group label {
+        color: #1a202c !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+  </style>
     {% block custom_css %}{% endblock custom_css %}
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
