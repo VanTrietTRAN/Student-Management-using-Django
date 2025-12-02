@@ -232,7 +232,36 @@ def student_view_result(request):
     try:
         student=Students.objects.get(admin=request.user.id)
         studentresult=StudentResult.objects.filter(student_id=student.id)
-        return render(request,"student_template/student_result.html",{"studentresult":studentresult})
+        
+        # Tính toán các chỉ số học tập
+        gpa = student.get_semester_gpa()
+        total_credits = student.get_total_credits()
+        passed_subjects = student.get_passed_subjects()
+        failed_subjects = student.get_failed_subjects()
+        classification = student.get_academic_classification()
+        
+        # Tính tổng điểm trung bình không trọng số (average của tất cả môn)
+        if studentresult.exists():
+            total_avg = sum([
+                result.subject_assignment_marks + result.subject_exam_marks 
+                for result in studentresult
+            ]) / studentresult.count()
+            total_avg = round(total_avg, 2)
+        else:
+            total_avg = 0
+        
+        context = {
+            "studentresult": studentresult,
+            "gpa": gpa,
+            "total_credits": total_credits,
+            "passed_subjects": passed_subjects,
+            "failed_subjects": failed_subjects,
+            "classification": classification,
+            "total_avg": total_avg,
+            "total_subjects": studentresult.count()
+        }
+        
+        return render(request,"student_template/student_result.html", context)
     except Exception as e:
         messages.error(request, f"Chưa có bảng điểm. Vui lòng liên hệ giảng viên hoặc admin.")
         return HttpResponseRedirect(reverse("student_home"))

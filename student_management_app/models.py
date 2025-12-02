@@ -85,6 +85,83 @@ class Students(models.Model):
     updated_at=models.DateTimeField(auto_now_add=True)
     fcm_token=models.TextField(default="")
     objects = models.Manager()
+    
+    def get_semester_gpa(self):
+        """Tính điểm trung bình học kỳ (GPA) theo thang điểm 4.0"""
+        results = StudentResult.objects.filter(student_id=self.id)
+        if not results.exists():
+            return 0.0
+        
+        total_grade_points = 0
+        total_credits = 0
+        
+        for result in results:
+            total_marks = result.subject_assignment_marks + result.subject_exam_marks
+            credit_hours = result.subject_id.credit_hours
+            
+            # Chuyển đổi điểm thành thang điểm 4.0
+            if total_marks >= 95:
+                grade_point = 4.0  # A+
+            elif total_marks >= 85:
+                grade_point = 4.0  # A
+            elif total_marks >= 70:
+                grade_point = 3.0  # B
+            elif total_marks >= 55:
+                grade_point = 2.0  # C
+            elif total_marks >= 40:
+                grade_point = 1.0  # D
+            else:
+                grade_point = 0.0  # F
+            
+            total_grade_points += grade_point * credit_hours
+            total_credits += credit_hours
+        
+        if total_credits == 0:
+            return 0.0
+        
+        return round(total_grade_points / total_credits, 2)
+    
+    def get_total_credits(self):
+        """Tính tổng số tín chỉ đã học"""
+        results = StudentResult.objects.filter(student_id=self.id)
+        total = sum([result.subject_id.credit_hours for result in results])
+        return total
+    
+    def get_passed_subjects(self):
+        """Đếm số môn đạt (điểm >= 40)"""
+        results = StudentResult.objects.filter(student_id=self.id)
+        passed = 0
+        for result in results:
+            total_marks = result.subject_assignment_marks + result.subject_exam_marks
+            if total_marks >= 40:
+                passed += 1
+        return passed
+    
+    def get_failed_subjects(self):
+        """Đếm số môn chưa đạt (điểm < 40)"""
+        results = StudentResult.objects.filter(student_id=self.id)
+        failed = 0
+        for result in results:
+            total_marks = result.subject_assignment_marks + result.subject_exam_marks
+            if total_marks < 40:
+                failed += 1
+        return failed
+    
+    def get_academic_classification(self):
+        """Xếp loại học lực dựa trên GPA"""
+        gpa = self.get_semester_gpa()
+        if gpa >= 3.6:
+            return "Xuất sắc"
+        elif gpa >= 3.2:
+            return "Giỏi"
+        elif gpa >= 2.5:
+            return "Khá"
+        elif gpa >= 2.0:
+            return "Trung bình"
+        elif gpa >= 1.0:
+            return "Yếu"
+        else:
+            return "Kém"
 
 class Attendance(models.Model):
     id=models.AutoField(primary_key=True)
