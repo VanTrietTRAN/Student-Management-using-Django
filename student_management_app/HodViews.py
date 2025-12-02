@@ -816,8 +816,8 @@ def admin_save_grades(request):
                     subject_id=subject
                 )
                 
-                result.subject_assignment_marks = weighted_assignment
-                result.subject_exam_marks = weighted_exam
+                result.subject_assignment_marks = round(weighted_assignment, 2)
+                result.subject_exam_marks = round(weighted_exam, 2)
                 result.save()
                 
                 success_count += 1
@@ -1064,7 +1064,7 @@ def admin_export_grades(request):
     
     for idx, result in enumerate(results, 1):
         student = result.student_id
-        total = result.subject_assignment_marks + result.subject_exam_marks
+        total = round(result.subject_assignment_marks + result.subject_exam_marks, 2)
         
         if total >= 85:
             letter = 'A'
@@ -1084,8 +1084,8 @@ def admin_export_grades(request):
             student.admin.email,
             subject.subject_name,
             f"{subject.staff_id.first_name} {subject.staff_id.last_name}",
-            f"{result.subject_assignment_marks:.1f}",
-            f"{result.subject_exam_marks:.1f}",
+            f"{result.subject_assignment_marks:.2f}",
+            f"{result.subject_exam_marks:.2f}",
             f"{total:.1f}",
             letter
         ])

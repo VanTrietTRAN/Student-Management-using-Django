@@ -25,8 +25,8 @@ class EditResultViewClass(View):
             student_obj = Students.objects.get(admin=student_admin_id)
             subject_obj = Subjects.objects.get(id=subject_id)
             result=StudentResult.objects.get(subject_id=subject_obj,student_id=student_obj)
-            result.subject_assignment_marks=assignment_marks
-            result.subject_exam_marks=exam_marks
+            result.subject_assignment_marks=round(assignment_marks, 2)
+            result.subject_exam_marks=round(exam_marks, 2)
             result.save()
             messages.success(request, "Successfully Updated Result")
             return HttpResponseRedirect(reverse("edit_student_result"))

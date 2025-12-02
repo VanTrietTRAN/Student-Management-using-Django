@@ -282,9 +282,9 @@ def staff_view_class_students(request, subject_id):
         # Lấy điểm của sinh viên (nếu có)
         try:
             result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
-            assignment_marks = result.subject_assignment_marks
-            exam_marks = result.subject_exam_marks
-            total_marks = assignment_marks + exam_marks if assignment_marks and exam_marks else None
+            assignment_marks = round(result.subject_assignment_marks, 2)
+            exam_marks = round(result.subject_exam_marks, 2)
+            total_marks = round(assignment_marks + exam_marks, 2) if assignment_marks and exam_marks else None
         except StudentResult.DoesNotExist:
             assignment_marks = None
             exam_marks = None
@@ -520,15 +520,15 @@ def export_subject_grades(request, subject_id):
         try:
             result = StudentResult.objects.get(student_id=student.id, subject_id=subject_id)
             # Điểm trong DB là sau khi nhân hệ số (0-40, 0-60)
-            assignment_marks_weighted = result.subject_assignment_marks if result.subject_assignment_marks else 0
-            exam_marks_weighted = result.subject_exam_marks if result.subject_exam_marks else 0
+            assignment_marks_weighted = round(result.subject_assignment_marks, 2) if result.subject_assignment_marks else 0
+            exam_marks_weighted = round(result.subject_exam_marks, 2) if result.subject_exam_marks else 0
             
             # Chuyển về điểm gốc (0-100)
-            assignment_marks_raw = round(assignment_marks_weighted / 0.4, 1) if assignment_marks_weighted else ''
-            exam_marks_raw = round(exam_marks_weighted / 0.6, 1) if exam_marks_weighted else ''
+            assignment_marks_raw = round(assignment_marks_weighted / 0.4, 2) if assignment_marks_weighted else ''
+            exam_marks_raw = round(exam_marks_weighted / 0.6, 2) if exam_marks_weighted else ''
             
             # Tổng điểm
-            total = assignment_marks_weighted + exam_marks_weighted
+            total = round(assignment_marks_weighted + exam_marks_weighted, 2)
             
             # Tính điểm chữ
             if total >= 95:
@@ -603,13 +603,13 @@ def save_student_result(request):
         check_exist=StudentResult.objects.filter(subject_id=subject_obj,student_id=student_obj).exists()
         if check_exist:
             result=StudentResult.objects.get(subject_id=subject_obj,student_id=student_obj)
-            result.subject_assignment_marks=assignment_marks
-            result.subject_exam_marks=exam_marks
+            result.subject_assignment_marks=round(assignment_marks, 2)
+            result.subject_exam_marks=round(exam_marks, 2)
             result.save()
             messages.success(request, "Successfully Updated Result")
             return HttpResponseRedirect(reverse("staff_add_result"))
         else:
-            result=StudentResult(student_id=student_obj,subject_id=subject_obj,subject_exam_marks=exam_marks,subject_assignment_marks=assignment_marks)
+            result=StudentResult(student_id=student_obj,subject_id=subject_obj,subject_exam_marks=round(exam_marks, 2),subject_assignment_marks=round(assignment_marks, 2))
             result.save()
             messages.success(request, "Successfully Added Result")
             return HttpResponseRedirect(reverse("staff_add_result"))
