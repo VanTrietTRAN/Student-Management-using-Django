@@ -46,9 +46,9 @@ def update_all_system_dates():
         schedules = Schedule.objects.all()
         updated_schedules = 0
         for schedule in schedules:
-            if schedule.session_year.session_start_year.year < 2025:
+            if schedule.session_year_id.session_start_year.year < 2025:
                 session_2025 = SessionYearModel.objects.first()
-                schedule.session_year = session_2025
+                schedule.session_year_id = session_2025
                 schedule.save()
                 updated_schedules += 1
         print(f"   ✅ Updated {updated_schedules} schedule(s)")
