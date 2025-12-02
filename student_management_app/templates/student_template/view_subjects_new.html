@@ -208,6 +208,22 @@ Môn Học Của Tôi
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* Force white text on card headers for better contrast */
+.card-header.bg-gradient-primary,
+.card-header.bg-gradient-primary .card-title,
+.card-header.bg-gradient-primary h5,
+.card-header.bg-gradient-primary i {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Available subjects header */
+.card-header.bg-light .card-title,
+.card-header.bg-light h5 {
+    color: #2d3748 !important;
+    font-weight: 600;
+}
+
 .nav-tabs .nav-link {
     border-radius: 10px 10px 0 0;
     font-weight: 600;
