@@ -517,39 +517,65 @@ body {
 }
 
 /* ==== FORM CONTROLS - DROPDOWN TEXT VISIBILITY ==== */
+/* Force visible text in all select dropdowns */
 select.form-control,
-.form-control select {
-    color: #1e293b !important;
-    font-weight: 500 !important;
-    font-size: 14px;
+.form-control.select,
+select {
+    color: #000000 !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    background-color: #ffffff !important;
 }
 
 select.form-control option,
-.form-control select option {
-    color: #1e293b !important;
+.form-control.select option,
+select option {
+    color: #000000 !important;
     background-color: #ffffff !important;
-    font-weight: 500 !important;
-    padding: 8px 12px;
+    font-weight: 600 !important;
+    padding: 10px 15px !important;
+    font-size: 15px !important;
 }
 
+/* First option (placeholder) - slightly lighter but still visible */
 select.form-control option:first-child,
-.form-control select option:first-child {
-    color: #64748b !important;
+.form-control.select option:first-child,
+select option:first-child {
+    color: #4a5568 !important;
     font-style: italic;
     font-weight: 600 !important;
 }
 
-/* Ensure disabled options are visible */
+/* Ensure disabled options are still visible */
 select.form-control option:disabled,
-.form-control select option:disabled {
-    color: #94a3b8 !important;
+.form-control.select option:disabled,
+select option:disabled {
+    color: #718096 !important;
+}
+
+/* Selected option must be clearly visible */
+select.form-control option:checked,
+.form-control.select option:checked,
+select option:checked {
+    background-color: #e6f3ff !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
 }
 
 /* Better focus state for dropdowns */
 select.form-control:focus,
-.form-control select:focus {
+.form-control.select:focus,
+select:focus {
     border-color: var(--primary-color) !important;
     box-shadow: 0 0 0 0.2rem rgba(91, 33, 182, 0.25) !important;
+    background-color: #ffffff !important;
+}
+
+/* Label text must be visible */
+label {
+    color: #2d3748 !important;
+    font-weight: 600 !important;
+    font-size: 14px;
 }
 
 /* ==== RESPONSIVE ==== */
