@@ -157,7 +157,7 @@ Môn Học Của Tôi
                                     </tr>
                                     <tr>
                                         <td><i class="fas fa-money-bill-wave text-danger"></i> <strong>Học phí:</strong></td>
-                                        <td><strong class="text-danger">{{ subject.get_total_fee|floatformat:0 }} VNĐ</strong></td>
+                                        <td><strong class="text-danger">{{ subject.get_total_fee|floatformat:0|intcomma }} VNĐ</strong></td>
                                     </tr>
                                 </table>
                                 
@@ -170,7 +170,7 @@ Môn Học Của Tôi
                                 </div>
                                 {% endif %}
                             </div>
-                            <div class="card-footer text-center">
+            <div class="card-footer text-center">
                                 <a href="{% url 'student_enroll_subject' subject.id %}" 
                                    class="btn btn-primary btn-block">
                                     <i class="fas fa-plus"></i> Đăng ký môn học
