@@ -39,13 +39,13 @@ Kết quả học tập
                                         </td>
                                         <td class="text-center">{{ row.subject_id.credit_hours }}</td>
                                         <td class="text-center">
-                                            <span class="badge badge-info">{{ row.subject_assignment_marks|floatformat:1 }}</span>
+                                            <span class="badge badge-info">{{ row.subject_assignment_marks|floatformat:2 }}</span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge badge-primary">{{ row.subject_exam_marks|floatformat:1 }}</span>
+                                            <span class="badge badge-primary">{{ row.subject_exam_marks|floatformat:2 }}</span>
                                         </td>
                                         <td class="text-center">
-                                            <strong style="font-size: 1.1em;">{{ total|floatformat:1 }}</strong>
+                                            <strong style="font-size: 1.1em;">{{ total|floatformat:2 }}</strong>
                                         </td>
                                         <td class="text-center">
                                             {% if total >= 95 %}

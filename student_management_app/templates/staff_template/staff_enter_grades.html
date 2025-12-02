@@ -121,7 +121,7 @@ Nhập điểm - {{ subject.subject_name }}
                                               <td class="text-center">
                                                   <small class="assignment-weighted" data-student="{{ student.id }}">
                                                       {% if student.assignment_marks_raw %}
-                                                      {{ student.assignment_marks_raw|floatformat:1 }}×0.4
+                                                      {{ student.assignment_marks_raw|floatformat:2 }}×0.4
                                                       {% else %}
                                                       -
                                                       {% endif %}
@@ -130,7 +130,7 @@ Nhập điểm - {{ subject.subject_name }}
                                               <td class="text-center">
                                                   <small class="exam-weighted" data-student="{{ student.id }}">
                                                       {% if student.exam_marks_raw %}
-                                                      {{ student.exam_marks_raw|floatformat:1 }}×0.6
+                                                      {{ student.exam_marks_raw|floatformat:2 }}×0.6
                                                       {% else %}
                                                       -
                                                       {% endif %}
@@ -139,7 +139,7 @@ Nhập điểm - {{ subject.subject_name }}
                                               <td class="text-center">
                                                   <strong class="total-marks" data-student="{{ student.id }}">
                                                       {% if student.assignment_marks and student.exam_marks %}
-                                                      {{ student.assignment_marks|add:student.exam_marks|floatformat:1 }}
+                                                      {{ student.assignment_marks|add:student.exam_marks|floatformat:2 }}
                                                       {% else %}
                                                       -
                                                       {% endif %}
