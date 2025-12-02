@@ -1,0 +1,204 @@
+================================================================================
+DANH SÁCH TÀI KHOẢN SINH VIÊN
+================================================================================
+
+Mật khẩu mặc định: admin
+
+================================================================================
+
+1. Nguyễn Văn An
+   Email: nguyenvanan@student.edu.vn
+   Username: nguyenvanan
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+2. Trần Thị Bình
+   Email: tranthibinh@student.edu.vn
+   Username: tranthibinh
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+3. Lê Hoàng Cường
+   Email: lehoangcuong@student.edu.vn
+   Username: lehoangcuong
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+4. Phạm Thị Dung
+   Email: phamthidung@student.edu.vn
+   Username: phamthidung
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+5. Hoàng Minh Đức
+   Email: hoangminhduc@student.edu.vn
+   Username: hoangminhduc
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+6. Vũ Thị Hà
+   Email: vuthiha@student.edu.vn
+   Username: vuthiha
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+7. Đặng Quốc Hùng
+   Email: dangquochung@student.edu.vn
+   Username: dangquochung
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+8. Ngô Thị Lan
+   Email: ngothilan@student.edu.vn
+   Username: ngothilan
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+9. Bùi Văn Long
+   Email: buivanlong@student.edu.vn
+   Username: buivanlong
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+10. Đỗ Thị Mai
+   Email: dothimai@student.edu.vn
+   Username: dothimai
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+11. Lương Anh Nam
+   Email: luonganhnam@student.edu.vn
+   Username: luonganhnam
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+12. Phan Thị Nga
+   Email: phanthinga@student.edu.vn
+   Username: phanthinga
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+13. Trịnh Văn Phong
+   Email: trinhvanphong@student.edu.vn
+   Username: trinhvanphong
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+14. Võ Thị Quỳnh
+   Email: vothiquynh@student.edu.vn
+   Username: vothiquynh
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+15. Đinh Minh Sơn
+   Email: dinhminhson@student.edu.vn
+   Username: dinhminhson
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+16. Lý Thị Trang
+   Email: lythitrang@student.edu.vn
+   Username: lythitrang
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+17. Mai Văn Tuấn
+   Email: maivantuan@student.edu.vn
+   Username: maivantuan
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+18. Hồ Thị Uyên
+   Email: hothiuyen@student.edu.vn
+   Username: hothiuyen
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+19. Dương Văn Vinh
+   Email: duongvanvinh@student.edu.vn
+   Username: duongvanvinh
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+20. Chu Thị Xuân
+   Email: chuthixuan@student.edu.vn
+   Username: chuthixuan
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+21. Số 21 Sinh Viên
+   Email: student21@student.edu.vn
+   Username: student21
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+22. Số 22 Sinh Viên
+   Email: student22@student.edu.vn
+   Username: student22
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+23. Số 23 Sinh Viên
+   Email: student23@student.edu.vn
+   Username: student23
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+24. Số 24 Sinh Viên
+   Email: student24@student.edu.vn
+   Username: student24
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+25. Số 25 Sinh Viên
+   Email: student25@student.edu.vn
+   Username: student25
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+26. Số 26 Sinh Viên
+   Email: student26@student.edu.vn
+   Username: student26
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+27. Số 27 Sinh Viên
+   Email: student27@student.edu.vn
+   Username: student27
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
+28. Số 28 Sinh Viên
+   Email: student28@student.edu.vn
+   Username: student28
+   Password: admin
+   Khóa học: Cử nhân Tin học Ứng dụng
+   Niên khóa: 2025-01-01 - 2026-12-31
+   ────────────────────────────────────────────────────────────────────────────
